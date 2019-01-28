@@ -17,12 +17,16 @@ import {IBLSystem} from "../systems/IBLSystem";
 import {CameraSystem} from "../systems/CameraSystem";
 import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
 import {PointLightComponent} from "../components/light/pointLightComponent";
+import {Shader} from "../model/shader";
+import {GLSLLoader} from "../loader/GLSLLoader";
+import {KhronosPbrShader} from "../shader/khronosPbrShader";
 
 export class Viewer {
     private cache:Cache;
     private canvas:Canvas;
     private loader: ResourceLoader;
     private gl: WebGL2RenderingContext;
+    private shader: Shader;
 
     constructor() {
         this.canvas = new Canvas({width:1280, height: 720});
@@ -44,13 +48,7 @@ export class Viewer {
         this.loader.addMiddleware(new CubemapLoader(gl), CubemapLoader);
         this.loader.addMiddleware(new TextureLoader(gl), TextureLoader);
         this.loader.addMiddleware(new GLTFLoader(gl, this.cache), GLTFLoader);
-
-        //Create Systems
-        ECS.systemUpdateMethods = ['update', 'render'];
-        ECS.addSystem(new CameraSystem({gl}));
-        ECS.addSystem(new LookAtCameraControlSystem({width: 1280, height: 720}));
-        ECS.addSystem(new IBLSystem({cache: this.cache}));
-        ECS.addSystem(new ForwardShadingSystem({gl, cache: this.cache}));
+        this.loader.addMiddleware(new GLSLLoader(gl), GLSLLoader);
 
         //Cache them all
         this.loader.onLoadComplete.on((data:MiddlewareData<any>) => {
@@ -127,6 +125,22 @@ export class Viewer {
         this.loader.get(GLTFLoader).add("bottle", "../assets/bottle/WaterBottle.gltf", "../assets/bottle/WaterBottle.bin");
     }
 
+    private loadShader() {
+        this.shader = new KhronosPbrShader(this.gl, this.cache);
+        this.loader.get(GLSLLoader).add("shader", "../assets/shader/pbr-vert.glsl", "../assets/shader/pbr-frag.glsl", this.shader);
+    }
+
+    loadScene() {
+        this.loadIBL();
+        this.loadModel();
+        this.loadShader();
+
+        this.loader.load(()=>{
+            console.log("finished loading ",this.cache);
+            this.onLoadFinished();
+        });
+    }
+
     private createModellEntity() {
         const entity = ECS.createEntity();
         entity.add(new ModelComponent({key: "bottle"}));
@@ -185,13 +199,13 @@ export class Viewer {
         this.cache.add(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.WHITE_CUBE, createWhiteCubemap(this.gl));
     }
 
-    loadScene() {
-        this.loadIBL();
-        this.loadModel();
-        this.loader.load(()=>{
-            console.log("finished loading ",this.cache);
-            this.onLoadFinished();
-        });
+    private createSystems() {
+        //Create Systems
+        ECS.systemUpdateMethods = ['update', 'render'];
+        ECS.addSystem(new CameraSystem({gl: this.gl}));
+        ECS.addSystem(new LookAtCameraControlSystem({width: 1280, height: 720}));
+        ECS.addSystem(new IBLSystem({cache: this.cache}));
+        ECS.addSystem(new ForwardShadingSystem({gl: this.gl, cache: this.cache, shader: this.shader}));
     }
 
     private onLoadFinished() {
@@ -200,10 +214,15 @@ export class Viewer {
         this.createEnvironmentEntity();
         this.createLightEntity();
         this.createModellEntity();
+        this.createSystems();
 
         console.log("ECS ",ECS["instance"]);
-        window.requestAnimationFrame(() => {
-           ECS.update();
-        });
+        this.update();
     }
+
+    update(){
+        ECS.update();
+        requestAnimationFrame(()=>{this.update()});
+    }
+
 }

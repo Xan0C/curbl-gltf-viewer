@@ -47,12 +47,17 @@ export class GLShader {
     protected _attributes:Attributes.AttributeMap;
     protected _uniforms:UniformAccessObject;
 
-    constructor(gl:WebGL2RenderingContext, vertexSrc:string, fragmentSrc:string){
+    constructor(gl: WebGL2RenderingContext){
         this.gl = gl;
+    }
+
+    public upload(vertexSrc:string, fragmentSrc:string): GLShader {
+        const gl = this.gl;
         this._program = ProgramCompiler.compile(gl,vertexSrc,fragmentSrc);
         this._attributes = Attributes.extract(gl,this._program);
         let uniformData = Uniforms.extract(gl,this._program);
         this._uniforms = Uniforms.generateUniformAccessObject(gl,uniformData,this._program);
+        return this;
     }
 
     public get program():WebGLProgram{

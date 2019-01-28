@@ -109,7 +109,7 @@ export class Model {
         for(let i=0, mesh:Primitive; mesh = this._meshes[i]; i++){
             view = this._buffer.views[mesh.indices.bufferView];
             offset = view.bufferOffset + mesh.indices.byteOffset;
-            shader.apply(cache.get<Material>(CACHE_TYPE.MATERIAL, mesh.material));
+            shader.applyMaterial(cache.get<Material>(CACHE_TYPE.MATERIAL, mesh.material));
             mesh.draw(mesh.draw_mode,mesh.indices.count,mesh.indices.type,offset);
         }
     }

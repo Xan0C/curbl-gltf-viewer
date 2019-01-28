@@ -3,7 +3,8 @@ import {IBaseCache} from "./caches";
 export enum CACHE_TYPE  {
     TEXTURE,
     MODEL,
-    MATERIAL
+    MATERIAL,
+    SHADER
 }
 
 /**

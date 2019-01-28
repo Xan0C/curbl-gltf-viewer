@@ -4,7 +4,7 @@ import {Cache} from "../cache";
 import {PointLightComponent} from "../components/light/pointLightComponent";
 import {Vector} from "../math";
 import {ForwardModelPass} from "./ForwardModelPass";
-import {KhronosPbrShader} from "../shader/khronosPbrShader";
+import {Shader} from "../model/shader";
 
 @ECS.System(PointLightComponent, TransformComponent)
 export class ForwardLightPass extends System {
@@ -12,13 +12,13 @@ export class ForwardLightPass extends System {
     private gl:WebGL2RenderingContext;
     private cache:Cache;
     private modelPass:ForwardModelPass;
-    private shader: KhronosPbrShader;
+    private shader: Shader;
 
-    constructor(config:{gl: WebGL2RenderingContext, cache: Cache}){
+    constructor(config:{gl: WebGL2RenderingContext, cache: Cache, shader: Shader}){
         super();
         this.gl = config.gl;
         this.cache = config.cache;
-        this.shader = new KhronosPbrShader(this.gl,this.cache);
+        this.shader = config.shader;
     }
 
     setUp():void{

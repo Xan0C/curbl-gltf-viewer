@@ -1,14 +1,18 @@
 import {GLShader} from "../gl/shader";
+import {Material} from "../material";
+import {Model} from "./model";
 
 export interface IShader extends Shader {
-    apply(...args):void;
+    applyMaterial(...args):void;
 }
 
 export class Shader extends GLShader implements IShader {
 
-    constructor(gl:WebGL2RenderingContext,vertexSrc:string,fragmentSrc:string){
-        super(gl,vertexSrc,fragmentSrc);
+    constructor(gl: WebGL2RenderingContext){
+        super(gl);
     }
 
-    apply(...args):void {}
+    applyMaterial(material:Material):void {}
+
+    applyModel(model:Model):void {}
 }

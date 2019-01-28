@@ -62,7 +62,7 @@ export class GLVertexArrayObject {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER,null);
         for(let i=0,attribute:IAttribute; attribute = this.attributes[i]; i++){
             if(lastBuffer !== attribute.buffer){
-                //unbind previous buffer we dont want to apply the attribute to both buffers
+                //unbind previous buffer we dont want to applyMaterial the attribute to both buffers
                 if(lastBuffer) {
                     lastBuffer.unbind();
                 }
