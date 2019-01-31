@@ -6,11 +6,34 @@
 layout (location = 0) out vec4 fragmentColor;
 
 in mat3 v_TBN;
-in vec2 v_Texcoord;
+in vec2 v_UV;
 in vec3 v_Position;
 in vec3 v_Normal;
 in vec3 v_ViewPos;
-in vec3 v_CubePos;
+
+uniform vec3 u_LightPosition;
+uniform vec3 u_LightColor;
+
+//IBL
+uniform samplerCube u_DiffuseEnvSampler;
+uniform samplerCube u_SpecularEnvSampler;
+uniform sampler2D u_brdfLUT;
+
+//BaseColorMap
+uniform sampler2D u_BaseColorSampler;
+//MetallicRoughnessMap
+uniform sampler2D u_MetallicRoughnessSampler;
+//OcclusionSampler
+//uniform sampler2D u_OcclusionSampler;
+
+uniform float u_MetallicFactor;
+uniform float u_RoughnessFactor;
+uniform vec4 u_BaseColorFactor;
+
+uniform vec3 u_EmissiveFactor;
+
+uniform sampler2D u_NormalSampler;
+uniform sampler2D u_EmissiveSampler;
 
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
@@ -38,29 +61,10 @@ uniform float u_HasTangents;
 uniform float u_HasNormals;
 uniform float u_HasNormalMap;
 
-uniform vec3 u_LightPosition;
-uniform vec3 u_LightColor;
-
-uniform vec4 u_BaseColorFactor;
-uniform float u_RoughnessFactor;
-uniform float u_MetallicFactor;
-uniform vec3 u_EmissiveFactor;
-
-
-//IBL
-uniform samplerCube u_DiffuseEnvSampler;
-uniform samplerCube u_SpecularEnvSampler;
-uniform sampler2D u_brdfLUT;
-
-uniform sampler2D u_BaseColorSampler;
-uniform sampler2D u_MetallicRoughnessSampler;
-uniform sampler2D u_NormalSampler;
-uniform sampler2D u_EmissiveSampler;
-//uniform sampler2D u_OcclusionSampler;
-
 vec4 SRGBtoLINEAR(vec4 srgbIn)
 {
     //vec3 linOut = pow(srgbIn.xyz,vec3(2.2));  //fast approx
+
     //vec3 bLess = step(vec3(0.04045),srgbIn.xyz);
     //vec3 linOut = mix( srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055),vec3(2.4)), bLess );
     //return vec4(linOut,srgbIn.w);
@@ -77,8 +81,8 @@ vec3 getNormal()
     //No tangents
     vec3 pos_dx = dFdx(v_Position);
     vec3 pos_dy = dFdy(v_Position);
-    vec3 tex_dx = dFdx(vec3(v_Texcoord, 0.0));
-    vec3 tex_dy = dFdy(vec3(v_Texcoord, 0.0));
+    vec3 tex_dx = dFdx(vec3(v_UV, 0.0));
+    vec3 tex_dy = dFdy(vec3(v_UV, 0.0));
     vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
 
     //calc normals if not provided
@@ -88,14 +92,13 @@ vec3 getNormal()
 
     //Calculate bitangent
     t = normalize(t - ng * dot(ng, t));
-    //t =  (t * (1.0 - u_HasTangents)) + (tbn[0].xyz * u_HasTangents);
-    vec3 b = normalize(cross(ng, t));
-    //tbn[1].xyz * u_HasTangents + normalize(cross(ng, t)) * (1.0 - u_HasTangents);
+    t = tbn[0].xyz * u_HasTangents + t * (1.0 - u_HasTangents);
+    vec3 b = tbn[1] * u_HasTangents + normalize(cross(ng, t)) * (1.0 - u_HasTangents);
 
     //if tangents are provided we use the given tbn matrix
     tbn = mat3(t, b, ng);
 
-    vec3 n = texture(u_NormalSampler, v_Texcoord).rgb;
+    vec3 n = texture(u_NormalSampler, v_UV).rgb;
     n = normalize(tbn * (2.0 * n - 1.0)) * u_HasNormalMap + normalize(tbn[2].xyz) * (1.0 - u_HasNormalMap);
 
     return n;
@@ -112,7 +115,7 @@ vec3 getIBLContribution(PBRInfo pbrInputs, vec3 n, vec3 reflection)
     vec3 brdf = SRGBtoLINEAR(texture(u_brdfLUT, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness))).rgb;
     vec3 diffuseLight = SRGBtoLINEAR(texture(u_DiffuseEnvSampler, n)).rgb;
 
-    vec3 specularLight = SRGBtoLINEAR(texture(u_SpecularEnvSampler, reflection,lod)).rgb;
+    vec3 specularLight = SRGBtoLINEAR(texture(u_SpecularEnvSampler, reflection, lod)).rgb;
 
     vec3 diffuse = diffuseLight * pbrInputs.diffuseColor;
     vec3 specular = specularLight * (pbrInputs.specularColor * brdf.x + brdf.y);
@@ -169,7 +172,7 @@ void main(){
 
     // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
     // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
-    vec4 mrSample = texture(u_MetallicRoughnessSampler, v_Texcoord);
+    vec4 mrSample = texture(u_MetallicRoughnessSampler, v_UV);
     perceptualRoughness = mrSample.g * perceptualRoughness;
     perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
 
@@ -180,7 +183,7 @@ void main(){
     // convert to material roughness by squaring the perceptual roughness [2].
     float alphaRoughness = perceptualRoughness * perceptualRoughness;
 
-    vec4 baseColor = SRGBtoLINEAR(texture(u_BaseColorSampler, v_Texcoord)) * u_BaseColorFactor;
+    vec4 baseColor = SRGBtoLINEAR(texture(u_BaseColorSampler, v_UV)) * u_BaseColorFactor;
 
     vec3 f0 = vec3(0.04);
     vec3 diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
@@ -198,7 +201,7 @@ void main(){
 
     vec3 n = getNormal();                             // normal at surface point
     vec3 v = normalize(v_ViewPos - v_Position);       // Vector from surface point to camera
-    vec3 l = normalize(u_LightPosition); // Vector from surface point to light
+    vec3 l = normalize(u_LightPosition - v_Position);              // Vector from surface point to light
     vec3 h = normalize(l+v);                          // Half vector between both l and v
     vec3 reflection = -normalize(reflect(v, n));
 
@@ -236,10 +239,10 @@ void main(){
 
     color += getIBLContribution(pbrInputs, n, reflection);
 
-    //float ao = texture(u_OcclusionSampler, v_Texcoord).r;
+    //float ao = texture(u_OcclusionSampler, v_UV).r;
     //color = mix(color, color * ao, 1.0);
 
-    vec3 emissive = SRGBtoLINEAR(texture(u_EmissiveSampler, v_Texcoord)).rgb * u_EmissiveFactor;
+    vec3 emissive = SRGBtoLINEAR(texture(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;
     color += emissive;
 
 
@@ -252,6 +255,6 @@ void main(){
     // uniform sampler2D u_NormalSampler;
     // uniform sampler2D u_EmissiveSampler;
     // //uniform sampler2D u_OcclusionSampler;
-
+    //color = specContrib;
     fragmentColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
 }

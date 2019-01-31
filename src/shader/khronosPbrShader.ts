@@ -101,6 +101,17 @@ export class KhronosPbrShader extends Shader {
 
         /*******************************IBL*************************************/
 
+        let brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BRDF_LUT);
+        if (brdfLUT) {
+            brdfLUT.bind(TEXTURES.BRDF_LUT);
+            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
+        } else {
+            brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
+            brdfLUT.bind(TEXTURES.BRDF_LUT);
+            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
+        }
+
+
         let diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.DIFFUSE_ENVIRONMENT);
         if(diffuseEnv){
             diffuseEnv.bind(TEXTURES.DIFFUSE_ENVIRONMENT);
@@ -111,25 +122,15 @@ export class KhronosPbrShader extends Shader {
             this.uniforms.u_DiffuseEnvSampler = TEXTURES.DIFFUSE_ENVIRONMENT;
         }
 
-        let specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.SPECULAR_ENVIRONMENT);
-        if(specularEnv){
-            specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
-            this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
-        }else{
-            specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK_CUBE);
-            specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
-            this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
-        }
-
-        let brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BRDF_LUT);
-        if (brdfLUT) {
-            brdfLUT.bind(TEXTURES.BRDF_LUT);
-            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
-        } else {
-            brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
-            brdfLUT.bind(TEXTURES.BRDF_LUT);
-            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
-        }
+        // let specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.SPECULAR_ENVIRONMENT);
+        // if(specularEnv){
+        //     specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
+        //     this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
+        // }else{
+        //     specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK_CUBE);
+        //     specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
+        //     this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
+        // }
     }
 
     private applyCamera():void{

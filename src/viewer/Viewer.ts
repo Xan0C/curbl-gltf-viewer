@@ -185,7 +185,7 @@ export class Viewer {
             color:{r:1,g:1,b:1}
         }));
         entity.add(new TransformComponent({
-            position:{x:0, y:5, z:5},
+            position:{x:0, y: 0.5, z: 0.5},
             rotation:{x:0, y:0, z: 0, w:1},
             scale:{x:1, y:1, z: 1}
         }));
