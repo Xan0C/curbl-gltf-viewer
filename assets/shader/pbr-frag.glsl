@@ -61,13 +61,14 @@ uniform float u_HasTangents;
 uniform float u_HasNormals;
 uniform float u_HasNormalMap;
 
+// not needed since textures are transformed to linear when created
 vec4 SRGBtoLINEAR(vec4 srgbIn)
 {
     //vec3 linOut = pow(srgbIn.xyz,vec3(2.2));  //fast approx
 
-    //vec3 bLess = step(vec3(0.04045),srgbIn.xyz);
-    //vec3 linOut = mix( srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055),vec3(2.4)), bLess );
-    //return vec4(linOut,srgbIn.w);
+//    vec3 bLess = step(vec3(0.04045),srgbIn.xyz);
+//    vec3 linOut = mix( srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055),vec3(2.4)), bLess );
+//    return vec4(linOut,srgbIn.w);
 
     return srgbIn;
 }
@@ -245,16 +246,5 @@ void main(){
     vec3 emissive = SRGBtoLINEAR(texture(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;
     color += emissive;
 
-
-    // uniform samplerCube u_DiffuseEnvSampler;
-    // uniform samplerCube u_SpecularEnvSampler;
-    // uniform sampler2D u_brdfLUT;
-    //
-    // uniform sampler2D u_BaseColorSampler;
-    // uniform sampler2D u_MetallicRoughnessSampler;
-    // uniform sampler2D u_NormalSampler;
-    // uniform sampler2D u_EmissiveSampler;
-    // //uniform sampler2D u_OcclusionSampler;
-    //color = specContrib;
     fragmentColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
 }

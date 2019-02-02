@@ -25,16 +25,18 @@ out mat3 v_TBN;
 
 //Davon ausgehend das erstmal alles da ist
 void main(){
-    v_Normal = a_Normal.xyz;
     v_Position = vec3(u_ModelMatrix * vec4(a_Position,1.0));
-    v_UV = a_Texcoord;
-    v_ViewPos = Camera.viewPos;
+    v_TBN = mat3(1.0);
+    v_Normal = normalize(vec3(u_ModelMatrix * vec4(a_Normal.xyz, 0.0)));
 
     mat3 normalMatrix = transpose(inverse(mat3(u_ModelMatrix)));
-    vec3 normalW = normalize(normalMatrix * a_Normal);
-    vec3 tangentW = normalize(vec3(u_ModelMatrix * vec4(a_Tangent.xyz, 0.0)));
-    vec3 bitangentW = cross(normalW, tangentW) * a_Tangent.w;
-    v_TBN = mat3(tangentW, bitangentW, normalW);
+    vec3 N = normalize(normalMatrix * a_Normal);
+    vec3 T = normalize(vec3(u_ModelMatrix * vec4(a_Tangent.xyz, 0.0)));
+    vec3 B = cross(N, T) * a_Tangent.w;
+    v_TBN = mat3(T,B,N);
+
+    v_UV = a_Texcoord;
+    v_ViewPos = Camera.viewPos;
 
     gl_Position = Camera.projectionMatrix * Camera.viewMatrix * u_ModelMatrix * vec4(a_Position,1.0);
 }

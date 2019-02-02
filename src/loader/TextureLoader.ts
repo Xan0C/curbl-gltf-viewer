@@ -29,7 +29,7 @@ export class TextureLoader extends Middleware<GLTexture> {
     }
 
     add(key:string, url:string, config:TextureLoaderConfig = {
-        id:1,
+        id:0,
         sampler: {
             wrapS: TEXTURE_WRAP.REPEAT,
             wrapT: TEXTURE_WRAP.REPEAT
