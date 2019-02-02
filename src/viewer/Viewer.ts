@@ -106,7 +106,7 @@ export class Viewer {
             type:GL_TYPES.UNSIGNED_BYTE
         });
 
-        this.loader.get(TextureLoader).add("brdfLut", "./assets/ibl/brdfLUT.png", {
+        this.loader.get(TextureLoader).add("brdfLUT", "./assets/ibl/brdfLUT.png", {
             id:TEXTURE_IDS.BRDF_LUT,
             premultiplyAlpha: false,
             internalFormat: GL_INTERNALFORMAT.SRGB8_ALPHA8,
