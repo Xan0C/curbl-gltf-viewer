@@ -52,7 +52,8 @@ export module MapType {
         'FLOAT_MAT3':  'mat3',
         'FLOAT_MAT4':  'mat4',
 
-        'SAMPLER_2D':  'sampler2D'
+        'SAMPLER_2D':  'sampler2D',
+        'SAMPLER_CUBE': 'samplerCube'
     };
     export function map(gl:WebGL2RenderingContext, type:number):string{
         if(!GL_TABLE){

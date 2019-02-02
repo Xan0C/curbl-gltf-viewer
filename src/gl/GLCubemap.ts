@@ -65,7 +65,7 @@ export class GLCubemap extends GLTexture {
         let gl = this.gl;
         gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this.premultiplyAlpha as any as GLint);
         gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, flip as any as GLint);
-        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, 0, this.internalformat, width, height, 0, this.format, this.type, data || null);
+        gl.texImage2D(gl.TEXTURE_CUBE_MAP_POSITIVE_X + face, level, this.internalformat, width, height, 0, this.format, this.type, data || null);
         if (level === 0) {
             this._width = width;
             this._height = height;

@@ -60,6 +60,7 @@ export module Uniforms {
         'mat4':     'uniformMatrix4fv(location, false, value)',
 
         'sampler2D':'uniform1i(location, value)',
+        'samplerCube':'uniform1i(location, value)',
 
         'ubo':'uniformBlockBinding(this.program, location, value)'
     };
@@ -82,7 +83,8 @@ export module Uniforms {
         'bvec3':    'uniform3iv(location, value)',
         'bvec4':    'uniform4iv(location, value)',
 
-        'sampler2D':'uniform1iv(location, value)'
+        'sampler2D':'uniform1iv(location, value)',
+        'samplerCube':'uniform1iv(location, value)'
     };
 
     export class Uniform{

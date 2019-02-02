@@ -39,6 +39,7 @@ export module  DefaultValue {
             case 'vec4':
                 return new Float32Array(4 * size);
             case 'int':
+            case 'samplerCube':
             case 'sampler2D':
                 return 0;
             case 'ivec2':
