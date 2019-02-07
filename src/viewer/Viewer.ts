@@ -12,7 +12,6 @@ import {ECS} from "curbl-ecs";
 import {CameraComponent, LookAtCameraComponent, ModelComponent, TransformComponent} from "../components";
 import {IBLComponent} from "../components/renderer/IBLComponent";
 import {createBlackCubemap, createBlackTexture, createWhiteCubemap, createWhiteTexture} from "./cacheDefaults";
-import {ForwardShadingSystem} from "../systems/ForwardShadingSystem";
 import {IBLSystem} from "../systems/IBLSystem";
 import {CameraSystem} from "../systems/CameraSystem";
 import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
@@ -20,6 +19,11 @@ import {PointLightComponent} from "../components/light/pointLightComponent";
 import {Shader} from "../model/shader";
 import {GLSLLoader} from "../loader/GLSLLoader";
 import {KhronosPbrShader} from "../shader/khronosPbrShader";
+//import {SkyboxPass} from "../systems/SkyboxPass";
+import {SkyboxComponent} from "../components/renderer/skyboxComponent";
+import {SkyboxShader} from "../shader/SkyboxShader";
+import {ForwardShadingSystem} from "../systems/ForwardShadingSystem";
+import {SkyboxPass} from "../systems/SkyboxPass";
 
 export class Viewer {
     private cache:Cache;
@@ -27,6 +31,7 @@ export class Viewer {
     private loader: ResourceLoader;
     private gl: WebGL2RenderingContext;
     private shader: Shader;
+    private skyboxShader: Shader;
 
     constructor() {
         this.canvas = new Canvas({width:1280, height: 720});
@@ -63,8 +68,8 @@ export class Viewer {
                 left:'./assets/ibl/environment/environment_left_0.jpg',
                 top:'./assets/ibl/environment/environment_top_0.jpg',
                 bottom:'./assets/ibl/environment/environment_bottom_0.jpg',
-                back:'./assets/ibl/environment/environment_back_0.jpg',
-                front:'./assets/ibl/environment/environment_front_0.jpg'
+                front:'./assets/ibl/environment/environment_front_0.jpg',
+                back:'./assets/ibl/environment/environment_back_0.jpg'
             }]
         );
 
@@ -74,8 +79,8 @@ export class Viewer {
                 left:'./assets/ibl/diffuse/diffuse_left_0.jpg',
                 top:'./assets/ibl/diffuse/diffuse_top_0.jpg',
                 bottom:'./assets/ibl/diffuse/diffuse_bottom_0.jpg',
-                back:'./assets/ibl/diffuse/diffuse_back_0.jpg',
-                front:'./assets/ibl/diffuse/diffuse_front_0.jpg'
+                front:'./assets/ibl/diffuse/diffuse_front_0.jpg',
+                back:'./assets/ibl/diffuse/diffuse_back_0.jpg'
             }],
             {
                 id:TEXTURE_IDS.DIFFUSE_ENVIRONMENT,
@@ -87,14 +92,14 @@ export class Viewer {
         );
 
         let specular_map = [];
-        for(let i=0; i < 1; i++){
+        for(let i=0; i < 10; i++){
             specular_map.push({
                 right:'./assets/ibl/specular/specular_right_'+i+'.jpg',
                 left:'./assets/ibl/specular/specular_left_'+i+'.jpg',
                 top:'./assets/ibl/specular/specular_top_'+i+'.jpg',
                 bottom:'./assets/ibl/specular/specular_bottom_'+i+'.jpg',
-                back:'./assets/ibl/specular/specular_back_'+i+'.jpg',
-                front:'./assets/ibl/specular/specular_front_'+i+'.jpg'
+                front:'./assets/ibl/specular/specular_front_'+i+'.jpg',
+                back:'./assets/ibl/specular/specular_back_'+i+'.jpg'
             });
         }
 
@@ -127,7 +132,9 @@ export class Viewer {
 
     private loadShader() {
         this.shader = new KhronosPbrShader(this.gl, this.cache);
+        this.skyboxShader = new SkyboxShader(this.gl, this.cache);
         this.loader.get(GLSLLoader).add("shader", "../assets/shader/pbr-vert.glsl", "../assets/shader/pbr-frag.glsl", this.shader);
+        this.loader.get(GLSLLoader).add("skyboxShader", "../assets/shader/skybox-vert.glsl", "../assets/shader/skybox-frag.glsl", this.skyboxShader);
     }
 
     loadScene() {
@@ -159,6 +166,7 @@ export class Viewer {
             specularEnvironment: "specular_map",
             brdfLUT: "brdfLUT"
         }));
+        entity.add(new SkyboxComponent({texture: "skybox"}));
         ECS.addEntity(entity);
     }
 
@@ -166,7 +174,7 @@ export class Viewer {
         const entity = ECS.createEntity();
         entity.add(new CameraComponent());
         entity.add(new TransformComponent({
-            position: {x:0,y:0,z:0.25},
+            position: {x:0,y:0,z:-1.0},
             rotation: {x:0,y:0,z:0,w:1},
             scale: {x:1,y:1,z:1}
         }));
@@ -185,8 +193,8 @@ export class Viewer {
             color:{r:1,g:1,b:1}
         }));
         entity.add(new TransformComponent({
-            position:{x:0, y: 0.5, z: 0.5},
-            rotation:{x:0, y:0, z: 0, w:1},
+            position:{x:0, y: 3, z: 15},
+            rotation:{x:0, y:2, z: 1, w:1},
             scale:{x:1, y:1, z: 1}
         }));
         ECS.addEntity(entity);
@@ -205,6 +213,7 @@ export class Viewer {
         ECS.addSystem(new CameraSystem({gl: this.gl}));
         ECS.addSystem(new LookAtCameraControlSystem({width: 1280, height: 720}));
         ECS.addSystem(new IBLSystem({cache: this.cache}));
+        ECS.addSystem(new SkyboxPass({gl: this.gl, cache: this.cache, shader: this.skyboxShader}));
         ECS.addSystem(new ForwardShadingSystem({gl: this.gl, cache: this.cache, shader: this.shader}));
     }
 

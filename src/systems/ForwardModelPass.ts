@@ -5,6 +5,7 @@ import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
 import {Model} from "../model";
 import {GL_PRIMITIVES} from "../gl/constants";
 import {Shader} from "../model/shader";
+import {Matrix} from "../math";
 // import {GLBuffer} from "../gl";
 
 @ECS.System(ModelComponent,TransformComponent)
@@ -53,7 +54,6 @@ export class ForwardModelPass extends System {
     }
 
     draw():void{
-
         for(let i=0, entity:IEntity; entity = this.entities[i]; i++) {
             this.drawModel(entity);
         }
@@ -62,8 +62,12 @@ export class ForwardModelPass extends System {
     private drawModel(entity:IEntity):void {
         const key = entity.get(ModelComponent).key;
         const model = this.cache.get<Model>(CACHE_TYPE.MODEL,key);
-        this.shader.uniforms.u_ModelMatrix = entity.get(TransformComponent).modelMatrix.elements;
-        this.shader.applyModel(model);
+
+        const modelTransform = model.transform.globalMatrix;
+        const transformComponent =  entity.get(TransformComponent).modelMatrix;
+        this.shader.uniforms.u_ModelMatrix = Matrix.multiply(transformComponent, modelTransform).elements;
+
+        this.shader.apply(model);
         model.draw(this.shader,this.cache);
     }
 

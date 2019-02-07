@@ -103,7 +103,7 @@ export class Model {
      * @param {Shader} shader - Shader that should be used for all meshes/Materials
      * @param {Cache} cache - cache to get the materials
      */
-    public draw(shader: Shader, cache: Cache):void{
+    public draw(shader: Shader, cache: Cache):void {
         let offset = 0;
         let view:BufferView;
         for(let i=0, mesh:Primitive; mesh = this._meshes[i]; i++){

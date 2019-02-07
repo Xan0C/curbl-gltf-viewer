@@ -5,8 +5,8 @@ export class GLCubemap extends GLTexture {
     public static readonly LEFT_FACE: number = 1;
     public static readonly TOP_FACE: number = 2;
     public static readonly BOTTOM_FACE: number = 3;
-    public static readonly BACK_FACE: number = 4;
-    public static readonly FRONT_FACE: number = 5;
+    public static readonly FRONT_FACE: number = 4;
+    public static readonly BACK_FACE: number = 5;
 
     protected gl: WebGL2RenderingContext;
     protected _textureID: number;
@@ -195,15 +195,6 @@ export class GLCubemap extends GLTexture {
         return this._height;
     }
 
-    public uploadLevel(source: Array<HTMLImageElement | ImageData> | HTMLImageElement | ImageData, level: number,
-                       flip: boolean = false): void
-    {
-        const sources = [].concat(source);
-        for (let i = 0, source; source = sources[i]; i++) {
-            this.upload(source, flip, i, level);
-        }
-    }
-
     /**
      * create CubeMap from source data
      * @param gl
@@ -223,8 +214,11 @@ export class GLCubemap extends GLTexture {
         const cubemap = new GLCubemap(gl, textureID, null, null, internalformat, format, type);
         const sources = [].concat(source);
         cubemap.premultiplyAlpha = premultiplyAlpha;
-        for (let i = 0, source; source = sources[i]; i++) {
-            cubemap.upload(source, flip, i, 0);
+        const mipLevels = Math.floor(sources.length/6);
+        for(let j=0; j < mipLevels; j++) {
+            for (let i = 0; i < 6; i++) {
+                cubemap.upload(sources[(j*6)+i], flip, i, j);
+            }
         }
         if (GLTexture.isPowerOf2(source[0].width) && GLTexture.isPowerOf2(source[0].height)) {
             cubemap.enableMipmap();

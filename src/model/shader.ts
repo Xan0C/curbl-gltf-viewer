@@ -1,6 +1,5 @@
 import {GLShader} from "../gl/shader";
 import {Material} from "../material";
-import {Model} from "./model";
 
 export interface IShader extends Shader {
     applyMaterial(...args):void;
@@ -13,6 +12,5 @@ export class Shader extends GLShader implements IShader {
     }
 
     applyMaterial(material:Material):void {}
-
-    applyModel(model:Model):void {}
+    apply(...args):void {}
 }

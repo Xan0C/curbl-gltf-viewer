@@ -29,7 +29,7 @@ export class KhronosPbrShader extends Shader {
         this.cache = cache;
     }
 
-    public applyModel(model:Model):void {
+    public apply(model:Model):void {
         if(model.hasAttribute(GL_PRIMITIVES.TANGENT)){
             this.uniforms.u_HasTangents = 1.0;
         }else {

@@ -138,7 +138,7 @@ export class GLTF_Parser {
      */
     private processNode(model:Model, node:IGLTF_Node, parent?: Transform):void{
         this.parseMesh(model,node.mesh);
-        const transform = this.parseTransform(model,node);
+        const transform = this.parseTransform(model,node, parent);
 
         node.children = node.children||[];
         for(let i=0,child:number; i < node.children.length ;i++){

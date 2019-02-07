@@ -100,7 +100,8 @@ vec3 getNormal()
     tbn = mat3(t, b, ng);
 
     vec3 n = texture(u_NormalSampler, v_UV).rgb;
-    n = normalize(tbn * (2.0 * n - 1.0)) * u_HasNormalMap + normalize(tbn[2].xyz) * (1.0 - u_HasNormalMap);
+    //TODO: normal scale
+    n = normalize(tbn * ((2.0 * n - 1.0) * vec3(0.5, 0.5, 1.0))) * u_HasNormalMap + normalize(tbn[2].xyz) * (1.0 - u_HasNormalMap);
 
     return n;
 }
@@ -245,6 +246,8 @@ void main(){
 
     vec3 emissive = SRGBtoLINEAR(texture(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;
     color += emissive;
+
+    //color = getIBLContribution(pbrInputs, n, reflection);
 
     fragmentColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
 }

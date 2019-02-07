@@ -78,11 +78,9 @@ export class TransformComponent implements IComponent {
 
     private apply():Matrix{
         if(this._dirty) {
-            Matrix.setTranslate(this._translation, this._localMatrix);
-            this._localMatrix.rotate(this._rotation.z, {x: 0, y: 0, z: 1});
-            this._localMatrix.rotate(this._rotation.y, {x: 0, y: 1, z: 0});
-            this._localMatrix.rotate(this._rotation.x, {x: 1, y: 0, z: 0});
-            this._localMatrix.scale(this._scale);
+            Matrix.setScale(this._scale, this._localMatrix);
+            //TODO: set rotation by quaternion
+            this._localMatrix.translate(this._translation);
             this._dirty = false;
         }
         return this._localMatrix;

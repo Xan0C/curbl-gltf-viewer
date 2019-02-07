@@ -10,8 +10,8 @@ export enum CUBEMAP_FACE {
     LEFT,
     TOP,
     BOTTOM,
-    BACK,
-    FRONT
+    FRONT,
+    BACK
 }
 
 export class CubemapLoader extends Middleware<GLCubemap> {
@@ -54,7 +54,7 @@ export class CubemapLoader extends Middleware<GLCubemap> {
 
         const data = GLCubemap.cubemapFromSource(
             this.gl,
-            images.slice(0,6),
+            images,
             textureConfig.flipY,
             textureConfig.premultiplyAlpha,
             textureConfig.id,
@@ -102,10 +102,6 @@ export class CubemapLoader extends Middleware<GLCubemap> {
             }else{
                 data.setWrapT(TEXTURE_WRAP.REPEAT);
             }
-        }
-
-        for(let i=6; i < images.length; i+=6) {
-            data.uploadLevel(images.slice(6,i+6), i/6);
         }
 
         return data;
