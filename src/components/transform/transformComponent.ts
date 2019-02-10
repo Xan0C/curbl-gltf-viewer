@@ -52,7 +52,7 @@ export class TransformComponent implements IComponent {
         this._scale = new Vector(config.scale.x,config.scale.y,config.scale.z);
         this._children = [];
         this._level = 0;
-        this._dirty = false;
+        this._dirty = true;
         this.apply();
     }
 

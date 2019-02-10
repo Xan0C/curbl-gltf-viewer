@@ -31,13 +31,13 @@ export class KhronosPbrShader extends Shader {
 
     public apply(model:Model):void {
         if(model.hasAttribute(GL_PRIMITIVES.TANGENT)){
-            this.uniforms.u_HasTangents = 1.0;
+           // this.uniforms.u_HasTangents = 1.0;
         }else {
             this.uniforms.u_HasTangents = 0.0;
         }
 
         if(model.hasAttribute(GL_PRIMITIVES.NORMAL)){
-            this.uniforms.u_HasNormals = 1.0;
+            //this.uniforms.u_HasNormals = 1.0;
         }else {
             this.uniforms.u_HasNormals = 0.0;
         }
@@ -80,7 +80,7 @@ export class KhronosPbrShader extends Shader {
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.NORMAL].texture);
             texture.bind(TEXTURES.NORMAL);
             this.uniforms.u_NormalSampler = TEXTURES.NORMAL;
-            this.uniforms.u_HasNormalMap = 1.0;
+            this.uniforms.u_HasNormalMap = 0.0;
         } else {
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
             texture.bind(TEXTURES.NORMAL);

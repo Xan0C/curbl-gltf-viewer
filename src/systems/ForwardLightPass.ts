@@ -35,19 +35,19 @@ export class ForwardLightPass extends System {
      * @param depthBuffer
      * @param color
      */
-    // private clearContext(colorBuffer:boolean=true,depthBuffer:boolean=false,color:{r:number,g:number,b:number,a:number}={r:0,g:0,b:0,a:1}){
-    //     this.gl.clearColor(color.r,color.g,color.b,color.a);
-    //     if(colorBuffer && depthBuffer){
-    //         this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
-    //     }else if(colorBuffer){
-    //         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
-    //     }else if(depthBuffer){
-    //         this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
-    //     }
-    // }
+    private clearContext(colorBuffer:boolean=true,depthBuffer:boolean=false,color:{r:number,g:number,b:number,a:number}={r:0,g:0,b:0,a:1}){
+        this.gl.clearColor(color.r,color.g,color.b,color.a);
+        if(colorBuffer && depthBuffer){
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT | this.gl.STENCIL_BUFFER_BIT);
+        }else if(colorBuffer){
+            this.gl.clear(this.gl.COLOR_BUFFER_BIT);
+        }else if(depthBuffer){
+            this.gl.clear(this.gl.DEPTH_BUFFER_BIT);
+        }
+    }
 
     render():void {
-        //this.clearContext(true,true,{r:0.2,g:0.2,b:0.2,a:1});
+        this.clearContext(true,true,{r:0.2,g:0.2,b:0.2,a:1});
 
         this.gl.enable(this.gl.CULL_FACE);
         this.gl.enable(this.gl.DEPTH_TEST);

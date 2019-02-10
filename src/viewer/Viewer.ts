@@ -23,7 +23,6 @@ import {KhronosPbrShader} from "../shader/khronosPbrShader";
 import {SkyboxComponent} from "../components/renderer/skyboxComponent";
 import {SkyboxShader} from "../shader/SkyboxShader";
 import {ForwardShadingSystem} from "../systems/ForwardShadingSystem";
-import {SkyboxPass} from "../systems/SkyboxPass";
 
 export class Viewer {
     private cache:Cache;
@@ -174,7 +173,7 @@ export class Viewer {
         const entity = ECS.createEntity();
         entity.add(new CameraComponent());
         entity.add(new TransformComponent({
-            position: {x:0,y:0,z:-1.0},
+            position: {x:0,y:0,z:-1.00},
             rotation: {x:0,y:0,z:0,w:1},
             scale: {x:1,y:1,z:1}
         }));
@@ -213,7 +212,7 @@ export class Viewer {
         ECS.addSystem(new CameraSystem({gl: this.gl}));
         ECS.addSystem(new LookAtCameraControlSystem({width: 1280, height: 720}));
         ECS.addSystem(new IBLSystem({cache: this.cache}));
-        ECS.addSystem(new SkyboxPass({gl: this.gl, cache: this.cache, shader: this.skyboxShader}));
+        //ECS.addSystem(new SkyboxPass({gl: this.gl, cache: this.cache, shader: this.skyboxShader}));
         ECS.addSystem(new ForwardShadingSystem({gl: this.gl, cache: this.cache, shader: this.shader}));
     }
 

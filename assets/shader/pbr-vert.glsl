@@ -27,6 +27,7 @@ out mat3 v_TBN;
 void main(){
     v_Position = vec3(u_ModelMatrix * vec4(a_Position,1.0));
     v_TBN = mat3(1.0);
+
     v_Normal = normalize(vec3(u_ModelMatrix * vec4(a_Normal.xyz, 0.0)));
 
     mat3 normalMatrix = transpose(inverse(mat3(u_ModelMatrix)));

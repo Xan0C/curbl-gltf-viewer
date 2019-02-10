@@ -79,29 +79,33 @@ vec3 getNormal()
 {
     mat3 tbn = v_TBN;
 
-    //No tangents
-    vec3 pos_dx = dFdx(v_Position);
-    vec3 pos_dy = dFdy(v_Position);
-    vec3 tex_dx = dFdx(vec3(v_UV, 0.0));
-    vec3 tex_dy = dFdy(vec3(v_UV, 0.0));
-    vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
-
-    //calc normals if not provided
-    vec3 ng = normalize(v_Normal) * u_HasNormals + cross(pos_dx, pos_dy) * (1.0 - u_HasNormals);
-    //calc N vector of TBN Matrix if no tangents
-    ng = tbn[2].xyz * u_HasTangents + ng * (1.0 - u_HasTangents);
-
-    //Calculate bitangent
-    t = normalize(t - ng * dot(ng, t));
-    t = tbn[0].xyz * u_HasTangents + t * (1.0 - u_HasTangents);
-    vec3 b = tbn[1] * u_HasTangents + normalize(cross(ng, t)) * (1.0 - u_HasTangents);
-
-    //if tangents are provided we use the given tbn matrix
-    tbn = mat3(t, b, ng);
-
+//    //No tangents
+//    vec3 pos_dx = dFdx(v_Position);
+//    vec3 pos_dy = dFdy(v_Position);
+//    vec3 tex_dx = dFdx(vec3(v_UV, 0.0));
+//    vec3 tex_dy = dFdy(vec3(v_UV, 0.0));
+//    vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
+//
+//    //calc normals if not provided
+//    vec3 ng = normalize(v_Normal) * u_HasNormals + cross(pos_dx, pos_dy) * (1.0 - u_HasNormals);
+//    ng = cross(pos_dx, pos_dy);
+//    //calc N vector of TBN Matrix if no tangents
+//    //ng = tbn[2].xyz * u_HasTangents + ng * (1.0 - u_HasTangents);
+//
+//    //Calculate bitangent
+//    t = normalize(t - ng * dot(ng, t));
+//    //t = tbn[0].xyz * u_HasTangents + t * (1.0 - u_HasTangents);
+//    vec3 b = tbn[1] * u_HasTangents + normalize(cross(ng, t)) * (1.0 - u_HasTangents);
+//    b = normalize(cross(ng, t));
+//
+//    //if tangents are provided we use the given tbn matrix
+//    tbn = mat3(t, b, ng);
+//    tbn = v_TBN;
+    //TODO fix without tangents etc.
     vec3 n = texture(u_NormalSampler, v_UV).rgb;
     //TODO: normal scale
     n = normalize(tbn * ((2.0 * n - 1.0) * vec3(0.5, 0.5, 1.0))) * u_HasNormalMap + normalize(tbn[2].xyz) * (1.0 - u_HasNormalMap);
+    n = normalize(tbn * ((2.0 * n - 1.0) * vec3(0.5, 0.5, 1.0)));
 
     return n;
 }
