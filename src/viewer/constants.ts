@@ -1,19 +1,12 @@
 export const TEXTURE_IDS = {
-    ENVIRONMENT:0,
-    POSITION: 1,
-    NORMAL:2,
-    DIFFUSE:3,
-    ALBEDO: 3,
-    SPECULAR:4,
-    METAL_ROUGHNESS: 4,
-    EMISSIVE:5,
-    DEPTH:6,
-    SHADOW_MAP:7,
-    SSAONOISE:8,
-    SSAO:9,
-    DIFFUSE_ENVIRONMENT:10,
-    SPECULAR_ENVIRONMENT:11,
-    BRDF_LUT:12
+    DIFFUSE_ENVIRONMENT: 0,
+    SPECULAR_ENVIRONMENT: 1,
+    BRDF_LUT: 2,
+    DIFFUSE: 3,
+    METALLIC_ROUGHNESS: 4,
+    NORMAL: 5,
+    EMISSIVE: 6,
+    OCCLUSION: 7
 };
 
 export const CACHED_TEXTURES = {
@@ -37,11 +30,6 @@ export const CACHED_TEXTURES = {
     SSAO_NOISE:'__SSAONoise__',
     SKYBOX:'__skybox__'
 };
-
-export enum RENDER_MODE {
-    PBR=0,
-    LEGACY=1
-}
 
 export enum UBO_BINDINGS {
     CAMERA = 0

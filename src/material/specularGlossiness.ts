@@ -2,6 +2,8 @@ import {Color, Vector} from "../math";
 
 export class SpecularGlossiness {
     private _specularExponent:number;
+    private _normalScale:number;
+    private _occlusionStrength:number;
     private _diffuseColor:Color;
     private _specularColor:Color;
     private _ambientColor:Color;
@@ -12,6 +14,7 @@ export class SpecularGlossiness {
         this._ambientColor = ka;
         this._specularColor = ks;
         this._diffuseColor = kd;
+        this._occlusionStrength = 1;
         this._emissiveFactor = new Vector(0,0,0);
     }
 
@@ -53,5 +56,21 @@ export class SpecularGlossiness {
 
     public set emissiveFactor(value:Vector) {
         this._emissiveFactor = value;
+    }
+
+    get normalScale(): number {
+        return this._normalScale;
+    }
+
+    set normalScale(value: number) {
+        this._normalScale = value;
+    }
+
+    get occlusionStrength(): number {
+        return this._occlusionStrength;
+    }
+
+    set occlusionStrength(value: number) {
+        this._occlusionStrength = value;
     }
 }

@@ -64,7 +64,6 @@ export class ForwardModelPass extends System {
         const model = this.cache.get<Model>(CACHE_TYPE.MODEL,key);
 
         const modelTransform = model.transform.modelMatrix;
-        console.log(model.transform);
         const transformComponent =  entity.get(TransformComponent).modelMatrix;
         this.shader.uniforms.u_ModelMatrix = Matrix.multiply(transformComponent, modelTransform).elements;
 

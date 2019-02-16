@@ -19,7 +19,6 @@ import {PointLightComponent} from "../components/light/pointLightComponent";
 import {Shader} from "../model/shader";
 import {GLSLLoader} from "../loader/GLSLLoader";
 import {KhronosPbrShader} from "../shader/khronosPbrShader";
-//import {SkyboxPass} from "../systems/SkyboxPass";
 import {SkyboxComponent} from "../components/renderer/skyboxComponent";
 import {SkyboxShader} from "../shader/SkyboxShader";
 import {ForwardShadingSystem} from "../systems/ForwardShadingSystem";

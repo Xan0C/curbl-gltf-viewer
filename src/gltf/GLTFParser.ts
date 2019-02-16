@@ -6,9 +6,9 @@ import {
     IGLTF_Model,
     IGLTF_Node,
     IGLTF_Primitive,
-    IGLTF_Scene, IPBRSpecularGlossiness
+    IGLTF_Scene
 } from "./model";
-import {Matrix, Vector, Quaternion, Color} from "../math";
+import {Matrix, Vector, Quaternion} from "../math";
 import {GL_BUFFERS, TEXTURE_WRAP} from "../gl/constants";
 import {TextureLoader, TextureLoaderConfig} from "../loader/TextureLoader";
 import {BufferView, Model, Primitive} from "../model";
@@ -304,11 +304,9 @@ export class GLTF_Parser {
             materialNode.name = materialNode.name||ECS.uuid();
             let material:Material<SpecularGlossiness>|Material<MetallicRoughness>;
 
-            //TODO: Change defaul to pbr if implemented
             if(materialNode.extensions && materialNode.extensions.KHR_materials_pbrSpecularGlossiness) {
-                material = new Material<SpecularGlossiness>(materialNode.name);
-                this.parseSpecularMaterial(materialNode,material as Material<SpecularGlossiness>);
-            }else {
+                throw "specular glossiness model is not supported";
+            } else {
                 material = new Material<MetallicRoughness>(materialNode.name);
                 this.parsePBRMaterial(materialNode,material as Material<MetallicRoughness>);
             }
@@ -335,6 +333,7 @@ export class GLTF_Parser {
             }
 
             if(materialNode.normalTexture){
+                material.model.normalScale = materialNode.normalTexture.scale||1;
                 this.parseTexture(material,materialNode.normalTexture.index,MATERIAL_MAPS.NORMAL,{
                     id:TEXTURE_IDS.NORMAL,
                     premultiplyAlpha: false,
@@ -345,7 +344,7 @@ export class GLTF_Parser {
             }
 
             //We use SSAO instead
-            /*if(materialNode.occlusionTexture){
+            if(materialNode.occlusionTexture){
                 material.model.occlusionStrength = materialNode.occlusionTexture.strength||1;
                 this.parseTexture(material,materialNode.occlusionTexture.index,MATERIAL_MAPS.OCCLUSION,{
                     id:TEXTURE_IDS.OCCLUSION,
@@ -354,61 +353,15 @@ export class GLTF_Parser {
                     format:this.gl.RGBA,
                     type:this.gl.UNSIGNED_BYTE,
                 });
-            }*/
+            }
             return material;
         }
         throw "Could not parse material for gltf model";
     }
 
-    private parseSpecularMaterial(materialNode:IGLTF_Material,material:Material):void{
-        if(!materialNode.extensions || !materialNode.extensions.KHR_materials_pbrSpecularGlossiness){
-            return;
-        }
-        material.type = MATERIAL_TYPES.SPEC;
-        if(!material.model){
-            material.model = new SpecularGlossiness();
-        }
-        const specular = materialNode.extensions.KHR_materials_pbrSpecularGlossiness as IPBRSpecularGlossiness;
-        //SpecularColor
-        specular.specularFactor = specular.specularFactor||[1,1,1];
-        material.model.specularColor = new Color(specular.specularFactor[0],specular.specularFactor[1],specular.specularFactor[2]);
-        //DiffuseColor
-        specular.diffuseFactor = specular.diffuseFactor||[1,1,1,1];
-        material.model.diffuseColor = new Color(specular.diffuseFactor[0],specular.diffuseFactor[1],specular.diffuseFactor[2],specular.diffuseFactor[3]);
-        //SpecularExponent/GlossinesFactor
-        if(specular.glossinessFactor === undefined || specular.glossinessFactor === null){
-            specular.glossinessFactor = 1;
-        }
-        material.model.specularExponent = specular.glossinessFactor;
-        //DiffuseTexture
-        if(specular.diffuseTexture !== undefined && specular.diffuseTexture !== null) {
-            this.parseTexture(material,specular.diffuseTexture.index,MATERIAL_MAPS.ALBEDO,{
-                id:TEXTURE_IDS.DIFFUSE,
-                premultiplyAlpha: false,
-                internalFormat: this.gl.SRGB8_ALPHA8,
-                format:this.gl.RGBA,
-                type:this.gl.UNSIGNED_BYTE,
-            });
-        }
-        //Specular Texture
-        if(specular.specularGlossinessTexture !== undefined && specular.specularGlossinessTexture !== null){
-            this.parseTexture(material,specular.specularGlossinessTexture.index,MATERIAL_MAPS.SPECULAR,{
-                id:TEXTURE_IDS.SPECULAR,
-                premultiplyAlpha: false,
-                internalFormat: this.gl.RGBA,
-                format:this.gl.RGBA,
-                type:this.gl.UNSIGNED_BYTE
-            });
-        }
-    }
-
-    //TODO
     private parsePBRMaterial(materialNode:IGLTF_Material,material:Material<MetallicRoughness>):void{
-        //materialNode.name = "__default__";
-
         const pbr = materialNode.pbrMetallicRoughness;
         material.type = MATERIAL_TYPES.PBR;
-
 
         if(!material.model){
             material.model = new MetallicRoughness();
@@ -449,7 +402,7 @@ export class GLTF_Parser {
         //Metallic Roughness Texture
         if(pbr.metallicRoughnessTexture !== undefined && pbr.metallicRoughnessTexture !== null) {
             this.parseTexture(material,pbr.metallicRoughnessTexture.index,MATERIAL_MAPS.METAL_ROUGHNESS,{
-                id:TEXTURE_IDS.METAL_ROUGHNESS,
+                id:TEXTURE_IDS.METALLIC_ROUGHNESS,
                 premultiplyAlpha: false,
                 internalFormat: this.gl.RGBA,
                 format:this.gl.RGBA,

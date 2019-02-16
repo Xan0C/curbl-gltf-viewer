@@ -24,13 +24,15 @@ uniform sampler2D u_BaseColorSampler;
 //MetallicRoughnessMap
 uniform sampler2D u_MetallicRoughnessSampler;
 //OcclusionSampler
-//uniform sampler2D u_OcclusionSampler;
+uniform sampler2D u_OcclusionSampler;
 
 uniform float u_MetallicFactor;
 uniform float u_RoughnessFactor;
 uniform vec4 u_BaseColorFactor;
 
 uniform vec3 u_EmissiveFactor;
+uniform float u_OcclusionStrength;
+uniform float u_NormalScale;
 
 uniform sampler2D u_NormalSampler;
 uniform sampler2D u_EmissiveSampler;
@@ -56,10 +58,6 @@ struct PBRInfo
 
 const float M_PI = 3.141592653589793;
 const float c_MinRoughness = 0.04;
-
-uniform float u_HasTangents;
-uniform float u_HasNormals;
-uniform float u_HasNormalMap;
 
 // not needed since textures are transformed to linear when created
 vec4 SRGBtoLINEAR(vec4 srgbIn)
@@ -103,10 +101,7 @@ vec3 getNormal()
 //    tbn = v_TBN;
     //TODO fix without tangents etc.
     vec3 n = texture(u_NormalSampler, v_UV).rgb;
-    //TODO: normal scale
-    n = normalize(tbn * ((2.0 * n - 1.0) * vec3(0.5, 0.5, 1.0))) * u_HasNormalMap + normalize(tbn[2].xyz) * (1.0 - u_HasNormalMap);
-    n = normalize(tbn * ((2.0 * n - 1.0) * vec3(0.5, 0.5, 1.0)));
-
+    n = normalize(tbn * ((2.0 * n - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0)));
     return n;
 }
 
@@ -245,11 +240,10 @@ void main(){
 
     color += getIBLContribution(pbrInputs, n, reflection);
 
-    //float ao = texture(u_OcclusionSampler, v_UV).r;
-    //color = mix(color, color * ao, 1.0);
+    float ao = texture(u_OcclusionSampler, v_UV).r;
+    color = mix(color, color * ao, u_OcclusionStrength);
 
-    vec3 emissive = SRGBtoLINEAR(texture(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;
-    color += emissive;
+    color += SRGBtoLINEAR(texture(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;
 
     //color = getIBLContribution(pbrInputs, n, reflection);
 

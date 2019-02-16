@@ -5,8 +5,7 @@ import {UBO_BINDINGS} from "../viewer/constants";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
 
 /**
- * Handle Camera components
- * TODO: Handle multiple
+ * Handle Camera component
  */
 @ECS.System(TransformComponent,CameraComponent)
 export class CameraSystem extends System {

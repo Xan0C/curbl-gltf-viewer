@@ -5,15 +5,6 @@ import {GLTexture} from "../gl";
 import {TextureLoaderConfig} from "./TextureLoader";
 import {CACHE_TYPE} from "../cache";
 
-export enum CUBEMAP_FACE {
-    RIGHT,
-    LEFT,
-    TOP,
-    BOTTOM,
-    FRONT,
-    BACK
-}
-
 export class CubemapLoader extends Middleware<GLCubemap> {
 
     private readonly gl: WebGL2RenderingContext;

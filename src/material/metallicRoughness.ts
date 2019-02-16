@@ -5,11 +5,15 @@ export class MetallicRoughness {
     private _baseColorFactor:Quaternion;
     private _metallicFactor:number;
     private _roughnessFactor:number;
+    private _normalScale:number;
+    private _occlusionStrength:number;
 
     constructor(){
         this._baseColorFactor = new Quaternion(1,1,1,1);
         this._metallicFactor = 1;
         this._roughnessFactor = 1;
+        this._normalScale = 1;
+        this._occlusionStrength = 1;
         this._emissiveFactor = new Vector(0,0,0);
     }
 
@@ -43,5 +47,21 @@ export class MetallicRoughness {
 
     set emissiveFactor(value: Vector) {
         this._emissiveFactor = value;
+    }
+
+    get normalScale(): number {
+        return this._normalScale;
+    }
+
+    set normalScale(value: number) {
+        this._normalScale = value;
+    }
+
+    get occlusionStrength(): number {
+        return this._occlusionStrength;
+    }
+
+    set occlusionStrength(value: number) {
+        this._occlusionStrength = value;
     }
 }

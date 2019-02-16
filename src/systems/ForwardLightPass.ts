@@ -60,7 +60,6 @@ export class ForwardLightPass extends System {
         this.shader.bind();
         //Can only have 1 light currently
         for(let i=0, light:IEntity; light = this.entities[i]; i++) {
-
             this.shader.uniforms.u_LightPosition = direction.elements;
             this.shader.uniforms.u_LightColor = light.get(PointLightComponent).color.elements;
             this.modelPass.draw();

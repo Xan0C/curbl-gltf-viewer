@@ -12,8 +12,7 @@ enum DOM_EVENTS {
     MOUSEOUT = "MOUSE_OUT",
     MOUSEOVER = "MOUSE_OVER",
     MOUSEUP = "MOUSE_UP",
-    MOUSEMOVE = "MOUSE_MOVE",
-    MOUSEWHEEL = "MOUSE_WHEEL"
+    MOUSEMOVE = "MOUSE_MOVE"
 }
 
 const emitter = new EventEmitter();
