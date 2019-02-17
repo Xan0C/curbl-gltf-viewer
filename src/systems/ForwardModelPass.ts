@@ -50,7 +50,7 @@ export class ForwardModelPass extends System {
         model.addAttribute(GL_PRIMITIVES.POSITION,this.shader,this.shader.attributes.getAttribute('a_Position'));
         model.addAttribute(GL_PRIMITIVES.NORMAL,this.shader,this.shader.attributes.getAttribute('a_Normal'));
         model.addAttribute(GL_PRIMITIVES.TANGENT,this.shader,this.shader.attributes.getAttribute('a_Tangent'));
-        model.addAttribute(GL_PRIMITIVES.TEXCOORD_0,this.shader,this.shader.attributes.getAttribute('a_Texcoord'));
+        model.addAttribute(GL_PRIMITIVES.TEXCOORD_0,this.shader,this.shader.attributes.getAttribute('a_UV'));
     }
 
     draw():void{

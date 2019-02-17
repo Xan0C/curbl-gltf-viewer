@@ -1,7 +1,7 @@
 import {Shader} from "../model/shader";
 import {GLTexture} from "../gl";
 import {Cache, CACHE_TYPE} from "../cache";
-import {CACHED_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
+import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 
 export class SkyboxShader extends Shader {
 
@@ -14,7 +14,7 @@ export class SkyboxShader extends Shader {
 
     apply():void {
         this.applyCamera();
-        const texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.SKYBOX);
+        const texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SKYBOX);
         texture.bind(0);
         this.uniforms.u_Skybox = 0;
     }

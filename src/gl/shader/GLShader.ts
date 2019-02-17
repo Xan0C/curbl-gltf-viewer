@@ -46,18 +46,54 @@ export class GLShader {
     protected _program:WebGLProgram;
     protected _attributes:Attributes.AttributeMap;
     protected _uniforms:UniformAccessObject;
+    protected _defines:{[x:string]:string|number};
 
     constructor(gl: WebGL2RenderingContext){
         this.gl = gl;
+        this._defines = {};
+    }
+
+    private getDefinesString() {
+        let defineString = "";
+        for(let key in this._defines) {
+               defineString += "#define " + key + " " + this._defines[key] + "\n";
+        }
+        return defineString;
+    }
+
+    private getShaderSrcWithDefines(src:string):string {
+        const shaderDefines = this.getDefinesString();
+        const secondLineIdx = src.indexOf("\n");
+
+        const firstLine = src.substr(0, secondLineIdx);
+        const shaderSrc = src.substr(secondLineIdx);
+
+        if(firstLine.indexOf("#version") != -1) {
+            return firstLine + shaderDefines + shaderSrc;
+        }
+
+        return shaderDefines + firstLine + shaderSrc;
     }
 
     public upload(vertexSrc:string, fragmentSrc:string): GLShader {
         const gl = this.gl;
-        this._program = ProgramCompiler.compile(gl,vertexSrc,fragmentSrc);
+
+        const vertexSrcWithDefines = this.getShaderSrcWithDefines(vertexSrc);
+        const fragmentSrcWithDefines = this.getShaderSrcWithDefines(fragmentSrc);
+
+        this._program = ProgramCompiler.compile(gl, vertexSrcWithDefines, fragmentSrcWithDefines);
         this._attributes = Attributes.extract(gl,this._program);
         let uniformData = Uniforms.extract(gl,this._program);
         this._uniforms = Uniforms.generateUniformAccessObject(gl,uniformData,this._program);
         return this;
+    }
+
+    public addDefine(def:string, value: string|number) {
+        this._defines[def] = value;
+    }
+
+    public removeDefine(def:string, value: string|number) {
+        delete this._defines[def];
     }
 
     public get program():WebGLProgram{
@@ -82,6 +118,14 @@ export class GLShader {
 
     public get uniforms():UniformAccessObject|any{
         return this._uniforms;
+    }
+
+    get defines(): { [p: string]: string | number } {
+        return this._defines;
+    }
+
+    set defines(value: { [p: string]: string | number }) {
+        this._defines = value;
     }
 
     /**

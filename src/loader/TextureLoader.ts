@@ -3,7 +3,7 @@ import {GLTexture, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "../gl";
 import {CACHE_TYPE} from "../cache";
 
 export type TextureLoaderConfig = {
-    id:number;
+    id?:number;
     premultiplyAlpha?:boolean;
     internalFormat?:number;
     format?:number;

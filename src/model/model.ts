@@ -1,7 +1,7 @@
 import {BufferView, Modelbuffer} from "./data";
 import {AttributeAccessor, Primitive} from "./mesh";
 import {Attributes, GL_BUFFERS, GL_PRIMITIVES, GLBuffer} from "../gl";
-import {Material} from "../material";
+import {Material, MATERIAL_MAPS} from "../material";
 import GLAttribute = Attributes.GLAttribute;
 import {Transform} from "./transform";
 import {Cache, CACHE_TYPE} from "../cache";
@@ -10,12 +10,12 @@ import {Shader} from "./shader";
 
 export class Model {
     private _buffer:Modelbuffer;
-    private _meshes:Array<Primitive>;
+    private _primitives:Array<Primitive>;
     private _transform?:Transform;
 
     constructor(){
         this._buffer = new Modelbuffer();
-        this._meshes = [];
+        this._primitives = [];
     }
 
     /**
@@ -73,7 +73,7 @@ export class Model {
      * @param {WebGL2RenderingContext} gl
      */
     private setIndexBuffers(gl:WebGL2RenderingContext):void{
-        for(let i=0,mesh:Primitive; mesh = this._meshes[i]; i++){
+        for(let i=0,mesh:Primitive; mesh = this._primitives[i]; i++){
             if(mesh.indices && mesh.indices.bufferView !== undefined && mesh.indices.bufferView !== null) {
                 let view = this._buffer.views[mesh.indices.bufferView];
                 mesh.initVertexArrayObject(gl, this._buffer.buffers[view.buffer]);
@@ -89,7 +89,7 @@ export class Model {
     public upload():Model{
         for(let i=0, view:BufferView; view = this._buffer.views[i]; i++){
             if(view.buffer === undefined || view.buffer === null || !this._buffer.buffers[view.buffer]){
-                throw "Modell has not been initialized missing Buffers, make sure to initialize the modell buffers!";
+                throw "Model has not been initialized! Missing Buffers, make sure to initialize the model buffers first!";
             }
             let buffer = this._buffer.buffers[view.buffer];
             //Upload the data into the buffer
@@ -100,13 +100,13 @@ export class Model {
 
     /**
      * Draws all Meshes that form the Model
-     * @param {Shader} shader - Shader that should be used for all meshes/Materials
+     * @param {Shader} shader - Shader that should be used for all primitives/Materials
      * @param {Cache} cache - cache to get the materials
      */
     public draw(shader: Shader, cache: Cache):void {
         let offset = 0;
         let view:BufferView;
-        for(let i=0, mesh:Primitive; mesh = this._meshes[i]; i++){
+        for(let i=0, mesh:Primitive; mesh = this._primitives[i]; i++){
             view = this._buffer.views[mesh.indices.bufferView];
             offset = view.bufferOffset + mesh.indices.byteOffset;
             shader.applyMaterial(cache.get<Material>(CACHE_TYPE.MATERIAL, mesh.material));
@@ -122,13 +122,13 @@ export class Model {
      */
     addAttribute(key:GL_PRIMITIVES,shader:Shader,glAttribute:GLAttribute):void{
         shader.bind();
-        for(let i=0, mesh:Primitive; mesh = this._meshes[i]; i++){
-            let attribute:AttributeAccessor = mesh.attributes[key];
+        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
+            let attribute:AttributeAccessor = primitive.attributes[key];
             if(attribute !== null && attribute !== undefined) {
                 let view:BufferView = this._buffer.views[attribute.bufferView];
                 let buffer:GLBuffer = this._buffer.buffers[view.buffer];
                 let offset = view.bufferOffset + attribute.byteOffset;
-                mesh.vertexArrayObject.addAttribute(buffer, glAttribute, attribute.size, attribute.type, attribute.normalized, attribute.stride, offset);
+                primitive.vertexArrayObject.addAttribute(buffer, glAttribute, attribute.size, attribute.type, attribute.normalized, attribute.stride, offset);
             }else{
                 console.warn('Primitive has no Attribute'+key);
             }
@@ -137,24 +137,38 @@ export class Model {
     }
 
     /**
-     * check if any mesh in this model has the attribute
+     * check if any primitive in this model has the attribute
      * @param key - key of the attribute e.g. TANGENT,NORMAL, etc.
      */
     hasAttribute(key:GL_PRIMITIVES|string):boolean {
-        for(let i=0, mesh:Primitive; mesh = this._meshes[i]; i++){
-           if(mesh.hasAttribute(key)){
+        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
+           if(primitive.hasAttribute(key)){
                return true;
            }
         }
         return false;
     }
 
+    /**
+     * check if any material used by a primitve has the map with the specified key
+     * @param cache - cache to get the material from
+     * @param key - key of the map e.g ALBEDO, METALIC_ROUGHNESS etc.
+     */
+    hasMap(cache:Cache,key:MATERIAL_MAPS): boolean {
+        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++) {
+            const material = cache.get<Material>(CACHE_TYPE.MATERIAL, primitive.material);
+            if(material.maps[key]) {
+                return true;
+            }
+        }
+    }
+
     public unload():void{
         //TODO: destroy buffers and each mesh vao
     }
 
-    public addMesh(mesh:Primitive):Primitive{
-        this._meshes.push(mesh);
+    public addPrimitive(mesh:Primitive):Primitive{
+        this._primitives.push(mesh);
         return mesh;
     }
 
@@ -166,12 +180,12 @@ export class Model {
         this._buffer = value;
     }
 
-    public get meshes():Array<Primitive> {
-        return this._meshes;
+    public get primitives():Array<Primitive> {
+        return this._primitives;
     }
 
-    public set meshes(value:Array<Primitive>) {
-        this._meshes = value;
+    public set primitives(value:Array<Primitive>) {
+        this._primitives = value;
     }
 
     public get transform():Transform {

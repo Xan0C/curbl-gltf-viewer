@@ -2,8 +2,9 @@ import {AttributeAccessor, IndexAccessor} from "./accessor";
 import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "../../gl";
 
 /**
- * In GLTF this is a Primitive
+ * GLTF Primitive wrapper
  * Primitive is a Geometric piece of the Model that uses a specific material
+ * or. a stream of vertices that can be rendered together
  */
 export class Primitive {
     private _name:string;

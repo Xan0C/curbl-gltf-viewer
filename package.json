@@ -15,10 +15,12 @@
   "dependencies": {
     "curbl-ecs": "^1.0.5",
     "curbl-loader": "^0.1.1",
+    "dat.gui": "^0.7.5",
     "eventemitter3": "^3.1.0",
     "ts-simple-log": "^1.2.0"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.2",
     "@types/webgl2": "^0.0.4",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",

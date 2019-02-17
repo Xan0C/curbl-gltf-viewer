@@ -5,37 +5,51 @@
 
 layout (location = 0) out vec4 fragmentColor;
 
+#ifdef HAS_NORMALS
+#ifdef HAS_TANGENTS
 in mat3 v_TBN;
+#else
+in vec3 v_Normal;
+#endif
+#endif
+
 in vec2 v_UV;
 in vec3 v_Position;
-in vec3 v_Normal;
 in vec3 v_ViewPos;
 
-uniform vec3 u_LightPosition;
+uniform vec3 u_LightDirection;
 uniform vec3 u_LightColor;
 
 //IBL
+#ifdef USE_IBL
 uniform samplerCube u_DiffuseEnvSampler;
 uniform samplerCube u_SpecularEnvSampler;
 uniform sampler2D u_brdfLUT;
+#endif
 
 //BaseColorMap
+#ifdef HAS_BASECOLORMAP
 uniform sampler2D u_BaseColorSampler;
-//MetallicRoughnessMap
+#endif
+#ifdef HAS_NORMALMAP
+uniform sampler2D u_NormalSampler;
+uniform float u_NormalScale;
+#endif
+#ifdef HAS_EMISSIVEMAP
+uniform sampler2D u_EmissiveSampler;
+uniform vec3 u_EmissiveFactor;
+#endif
+#ifdef HAS_METALROUGHNESSMAP
 uniform sampler2D u_MetallicRoughnessSampler;
-//OcclusionSampler
+#endif
+#ifdef HAS_OCCLUSIONMAP
 uniform sampler2D u_OcclusionSampler;
+uniform float u_OcclusionStrength;
+#endif
 
 uniform float u_MetallicFactor;
 uniform float u_RoughnessFactor;
 uniform vec4 u_BaseColorFactor;
-
-uniform vec3 u_EmissiveFactor;
-uniform float u_OcclusionStrength;
-uniform float u_NormalScale;
-
-uniform sampler2D u_NormalSampler;
-uniform sampler2D u_EmissiveSampler;
 
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
@@ -59,70 +73,62 @@ struct PBRInfo
 const float M_PI = 3.141592653589793;
 const float c_MinRoughness = 0.04;
 
-// not needed since textures are transformed to linear when created
-vec4 SRGBtoLINEAR(vec4 srgbIn)
-{
-    //vec3 linOut = pow(srgbIn.xyz,vec3(2.2));  //fast approx
-
-//    vec3 bLess = step(vec3(0.04045),srgbIn.xyz);
-//    vec3 linOut = mix( srgbIn.xyz/vec3(12.92), pow((srgbIn.xyz+vec3(0.055))/vec3(1.055),vec3(2.4)), bLess );
-//    return vec4(linOut,srgbIn.w);
-
-    return srgbIn;
-}
-
 // Find the normal for this fragment, pulling either from a predefined normal map
 // or from the interpolated mesh normal and tangent attributes.
 vec3 getNormal()
 {
-    mat3 tbn = v_TBN;
+ // Retrieve the tangent space matrix
+#ifndef HAS_TANGENTS
+    vec3 pos_dx = dFdx(v_Position);
+    vec3 pos_dy = dFdy(v_Position);
+    vec3 tex_dx = dFdx(vec3(v_UV, 0.0));
+    vec3 tex_dy = dFdy(vec3(v_UV, 0.0));
+    vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
 
-//    //No tangents
-//    vec3 pos_dx = dFdx(v_Position);
-//    vec3 pos_dy = dFdy(v_Position);
-//    vec3 tex_dx = dFdx(vec3(v_UV, 0.0));
-//    vec3 tex_dy = dFdy(vec3(v_UV, 0.0));
-//    vec3 t = (tex_dy.t * pos_dx - tex_dx.t * pos_dy) / (tex_dx.s * tex_dy.t - tex_dy.s * tex_dx.t);
-//
-//    //calc normals if not provided
-//    vec3 ng = normalize(v_Normal) * u_HasNormals + cross(pos_dx, pos_dy) * (1.0 - u_HasNormals);
-//    ng = cross(pos_dx, pos_dy);
-//    //calc N vector of TBN Matrix if no tangents
-//    //ng = tbn[2].xyz * u_HasTangents + ng * (1.0 - u_HasTangents);
-//
-//    //Calculate bitangent
-//    t = normalize(t - ng * dot(ng, t));
-//    //t = tbn[0].xyz * u_HasTangents + t * (1.0 - u_HasTangents);
-//    vec3 b = tbn[1] * u_HasTangents + normalize(cross(ng, t)) * (1.0 - u_HasTangents);
-//    b = normalize(cross(ng, t));
-//
-//    //if tangents are provided we use the given tbn matrix
-//    tbn = mat3(t, b, ng);
-//    tbn = v_TBN;
-    //TODO fix without tangents etc.
+#ifdef HAS_NORMALS
+    vec3 ng = normalize(v_Normal);
+#else
+    vec3 ng = cross(pos_dx, pos_dy);
+#endif
+
+    t = normalize(t - ng * dot(ng, t));
+    vec3 b = normalize(cross(ng, t));
+    mat3 tbn = mat3(t, b, ng);
+#else // HAS_TANGENTS
+    mat3 tbn = v_TBN;
+#endif
+
+#ifdef HAS_NORMALMAP
     vec3 n = texture(u_NormalSampler, v_UV).rgb;
     n = normalize(tbn * ((2.0 * n - 1.0) * vec3(u_NormalScale, u_NormalScale, 1.0)));
+#else
+    // The tbn matrix is linearly interpolated, so we need to re-normalize
+    vec3 n = normalize(tbn[2].xyz);
+#endif
+
     return n;
 }
 
 // Calculation of the lighting contribution from an optional Image Based Light source.
 // Precomputed Environment Maps are required uniform inputs and are computed as outlined in [1].
 // See our README.md on Environment Maps [3] for additional discussion.
+#ifdef USE_IBL
 vec3 getIBLContribution(PBRInfo pbrInputs, vec3 n, vec3 reflection)
 {
     float mipCount = 9.0; // resolution of 512x512
     float lod = (pbrInputs.perceptualRoughness * mipCount);
     // retrieve a scale and bias to F0. See [1], Figure 3
-    vec3 brdf = SRGBtoLINEAR(texture(u_brdfLUT, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness))).rgb;
-    vec3 diffuseLight = SRGBtoLINEAR(texture(u_DiffuseEnvSampler, n)).rgb;
+    vec3 brdf = texture(u_brdfLUT, vec2(pbrInputs.NdotV, 1.0 - pbrInputs.perceptualRoughness)).rgb;
+    vec3 diffuseLight = texture(u_DiffuseEnvSampler, n).rgb;
 
-    vec3 specularLight = SRGBtoLINEAR(texture(u_SpecularEnvSampler, reflection, lod)).rgb;
+    vec3 specularLight = texture(u_SpecularEnvSampler, reflection, lod).rgb;
 
     vec3 diffuse = diffuseLight * pbrInputs.diffuseColor;
     vec3 specular = specularLight * (pbrInputs.specularColor * brdf.x + brdf.y);
 
     return diffuse + specular;
 }
+#endif
 
 // Basic Lambertian diffuse
 // Implementation from Lambert's Photometria https://archive.org/details/lambertsphotome00lambgoog
@@ -171,20 +177,25 @@ void main(){
     float perceptualRoughness = u_RoughnessFactor;
     float metallic = u_MetallicFactor;
 
+#ifdef HAS_METALROUGHNESSMAP
     // Roughness is stored in the 'g' channel, metallic is stored in the 'b' channel.
     // This layout intentionally reserves the 'r' channel for (optional) occlusion map data
     vec4 mrSample = texture(u_MetallicRoughnessSampler, v_UV);
     perceptualRoughness = mrSample.g * perceptualRoughness;
-    perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
-
     metallic = mrSample.b * metallic;
+#endif
+    perceptualRoughness = clamp(perceptualRoughness, c_MinRoughness, 1.0);
     metallic = clamp(metallic, 0.0, 1.0);
-
     // Roughness is authored as perceptual roughness; as is convention,
     // convert to material roughness by squaring the perceptual roughness [2].
     float alphaRoughness = perceptualRoughness * perceptualRoughness;
 
-    vec4 baseColor = SRGBtoLINEAR(texture(u_BaseColorSampler, v_UV)) * u_BaseColorFactor;
+    // The albedo may be defined from a base texture or a flat color
+#ifdef HAS_BASECOLORMAP
+    vec4 baseColor = texture(u_BaseColorSampler, v_UV) * u_BaseColorFactor;
+#else
+    vec4 baseColor = u_BaseColorFactor;
+#endif
 
     vec3 f0 = vec3(0.04);
     vec3 diffuseColor = baseColor.rgb * (vec3(1.0) - f0);
@@ -202,7 +213,7 @@ void main(){
 
     vec3 n = getNormal();                             // normal at surface point
     vec3 v = normalize(v_ViewPos - v_Position);       // Vector from surface point to camera
-    vec3 l = normalize(u_LightPosition - v_Position);              // Vector from surface point to light
+    vec3 l = normalize(u_LightDirection); // Vector from surface point to light
     vec3 h = normalize(l+v);                          // Half vector between both l and v
     vec3 reflection = -normalize(reflect(v, n));
 
@@ -238,14 +249,19 @@ void main(){
     // Obtain final intensity as reflectance (BRDF) scaled by the energy of the light (cosine law)
     vec3 color = NdotL * u_LightColor * (diffuseContrib + specContrib);
 
+#ifdef USE_IBL
     color += getIBLContribution(pbrInputs, n, reflection);
+#endif
 
+#ifdef HAS_OCCLUSIONMAP
     float ao = texture(u_OcclusionSampler, v_UV).r;
     color = mix(color, color * ao, u_OcclusionStrength);
+#endif
 
-    color += SRGBtoLINEAR(texture(u_EmissiveSampler, v_UV)).rgb * u_EmissiveFactor;
-
-    //color = getIBLContribution(pbrInputs, n, reflection);
+#ifdef HAS_EMISSIVEMAP
+    vec3 emissive = texture(u_EmissiveSampler, v_UV).rgb * u_EmissiveFactor;
+    color += emissive;
+#endif
 
     fragmentColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
 }

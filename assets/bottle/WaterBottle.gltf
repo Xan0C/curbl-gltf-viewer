@@ -2,24 +2,58 @@
   "accessors": [
     {
       "bufferView": 0,
+      "byteOffset": 0,
       "componentType": 5126,
       "count": 2549,
-      "type": "VEC2"
+      "type": "VEC2",
+      "max": [
+        0.9884517,
+        -0.0262669753
+      ],
+      "min": [
+        0.0156782083,
+        -0.968668759
+      ]
     },
     {
       "bufferView": 1,
+      "byteOffset": 0,
       "componentType": 5126,
       "count": 2549,
-      "type": "VEC3"
+      "type": "VEC3",
+      "max": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -0.99998796,
+        -1.0
+      ]
     },
     {
       "bufferView": 2,
+      "byteOffset": 0,
       "componentType": 5126,
       "count": 2549,
-      "type": "VEC4"
+      "type": "VEC4",
+      "max": [
+        1.0,
+        0.9541486,
+        1.0,
+        1.0
+      ],
+      "min": [
+        -1.0,
+        -0.9542063,
+        -1.0,
+        -1.0
+      ]
     },
     {
       "bufferView": 3,
+      "byteOffset": 0,
       "componentType": 5126,
       "count": 2549,
       "type": "VEC3",
@@ -36,9 +70,16 @@
     },
     {
       "bufferView": 4,
+      "byteOffset": 0,
       "componentType": 5123,
       "count": 13530,
-      "type": "SCALAR"
+      "type": "SCALAR",
+      "max": [
+        2548
+      ],
+      "min": [
+        0
+      ]
     }
   ],
   "asset": {
@@ -48,6 +89,7 @@
   "bufferViews": [
     {
       "buffer": 0,
+      "byteOffset": 0,
       "byteLength": 20392
     },
     {
@@ -102,7 +144,8 @@
             "POSITION": 3
           },
           "indices": 4,
-          "material": 0
+          "material": 0,
+          "mode": 4
         }
       ],
       "name": "WaterBottle"
@@ -119,6 +162,7 @@
         }
       },
       "normalTexture": {
+        "scale": 0.5,
         "index": 2
       },
       "occlusionTexture": {
@@ -132,17 +176,23 @@
       "emissiveTexture": {
         "index": 3
       },
-      "name": "BottleMat"
+      "name": "WaterBottle"
     }
   ],
   "nodes": [
     {
+      "children": [],
       "mesh": 0,
       "rotation": [
         0.0,
-        1.0,
+        -0.7071068,
         0.0,
-        0.0
+        0.7071067
+      ],
+      "scale": [
+        5.00000048,
+        5.0,
+        5.00000048
       ],
       "name": "WaterBottle"
     }

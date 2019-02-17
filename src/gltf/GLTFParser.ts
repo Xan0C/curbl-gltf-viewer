@@ -12,10 +12,9 @@ import {Matrix, Vector, Quaternion} from "../math";
 import {GL_BUFFERS, TEXTURE_WRAP} from "../gl/constants";
 import {TextureLoader, TextureLoaderConfig} from "../loader/TextureLoader";
 import {BufferView, Model, Primitive} from "../model";
-import {Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap, SpecularGlossiness} from "../material";
+import {Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {ECS} from "curbl-ecs";
-import {TEXTURE_IDS} from "../viewer/constants";
 import {Cache, CACHE_TYPE} from "../cache";
 import {Transform} from "../model/transform";
 
@@ -184,7 +183,7 @@ export class GLTF_Parser {
 
     /**
      * Parse the GLTF_Primitive/Primitive at the given meshIdx
-     * each Primitive is a set of primitives and all meshes form one model
+     * each Primitive is a set of primitives and all primitives form one model
      * (often a mesh is referred to as the complete set of all primitives that form the model)
      * @param {Model} model
      * @param {number} meshIdx
@@ -226,7 +225,7 @@ export class GLTF_Parser {
         //Set the Material for the mesh if any else its default
         this.setMeshMaterial(model_Mesh,primitive.material);
         //TODO: morph targets primitive.targets animations skinning etc.
-        model.addMesh(model_Mesh);
+        model.addPrimitive(model_Mesh);
     }
 
     /**
@@ -302,7 +301,7 @@ export class GLTF_Parser {
         if(materialIdx !== undefined && materialIdx !== null){
             const materialNode = this.gltfModel.materials[materialIdx];
             materialNode.name = materialNode.name||ECS.uuid();
-            let material:Material<SpecularGlossiness>|Material<MetallicRoughness>;
+            let material:Material<MetallicRoughness>;
 
             if(materialNode.extensions && materialNode.extensions.KHR_materials_pbrSpecularGlossiness) {
                 throw "specular glossiness model is not supported";
@@ -324,7 +323,6 @@ export class GLTF_Parser {
 
             if(materialNode.emissiveTexture){
                 this.parseTexture(material,materialNode.emissiveTexture.index,MATERIAL_MAPS.EMISSIVE,{
-                    id:TEXTURE_IDS.EMISSIVE,
                     premultiplyAlpha: false,
                     internalFormat: this.gl.SRGB8_ALPHA8,
                     format:this.gl.RGBA,
@@ -335,7 +333,6 @@ export class GLTF_Parser {
             if(materialNode.normalTexture){
                 material.model.normalScale = materialNode.normalTexture.scale||1;
                 this.parseTexture(material,materialNode.normalTexture.index,MATERIAL_MAPS.NORMAL,{
-                    id:TEXTURE_IDS.NORMAL,
                     premultiplyAlpha: false,
                     internalFormat: this.gl.RGBA,
                     format:this.gl.RGBA,
@@ -347,7 +344,6 @@ export class GLTF_Parser {
             if(materialNode.occlusionTexture){
                 material.model.occlusionStrength = materialNode.occlusionTexture.strength||1;
                 this.parseTexture(material,materialNode.occlusionTexture.index,MATERIAL_MAPS.OCCLUSION,{
-                    id:TEXTURE_IDS.OCCLUSION,
                     premultiplyAlpha: false,
                     internalFormat: this.gl.RGBA,
                     format:this.gl.RGBA,
@@ -391,7 +387,6 @@ export class GLTF_Parser {
         //AlbedoTexture
         if(pbr.baseColorTexture !== undefined && pbr.baseColorTexture !== null) {
             this.parseTexture(material,pbr.baseColorTexture.index,MATERIAL_MAPS.ALBEDO,{
-                id:TEXTURE_IDS.DIFFUSE,
                 premultiplyAlpha: false,
                 internalFormat: this.gl.SRGB8_ALPHA8,
                 format:this.gl.RGBA,
@@ -402,7 +397,6 @@ export class GLTF_Parser {
         //Metallic Roughness Texture
         if(pbr.metallicRoughnessTexture !== undefined && pbr.metallicRoughnessTexture !== null) {
             this.parseTexture(material,pbr.metallicRoughnessTexture.index,MATERIAL_MAPS.METAL_ROUGHNESS,{
-                id:TEXTURE_IDS.METALLIC_ROUGHNESS,
                 premultiplyAlpha: false,
                 internalFormat: this.gl.RGBA,
                 format:this.gl.RGBA,

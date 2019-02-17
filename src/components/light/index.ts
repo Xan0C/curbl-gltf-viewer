@@ -1,2 +1,1 @@
-export * from "./baseLight";
-export * from "./directLightComponent";
+export * from "./lightComponent";

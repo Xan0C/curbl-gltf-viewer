@@ -7,29 +7,33 @@ import {BaseCache, Cache, CACHE_TYPE} from "../cache";
 import {GL_INTERNALFORMAT, GL_TYPES, GLTexture, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "../gl";
 import {Model} from "../model";
 import {Material} from "../material";
-import {CACHED_TEXTURES, TEXTURE_IDS} from "./constants";
+import {GLOBAL_TEXTURES} from "./constants";
 import {ECS} from "curbl-ecs";
-import {CameraComponent, LookAtCameraComponent, ModelComponent, TransformComponent} from "../components";
-import {IBLComponent} from "../components/renderer/IBLComponent";
-import {createBlackCubemap, createBlackTexture, createWhiteCubemap, createWhiteTexture} from "./cacheDefaults";
-import {IBLSystem} from "../systems/IBLSystem";
+import {
+    CameraComponent,
+    LightComponent,
+    LookAtCameraComponent,
+    ModelComponent,
+    TransformComponent
+} from "../components";
 import {CameraSystem} from "../systems/CameraSystem";
 import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
-import {PointLightComponent} from "../components/light/pointLightComponent";
-import {Shader} from "../model/shader";
 import {GLSLLoader} from "../loader/GLSLLoader";
 import {KhronosPbrShader} from "../shader/khronosPbrShader";
-import {SkyboxComponent} from "../components/renderer/skyboxComponent";
 import {SkyboxShader} from "../shader/SkyboxShader";
 import {ForwardShadingSystem} from "../systems/ForwardShadingSystem";
+import {GUIComponent} from "../components/gui/GUIComponent";
+import {GUISystem} from "../systems/GUISystem";
+import {SkyboxPass} from "../systems/SkyboxPass";
+import {PrePass} from "../systems/PrePass";
 
 export class Viewer {
     private cache:Cache;
     private canvas:Canvas;
     private loader: ResourceLoader;
     private gl: WebGL2RenderingContext;
-    private shader: Shader;
-    private skyboxShader: Shader;
+    private shader: KhronosPbrShader;
+    private skyboxShader: SkyboxShader;
 
     constructor() {
         this.canvas = new Canvas({width:1280, height: 720});
@@ -60,7 +64,7 @@ export class Viewer {
     }
 
     private loadIBL() {
-        this.loader.get(CubemapLoader).add("skybox",
+        this.loader.get(CubemapLoader).add(GLOBAL_TEXTURES.SKYBOX,
             [{
                 right:'./assets/ibl/environment/environment_right_0.jpg',
                 left:'./assets/ibl/environment/environment_left_0.jpg',
@@ -71,7 +75,7 @@ export class Viewer {
             }]
         );
 
-        this.loader.get(CubemapLoader).add("diffuse_map",
+        this.loader.get(CubemapLoader).add(GLOBAL_TEXTURES.DIFFUSE_ENVIRONMENT,
             [{
                 right:'./assets/ibl/diffuse/diffuse_right_0.jpg',
                 left:'./assets/ibl/diffuse/diffuse_left_0.jpg',
@@ -81,7 +85,6 @@ export class Viewer {
                 back:'./assets/ibl/diffuse/diffuse_back_0.jpg'
             }],
             {
-                id:TEXTURE_IDS.DIFFUSE_ENVIRONMENT,
                 premultiplyAlpha: false,
                 internalFormat: GL_INTERNALFORMAT.SRGB8_ALPHA8,
                 format: GL_INTERNALFORMAT.RGBA,
@@ -101,16 +104,14 @@ export class Viewer {
             });
         }
 
-        this.loader.get(CubemapLoader).add("specular_map", specular_map, {
-            id:TEXTURE_IDS.SPECULAR_ENVIRONMENT,
+        this.loader.get(CubemapLoader).add(GLOBAL_TEXTURES.SPECULAR_ENVIRONMENT, specular_map, {
             premultiplyAlpha: false,
             internalFormat: GL_INTERNALFORMAT.SRGB8_ALPHA8,
             format: GL_INTERNALFORMAT.RGBA,
             type:GL_TYPES.UNSIGNED_BYTE
         });
 
-        this.loader.get(TextureLoader).add("brdfLUT", "./assets/ibl/brdfLUT.png", {
-            id:TEXTURE_IDS.BRDF_LUT,
+        this.loader.get(TextureLoader).add(GLOBAL_TEXTURES.BRDF_LUT, "./assets/ibl/brdfLUT.png", {
             premultiplyAlpha: false,
             internalFormat: GL_INTERNALFORMAT.SRGB8_ALPHA8,
             format: GL_INTERNALFORMAT.RGBA,
@@ -125,12 +126,19 @@ export class Viewer {
     }
 
     private loadModel() {
-        this.loader.get(GLTFLoader).add("bottle", "../assets/bottle/WaterBottle.gltf", "../assets/bottle/WaterBottle.bin");
+        this.loader.get(GLTFLoader).add(
+            "bottle",
+            "../assets/bottle/WaterBottle.gltf",
+            "../assets/bottle/WaterBottle.bin"
+        );
     }
 
     private loadShader() {
         this.shader = new KhronosPbrShader(this.gl, this.cache);
         this.skyboxShader = new SkyboxShader(this.gl, this.cache);
+
+        this.shader.initializeDefines(this.cache.get<Model>(CACHE_TYPE.MODEL, "bottle"));
+
         this.loader.get(GLSLLoader).add("shader", "../assets/shader/pbr-vert.glsl", "../assets/shader/pbr-frag.glsl", this.shader);
         this.loader.get(GLSLLoader).add("skyboxShader", "../assets/shader/skybox-vert.glsl", "../assets/shader/skybox-frag.glsl", this.skyboxShader);
     }
@@ -138,11 +146,14 @@ export class Viewer {
     loadScene() {
         this.loadIBL();
         this.loadModel();
-        this.loadShader();
 
         this.loader.load(()=>{
-            console.log("finished loading ",this.cache);
-            this.onLoadFinished();
+            console.log("finished loading model and ibl",this.cache);
+            this.loadShader();
+            this.loader.load(()=>{
+                console.log("finished loading shader");
+                this.onLoadFinished();
+            })
         });
     }
 
@@ -157,22 +168,11 @@ export class Viewer {
         ECS.addEntity(entity);
     }
 
-    private createEnvironmentEntity() {
-        const entity = ECS.createEntity();
-        entity.add(new IBLComponent({
-            diffuseEnvironment: "diffuse_map",
-            specularEnvironment: "specular_map",
-            brdfLUT: "brdfLUT"
-        }));
-        entity.add(new SkyboxComponent({texture: "skybox"}));
-        ECS.addEntity(entity);
-    }
-
     private createCameraEntity() {
         const entity = ECS.createEntity();
         entity.add(new CameraComponent());
         entity.add(new TransformComponent({
-            position: {x:0,y:0,z:-1.00},
+            position: {x:0,y:0,z:-4.00},
             rotation: {x:0,y:0,z:0,w:1},
             scale: {x:1,y:1,z:1}
         }));
@@ -187,22 +187,46 @@ export class Viewer {
 
     private createLightEntity() {
         const entity = ECS.createEntity();
-        entity.add(new PointLightComponent({
-            color:{r:1,g:1,b:1}
-        }));
-        entity.add(new TransformComponent({
-            position:{x:0, y: 3, z: 15},
-            rotation:{x:0, y:2, z: 1, w:1},
-            scale:{x:1, y:1, z: 1}
+        const lightComponent = new LightComponent({
+            lightColor: [255, 255, 255],
+            lightScale: 1.0,
+            lightRotation: 75,
+            lightPitch: 40
+        });
+        entity.add(lightComponent);
+        entity.add(new GUIComponent({
+            folder: "Directional Light",
+            properties: [
+                {
+                    prop: lightComponent,
+                    propName: "lightColor",
+                    isColor: true,
+                    onChange: ()=>lightComponent.updateLight()
+                },
+                {
+                    prop: lightComponent,
+                    propName: "lightScale",
+                    min: 0,
+                    max: 10,
+                    onChange: ()=>lightComponent.updateLight()
+                },
+                {
+                    prop: lightComponent,
+                    propName: "lightRotation",
+                    min: 0,
+                    max: 360,
+                    onChange: ()=>lightComponent.updateLight()
+                },
+                {
+                    prop: lightComponent,
+                    propName: "lightPitch",
+                    min: -90,
+                    max: 90,
+                    onChange: ()=>lightComponent.updateLight()
+                }
+            ]
         }));
         ECS.addEntity(entity);
-    }
-
-    private createCacheEntries() {
-        this.cache.add(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK, createBlackTexture(this.gl));
-        this.cache.add(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.WHITE, createWhiteTexture(this.gl));
-        this.cache.add(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK_CUBE, createBlackCubemap(this.gl));
-        this.cache.add(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.WHITE_CUBE, createWhiteCubemap(this.gl));
     }
 
     private createSystems() {
@@ -210,15 +234,14 @@ export class Viewer {
         ECS.systemUpdateMethods = ['update', 'render'];
         ECS.addSystem(new CameraSystem({gl: this.gl}));
         ECS.addSystem(new LookAtCameraControlSystem({width: 1280, height: 720}));
-        ECS.addSystem(new IBLSystem({cache: this.cache}));
-        //ECS.addSystem(new SkyboxPass({gl: this.gl, cache: this.cache, shader: this.skyboxShader}));
+        ECS.addSystem(new GUISystem());
+        ECS.addSystem(new PrePass(this.gl));
+        ECS.addSystem(new SkyboxPass({gl: this.gl, cache: this.cache, shader: this.skyboxShader}));
         ECS.addSystem(new ForwardShadingSystem({gl: this.gl, cache: this.cache, shader: this.shader}));
     }
 
     private onLoadFinished() {
-        this.createCacheEntries();
         this.createCameraEntity();
-        this.createEnvironmentEntity();
         this.createLightEntity();
         this.createModellEntity();
         this.createSystems();

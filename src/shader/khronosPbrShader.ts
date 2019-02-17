@@ -2,9 +2,9 @@ import {Shader} from "../model/shader";
 import {Model} from "../model";
 import {Material, MATERIAL_MAPS} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
-import {GLTexture} from "../gl";
+import {GL_PRIMITIVES, GLTexture} from "../gl";
 import {Cache, CACHE_TYPE} from "../cache";
-import {CACHED_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
+import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 import {GLCubemap} from "../gl/GLCubemap";
 
 const TEXTURES = {
@@ -27,6 +27,41 @@ export class KhronosPbrShader extends Shader {
         this.cache = cache;
     }
 
+    public initializeDefines(model:Model) {
+        if (model.hasAttribute(GL_PRIMITIVES.NORMAL)) {
+            this.addDefine("HAS_NORMALS", 1);
+        }
+        if (model.hasAttribute(GL_PRIMITIVES.TANGENT)) {
+            this.addDefine("HAS_TANGENTS", 1);
+        }
+        if (model.hasAttribute(GL_PRIMITIVES.TEXCOORD_0)) {
+            this.addDefine("HAS_UV", 1);
+        }
+        if(model.hasMap(this.cache, MATERIAL_MAPS.ALBEDO)) {
+            this.addDefine("HAS_BASECOLORMAP", 1);
+        }
+        if(model.hasMap(this.cache, MATERIAL_MAPS.METAL_ROUGHNESS)) {
+            this.addDefine("HAS_METALROUGHNESSMAP", 1);
+        }
+        if(model.hasMap(this.cache, MATERIAL_MAPS.NORMAL)) {
+            this.addDefine("HAS_NORMALMAP", 1);
+        }
+        if(model.hasMap(this.cache, MATERIAL_MAPS.EMISSIVE)) {
+            this.addDefine("HAS_EMISSIVEMAP", 1);
+        }
+        if(model.hasMap(this.cache, MATERIAL_MAPS.OCCLUSION)) {
+            this.addDefine("HAS_OCCLUSIONMAP", 1);
+        }
+
+        const brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.BRDF_LUT);
+        const diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.DIFFUSE_ENVIRONMENT);
+        const specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SPECULAR_ENVIRONMENT);
+
+        if(brdfLUT && diffuseEnv && specularEnv) {
+            this.addDefine("USE_IBL", 1);
+        }
+    }
+
     public apply(model:Model):void {}
 
     public applyMaterial(material?:Material<MetallicRoughness>) {
@@ -41,10 +76,6 @@ export class KhronosPbrShader extends Shader {
             texture.bind(TEXTURES.DIFFUSE);
             this.uniforms.u_BaseColorSampler = TEXTURES.DIFFUSE;
             this.uniforms.u_BaseColorFactor = material.model.baseColorFactor.elements;
-        }else{
-            let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.WHITE);
-            texture.bind(TEXTURES.DIFFUSE);
-            this.uniforms.u_BaseColorSampler = TEXTURES.DIFFUSE;
         }
         //applyMaterial MetallicRoughnessSampler
         if(material.maps[MATERIAL_MAPS.METAL_ROUGHNESS]){
@@ -53,10 +84,6 @@ export class KhronosPbrShader extends Shader {
             this.uniforms.u_MetallicRoughnessSampler = TEXTURES.METALLIC_ROUGHNESS;
             this.uniforms.u_RoughnessFactor = material.model.roughnessFactor;
             this.uniforms.u_MetallicFactor = material.model.metallicFactor;
-        }else{
-            let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.WHITE);
-            texture.bind(TEXTURES.METALLIC_ROUGHNESS);
-            this.uniforms.u_MetallicRoughnessSampler = TEXTURES.METALLIC_ROUGHNESS;
         }
         //applyMaterial NormalMaps
         if (material.maps[MATERIAL_MAPS.NORMAL]) {
@@ -64,10 +91,6 @@ export class KhronosPbrShader extends Shader {
             texture.bind(TEXTURES.NORMAL);
             this.uniforms.u_NormalSampler = TEXTURES.NORMAL;
             this.uniforms.u_NormalScale = material.model.normalScale;
-        } else {
-            let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
-            texture.bind(TEXTURES.NORMAL);
-            this.uniforms.u_NormalSampler = TEXTURES.NORMAL;
         }
         //applyMaterial emissive map
         if(material.maps[MATERIAL_MAPS.EMISSIVE]){
@@ -75,10 +98,6 @@ export class KhronosPbrShader extends Shader {
             texture.bind(TEXTURES.EMISSIVE);
             this.uniforms.u_EmissiveSampler = TEXTURES.EMISSIVE;
             this.uniforms.u_EmissiveFactor = material.model.emissiveFactor.elements;
-        }else{
-            let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
-            texture.bind(TEXTURES.EMISSIVE);
-            this.uniforms.u_EmissiveSampler = TEXTURES.EMISSIVE;
         }
         //apply Occlusion map
         if(material.maps[MATERIAL_MAPS.OCCLUSION]) {
@@ -86,40 +105,24 @@ export class KhronosPbrShader extends Shader {
             texture.bind(TEXTURES.OCCLUSION);
             this.uniforms.u_OcclusionSampler = TEXTURES.OCCLUSION;
             this.uniforms.u_OcclusionStrength = material.model.occlusionStrength;
-        }else{
-            let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
-            texture.bind(TEXTURES.OCCLUSION);
-            this.uniforms.u_OcclusionSampler = TEXTURES.OCCLUSION;
         }
 
         /*******************************IBL*************************************/
 
-        let brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BRDF_LUT);
+        const brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.BRDF_LUT);
         if (brdfLUT) {
             brdfLUT.bind(TEXTURES.BRDF_LUT);
             this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
-        } else {
-            brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK);
-            brdfLUT.bind(TEXTURES.BRDF_LUT);
-            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
         }
 
-        let diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.DIFFUSE_ENVIRONMENT);
+        const diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.DIFFUSE_ENVIRONMENT);
         if(diffuseEnv){
             diffuseEnv.bind(TEXTURES.DIFFUSE_ENVIRONMENT);
             this.uniforms.u_DiffuseEnvSampler = TEXTURES.DIFFUSE_ENVIRONMENT;
-        }else{
-            diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK_CUBE);
-            diffuseEnv.bind(TEXTURES.DIFFUSE_ENVIRONMENT);
-            this.uniforms.u_DiffuseEnvSampler = TEXTURES.DIFFUSE_ENVIRONMENT;
         }
 
-        let specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.SPECULAR_ENVIRONMENT);
+        const specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SPECULAR_ENVIRONMENT);
         if(specularEnv){
-            specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
-            this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
-        }else{
-            specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, CACHED_TEXTURES.BLACK_CUBE);
             specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
             this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
         }

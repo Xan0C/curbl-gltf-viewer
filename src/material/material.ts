@@ -1,8 +1,7 @@
 import {Materialmap} from "./materialmap";
 
 export enum MATERIAL_TYPES {
-    PBR,
-    SPEC
+    PBR
 }
 
 export enum MATERIAL_MAPS {
@@ -10,7 +9,6 @@ export enum MATERIAL_MAPS {
     NORMAL,
     OCCLUSION,
     EMISSIVE,
-    SPECULAR,
     METAL_ROUGHNESS
 }
 
