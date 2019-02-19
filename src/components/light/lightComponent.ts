@@ -1,5 +1,6 @@
 import {ECS, IComponent} from "curbl-ecs";
-import {Color, Vector} from "../../math";
+import {Color} from "../../math";
+import {vec3} from "gl-matrix";
 
 export interface BaseLightConfig  {
     lightColor: [number, number, number]
@@ -12,7 +13,7 @@ export interface BaseLightConfig  {
 export class LightComponent implements IComponent{
 
     private _color:Color;
-    private _direction: Vector;
+    private _direction: vec3;
     private _lightColor: [number, number, number];
     private _lightScale: number;
     private _lightRotation: number;
@@ -33,7 +34,7 @@ export class LightComponent implements IComponent{
         lightRotation: 75,
         lightPitch: 40
     }){
-        this._direction = new Vector();
+        this._direction = vec3.create();
         this._color = new Color();
 
         this._lightColor = config.lightColor;
@@ -54,9 +55,12 @@ export class LightComponent implements IComponent{
         const rot = this._lightRotation * Math.PI / 180;
         const pitch = this._lightPitch * Math.PI / 180;
 
-        this._direction.x = Math.sin(rot) * Math.cos(pitch);
-        this._direction.y = Math.sin(pitch);
-        this._direction.z = Math.cos(rot) * Math.cos(pitch);
+        vec3.set(
+            this._direction,
+            Math.sin(rot) * Math.cos(pitch),
+            Math.sin(pitch),
+            Math.cos(rot) * Math.cos(pitch)
+        );
     }
 
     get lightColor(): [number, number, number] {
@@ -99,11 +103,11 @@ export class LightComponent implements IComponent{
         this._color = value;
     }
 
-    get direction(): Vector {
+    get direction(): vec3 {
         return this._direction;
     }
 
-    set direction(value: Vector) {
+    set direction(value: vec3) {
         this._direction = value;
     }
 }

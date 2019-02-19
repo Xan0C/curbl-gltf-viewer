@@ -1,27 +1,27 @@
-import {Quaternion, Vector} from "../math";
+import {quat, vec3} from "gl-matrix";
 
 export class MetallicRoughness {
-    private _emissiveFactor:Vector;
-    private _baseColorFactor:Quaternion;
+    private _emissiveFactor:vec3;
+    private _baseColorFactor:quat;
     private _metallicFactor:number;
     private _roughnessFactor:number;
     private _normalScale:number;
     private _occlusionStrength:number;
 
     constructor(){
-        this._baseColorFactor = new Quaternion(1,1,1,1);
+        this._baseColorFactor = quat.fromValues(1,1,1,1);
         this._metallicFactor = 1;
         this._roughnessFactor = 1;
         this._normalScale = 1;
         this._occlusionStrength = 1;
-        this._emissiveFactor = new Vector(0,0,0);
+        this._emissiveFactor = vec3.create();
     }
 
-    get baseColorFactor(): Quaternion {
+    get baseColorFactor(): quat {
         return this._baseColorFactor;
     }
 
-    set baseColorFactor(value: Quaternion) {
+    set baseColorFactor(value: quat) {
         this._baseColorFactor = value;
     }
 
@@ -41,11 +41,11 @@ export class MetallicRoughness {
         this._roughnessFactor = value;
     }
 
-    get emissiveFactor(): Vector {
+    get emissiveFactor(): vec3 {
         return this._emissiveFactor;
     }
 
-    set emissiveFactor(value: Vector) {
+    set emissiveFactor(value: vec3) {
         this._emissiveFactor = value;
     }
 

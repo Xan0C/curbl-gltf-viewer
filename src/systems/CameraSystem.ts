@@ -3,6 +3,7 @@ import {CameraComponent, TransformComponent} from "../components";
 import {GLUniformBufferObject} from "../gl/GLUniformBufferObject";
 import {UBO_BINDINGS} from "../viewer/constants";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
+import {mat4, vec3} from "gl-matrix";
 
 /**
  * Handle Camera component
@@ -17,9 +18,12 @@ export class CameraSystem extends System {
     private cameraUBO: GLUniformBufferObject;
     private gl:WebGL2RenderingContext;
 
+    private translation:vec3;
+
     constructor(config:{gl: WebGL2RenderingContext}){
         super();
         this.gl = config.gl;
+        this.translation = vec3.create();
     }
 
     setUp():void{
@@ -36,9 +40,9 @@ export class CameraSystem extends System {
             this._camera = entity;
             const camera = this._camera.get(CameraComponent);
             const transform = this._camera.get(TransformComponent);
-            this.cameraUBO.updateItem("projectionMatrix",camera.projMatrix.elements);
-            this.cameraUBO.updateItem("viewMatrix",camera.viewMatrix.elements);
-            this.cameraUBO.updateItem("viewPos",transform.modelMatrix.translation.elements);
+            this.cameraUBO.updateItem("projectionMatrix",camera.projMatrix);
+            this.cameraUBO.updateItem("viewMatrix",camera.viewMatrix);
+            this.cameraUBO.updateItem("viewPos",mat4.getTranslation(this.translation, transform.modelMatrix));
             this.cameraUBO.upload();
             this.cameraUBO.bindUBO();
         }
@@ -54,9 +58,9 @@ export class CameraSystem extends System {
         if(this._camera) {
             const camera = this._camera.get(CameraComponent);
             const transform = this._camera.get(TransformComponent);
-            this.cameraUBO.updateItem("projectionMatrix", camera.projMatrix.elements, true);
-            this.cameraUBO.updateItem("viewMatrix", camera.viewMatrix.elements, true);
-            this.cameraUBO.updateItem("viewPos", transform.modelMatrix.translation.elements, true);
+            this.cameraUBO.updateItem("projectionMatrix",camera.projMatrix, true);
+            this.cameraUBO.updateItem("viewMatrix",camera.viewMatrix, true);
+            this.cameraUBO.updateItem("viewPos",mat4.getTranslation(this.translation, transform.modelMatrix), true);
         }
     }
 

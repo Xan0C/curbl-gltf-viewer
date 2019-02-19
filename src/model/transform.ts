@@ -1,5 +1,4 @@
-import {Matrix, Quaternion, Vector} from "../math";
-
+import {mat4, quat, vec3} from "gl-matrix";
 
 export type TransformConfig = {
     position:{x:number,y:number,z:number},
@@ -11,10 +10,10 @@ export class Transform {
     private _level:number;
     private _parent:Transform;
     private _children:Transform[];
-    private _localMatrix:Matrix;
-    private _rotation:Quaternion;
-    private _translation:Vector;
-    private _scale:Vector;
+    private _localMatrix:mat4;
+    private _rotation:quat;
+    private _translation:vec3;
+    private _scale:vec3;
     private _dirty:boolean;
 
     constructor(config:TransformConfig={
@@ -31,7 +30,7 @@ export class Transform {
         scale: {x:1,y:1,z:1}
     }):void{
         //M=T*R*S
-        this._localMatrix = new Matrix();
+        this._localMatrix = mat4.create();
         if(!config){
             config = Object.create(null);
         }
@@ -45,9 +44,9 @@ export class Transform {
             config.scale = {x:1,y:1,z:1};
         }
 
-        this._rotation = new Quaternion(config.rotation.x,config.rotation.y,config.rotation.z,config.rotation.w);
-        this._translation = new Vector(config.position.x,config.position.y,config.position.z);
-        this._scale = new Vector(config.scale.x,config.scale.y,config.scale.z);
+        this._rotation = quat.fromValues(config.rotation.x,config.rotation.y,config.rotation.z,config.rotation.w);
+        this._translation = vec3.fromValues(config.position.x,config.position.y,config.position.z);
+        this._scale = vec3.fromValues(config.scale.x,config.scale.y,config.scale.z);
         this._children = [];
         this._level = 0;
         this._dirty = true;
@@ -72,25 +71,33 @@ export class Transform {
         }
     }
 
-    private apply():Matrix{
+    private apply():mat4{
         if(this._dirty) {
-            Matrix.setScale(this._scale, this._localMatrix);
-            //TODO: set rotation by quaternion
-            this._localMatrix.translate(this._translation);
+            mat4.fromRotationTranslationScale(
+                this._localMatrix,
+                this._rotation,
+                this._translation,
+                this._scale
+            );
             this._dirty = false;
         }
         return this._localMatrix;
     }
 
-    public get globalMatrix():Matrix {
+    public get globalMatrix():mat4 {
         if(!this._parent){
             return this.apply();
         }else{
-            return this._parent.globalMatrix.multiply(this.localMatrix);
+            //TODO: check if this is right or do we need to calculcate the parent globalMatrix?
+            return mat4.multiply(
+                mat4.create(),
+                this._parent.localMatrix,
+                this._localMatrix
+            );
         }
     }
 
-    public get modelMatrix():Matrix {
+    public get modelMatrix():mat4 {
         return this.globalMatrix;
     }
 
@@ -98,40 +105,40 @@ export class Transform {
      * Returns the LocalTransformation Matrix
      * @returns {Matrix}
      */
-    public get localMatrix():Matrix {
+    public get localMatrix():mat4 {
         return this.apply();
     }
 
-    public set localMatrix(value:Matrix) {
+    public set localMatrix(value:mat4) {
         this._localMatrix = value;
     }
 
-    public get translation():Vector {
+    public get translation():vec3 {
         this._dirty = true;
         return this._translation;
     }
 
-    public set translation(value:Vector) {
+    public set translation(value:vec3) {
         this._dirty = true;
         this._translation = value;
     }
 
-    public get rotation():Quaternion {
+    public get rotation():quat {
         this._dirty = true;
         return this._rotation;
     }
 
-    public set rotation(value:Quaternion) {
+    public set rotation(value:quat) {
         this._dirty = true;
         this._rotation = value;
     }
 
-    public get scale():Vector {
+    public get scale():vec3 {
         this._dirty = true;
         return this._scale;
     }
 
-    public set scale(value:Vector) {
+    public set scale(value:vec3) {
         this._dirty = true;
         this._scale = value;
     }

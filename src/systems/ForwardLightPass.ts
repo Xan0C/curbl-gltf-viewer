@@ -35,7 +35,7 @@ export class ForwardLightPass extends System {
         this.shader.bind();
         for(let i=0, light:IEntity; light = this.entities[i]; i++) {
             this.shader.uniforms.u_LightColor = light.get(LightComponent).color.elements;
-            this.shader.uniforms.u_LightDirection = light.get(LightComponent).direction.elements;
+            this.shader.uniforms.u_LightDirection = light.get(LightComponent).direction;
             this.modelPass.draw();
         }
         this.shader.unbind();

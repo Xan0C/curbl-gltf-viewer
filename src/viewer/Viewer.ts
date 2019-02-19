@@ -17,7 +17,6 @@ import {
     TransformComponent
 } from "../components";
 import {CameraSystem} from "../systems/CameraSystem";
-import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
 import {GLSLLoader} from "../loader/GLSLLoader";
 import {KhronosPbrShader} from "../shader/khronosPbrShader";
 import {SkyboxShader} from "../shader/SkyboxShader";
@@ -26,6 +25,7 @@ import {GUIComponent} from "../components/gui/GUIComponent";
 import {GUISystem} from "../systems/GUISystem";
 import {SkyboxPass} from "../systems/SkyboxPass";
 import {PrePass} from "../systems/PrePass";
+import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
 
 export class Viewer {
     private cache:Cache;
@@ -172,13 +172,13 @@ export class Viewer {
         const entity = ECS.createEntity();
         entity.add(new CameraComponent());
         entity.add(new TransformComponent({
-            position: {x:0,y:0,z:-4.00},
+            position: {x:0,y:0,z:-12.00},
             rotation: {x:0,y:0,z:0,w:1},
             scale: {x:1,y:1,z:1}
         }));
         entity.add(new LookAtCameraComponent({
             aspect: (1920/1080),
-            fov: 45,
+            fov: 45.0 * Math.PI / 180.0,
             near: 0.01,
             far: 100.0
         }));

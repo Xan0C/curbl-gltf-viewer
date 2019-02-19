@@ -1,4 +1,4 @@
-import {Vector} from "./vector";
+import {vec3} from "gl-matrix";
 
 export module Math3d {
 
@@ -10,16 +10,16 @@ export module Math3d {
      * @param {number} height
      * @returns {Vector}
      */
-    export function getVSpherePos(x:number,y:number,width:number,height:number):Vector{
-        let p = new Vector(1.0*x/width*2.0-1.0, 1.0*y/height*2.0-1.0, 0);
-        p.y = -p.y;
-        let sqrLen = p.lengthSquared();
+    export function getVSpherePos(x:number,y:number,width:number,height:number):vec3 {
+        const out:vec3 = vec3.fromValues(1.0*x/width*2.0-1.0, -(1.0*y/height*2.0-1.0) , 0);
+        vec3.squaredLength(out);
+        let sqrLen = vec3.squaredLength(out);
         if(sqrLen <= 1.0){
-            p.z = Math.sqrt(1-sqrLen);
+            vec3.add(out, out, [0,0,  Math.sqrt(1-sqrLen)]);
         }else{
-            p.normalize();
+            vec3.normalize(out, out);
         }
-        return p;
+        return out;
     }
 
     /**
@@ -29,17 +29,17 @@ export module Math3d {
      * @param {number} a - rotation angle
      * @returns {Vector}
      */
-    export function rotateAxisAngle(v:Vector,n:Vector,a:number):Vector{
+    export function rotateAxisAngle(v:vec3,n:vec3,a:number):vec3{
         let co = Math.cos(a);
         let si = Math.sin(a);
 
-        let o:Vector = new Vector();
-        let mx = new Vector(n.x*n.x*(1.0-co)+co, n.x*n.y*(1.0-co)-n.z*si, n.x*n.z*(1.0-co)+n.y*si);
-        let my = new Vector(n.x*n.y*(1.0-co)+n.z*si, n.y*n.y*(1.0-co)+co, n.y*n.z*(1.0-co)-n.x*si);
-        let mz = new Vector(n.x*n.z*(1.0-co)-n.y*si, n.z*n.y*(1.0-co)+n.x*si, n.z*n.z*(1.0-co)+co);
-        o.x = mx.dot(v);
-        o.y = my.dot(v);
-        o.z = mz.dot(v);
+        let o:vec3 = vec3.create();
+        let mx = vec3.fromValues(n[0]*n[0]*(1.0-co)+co, n[0]*n[1]*(1.0-co)-n[2]*si, n[0]*n[2]*(1.0-co)+n[1]*si);
+        let my = vec3.fromValues(n[0]*n[1]*(1.0-co)+n[2]*si, n[1]*n[1]*(1.0-co)+co, n[1]*n[2]*(1.0-co)-n[0]*si);
+        let mz = vec3.fromValues(n[0]*n[2]*(1.0-co)-n[1]*si, n[2]*n[1]*(1.0-co)+n[0]*si, n[2]*n[2]*(1.0-co)+co);
+        o[0] = vec3.dot(mx, v);
+        o[1] = vec3.dot(my, v);
+        o[2] = vec3.dot(mz, v);
         return o;
     }
 

@@ -1,7 +1,8 @@
 import {CameraComponent, LookAtCameraComponent, TransformComponent} from "../components";
 import {ECS, IEntity, ISystem, System} from "curbl-ecs";
-import {Math3d, Matrix, Vector} from "../math";
+import {Math3d} from "../math";
 import {DomEvents} from "../events/DomEvents";
+import {mat4, quat, vec3} from "gl-matrix";
 
 @ECS.System(TransformComponent,CameraComponent,LookAtCameraComponent)
 export class LookAtCameraControlSystem extends System implements ISystem {
@@ -36,16 +37,34 @@ export class LookAtCameraControlSystem extends System implements ISystem {
         }
     }
 
+    private calcTranslation(panning:vec3, zooming:vec3, rotation:quat):vec3 {
+        const translation = vec3.create();
+        vec3.add(translation, translation, panning);
+        vec3.add(translation, translation, zooming);
+        const vec3Rotation = vec3.fromValues(
+            rotation[0]/rotation[3],
+            rotation[1]/rotation[3],
+            rotation[2]/rotation[3]
+        );
+        return vec3.add(translation, translation, vec3Rotation);
+    }
+
     public onMouseUp(ev:MouseEvent){
         for(let i=0,entity:IEntity; entity = this.entities[i]; i++){
             let transform = entity.get(TransformComponent);
             let perspective = entity.get(LookAtCameraComponent);
 
-            transform.translation = transform.translation.add(perspective.panning).add(perspective.zooming).add(transform.rotation.toVec3());
-            perspective.target = perspective.target.add(perspective.panning);
-            transform.rotation.x = transform.rotation.y = transform.rotation.z = 0;
-            perspective.panning.x = perspective.panning.y = perspective.panning.z = 0;
-            perspective.zooming.x = perspective.zooming.y = perspective.zooming.z = 0;
+            const translation = this.calcTranslation(
+                perspective.panning,
+                perspective.zooming,
+                transform.rotation
+            );
+            vec3.add(transform.translation, transform.translation, translation);
+
+            vec3.add(perspective.target, perspective.target, perspective.panning);
+            quat.set(transform.rotation, 0, 0, 0, transform.rotation[3]);
+            vec3.set(perspective.panning, 0, 0, 0);
+            vec3.set(perspective.zooming, 0, 0, 0);
         }
         this.drag = false;
         this.lastMouseX = -1;
@@ -59,8 +78,13 @@ export class LookAtCameraControlSystem extends System implements ISystem {
 
             const delta = (ev.deltaX + ev.deltaY + ev.deltaZ)/3;
             this.zoom(entity, delta, 0.001);
-            transform.translation = transform.translation.add(perspective.panning).add(perspective.zooming).add(transform.rotation.toVec3());
-            perspective.zooming.x = perspective.zooming.y = perspective.zooming.z = 0;
+            const translation = this.calcTranslation(
+                perspective.panning,
+                perspective.zooming,
+                transform.rotation
+            );
+            vec3.add(transform.translation, transform.translation, translation);
+            vec3.set(perspective.zooming, 0, 0, 0);
         }
     }
 
@@ -98,9 +122,14 @@ export class LookAtCameraControlSystem extends System implements ISystem {
             const perspective = entity.get(LookAtCameraComponent);
             const transform = entity.get(TransformComponent);
             this.pan(entity,x, y);
-            transform.translation = transform.translation.add(perspective.panning).add(perspective.zooming).add(transform.rotation.toVec3());
-            perspective.target = perspective.target.add(perspective.panning);
-            perspective.panning.x = perspective.panning.y = perspective.panning.z = 0;
+            const translation = this.calcTranslation(
+                perspective.panning,
+                perspective.zooming,
+                transform.rotation
+            );
+            vec3.add(transform.translation, transform.translation, translation);
+            vec3.add(perspective.target, perspective.target, perspective.panning);
+            vec3.set(perspective.panning, 0, 0, 0);
         }
     }
 
@@ -110,12 +139,19 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     protected pan(entity:IEntity,dx:number,dy:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
-        let aDir = perspective.target.substract(transform.translation); //Vektor von Target nach Position
-        aDir = aDir.normalize();
-        let aRight = aDir.cross(perspective.up);
-        aRight = aRight.normalize();
-        let aUp = aDir.cross(aRight);
-        perspective.panning = aRight.mult(dx).add(aUp.mult(dy));
+
+        const aDir = vec3.create();
+        vec3.subtract(aDir, perspective.target, transform.translation); //Vektor von Target nach Position
+        vec3.normalize(aDir, aDir);
+        const aRight = vec3.create();
+        vec3.cross(aRight, aDir, perspective.up);
+        vec3.normalize(aRight, aRight);
+        const aUp = vec3.create();
+        vec3.cross(aUp, aDir, aRight);
+        //calc out vector(overwriting aRight, aUp)
+        vec3.scale(aRight, aRight, dx);
+        vec3.scale(aUp, aUp, dy);
+        vec3.add(perspective.panning, aRight, aUp);
     }
 
     /**
@@ -125,27 +161,30 @@ export class LookAtCameraControlSystem extends System implements ISystem {
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
         let dz = (perspective.zoomPos + wheelDelta)*delta;
-        let aDir = perspective.target.substract(transform.translation);
-        let dist = aDir.length();
-        aDir = aDir.normalize();
+        const aDir = vec3.create();
+        vec3.subtract(aDir, perspective.target, transform.translation);
+        const dist = vec3.length(aDir);
+        vec3.normalize(aDir, aDir);
         if(dist-dz <= 1.0){
-            perspective.zooming = aDir.mult(dist-1.0);
-            return;
+            vec3.scale(perspective.zooming, aDir, dist-1.0);
+        }else {
+            vec3.scale(perspective.zooming, aDir, dz);
         }
-        perspective.zooming = aDir.mult(dz);
     }
 
     protected rotate(entity:IEntity,x:number,y:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
-        let po = Math3d.getVSpherePos(this.lastMouseX,this.lastMouseY,this.display.width,this.display.height);
-        let pn = Math3d.getVSpherePos(x,y,this.display.width,this.display.height);
+        const po = Math3d.getVSpherePos(this.lastMouseX,this.lastMouseY,this.display.width,this.display.height);
+        const pn = Math3d.getVSpherePos(x,y,this.display.width,this.display.height);
 
-        if(po.substract(pn).lengthSquared() < 0.0001 ){
+        const poPn = vec3.create();
+        vec3.subtract(poPn, po, pn);
+        if(vec3.squaredLength(poPn) < 0.0001 ){
             return;
         }
 
-        let cosangle = po.dot(pn);
+        let cosangle = vec3.dot(po, pn);
         if(cosangle > 1.0){
             cosangle = 1;
         }
@@ -154,24 +193,33 @@ export class LookAtCameraControlSystem extends System implements ISystem {
         }
 
         let angle = Math.acos(cosangle);
-        let rotAxis = pn.cross(po);
-        rotAxis = rotAxis.normalize();
-        let diff = new Vector(0,0,transform.translation.substract(perspective.target).length());
+        const rotAxis = vec3.create();
+        vec3.cross(rotAxis, pn, po);
+        vec3.normalize(rotAxis, rotAxis);
+        const subTranslationPerspective = vec3.create();
+        vec3.subtract(subTranslationPerspective, transform.translation, perspective.target);
+        let diff = vec3.fromValues(0, 0, vec3.length(subTranslationPerspective));
         let rotDiff = Math3d.rotateAxisAngle(diff,rotAxis,angle);
 
-        let cDir = perspective.target.substract(transform.translation);
-        cDir = cDir.normalize();
-        let cUp = perspective.up;
-        let cRight = cDir.cross(cUp);
-        cRight = cRight.normalize();
-        cRight = cRight.normalize();
-        cUp = cRight.cross(cDir);
+        const cDir = vec3.create();
+        vec3.subtract(cDir, perspective.target, transform.translation);
+        vec3.normalize(cDir, cDir);
+        const cRight = vec3.create();
+        vec3.cross(cRight, cDir, perspective.up);
+        vec3.normalize(cRight, cRight);
 
-        let rotDiffW:Vector = new Vector();
-        rotDiffW.x = cRight.x * rotDiff.x + cUp.x * rotDiff.y +  -cDir.x * rotDiff.z;
-        rotDiffW.y = cRight.y * rotDiff.x + cUp.y * rotDiff.y +  -cDir.y * rotDiff.z;
-        rotDiffW.z = cRight.z * rotDiff.x + cUp.z * rotDiff.y +  -cDir.z * rotDiff.z;
-        transform.rotation.setXYZ(rotDiffW.substract(transform.translation.substract(perspective.target)));
+        const cUp = vec3.create();
+        vec3.cross(cUp, cRight, cDir);
+
+        const rotDiffW:vec3 = vec3.fromValues(
+            cRight[0] * rotDiff[0] + cUp[0] * rotDiff[1] +  -cDir[0] * rotDiff[2],
+            cRight[1] * rotDiff[0] + cUp[1] * rotDiff[1] +  -cDir[1] * rotDiff[2],
+            cRight[2] * rotDiff[0] + cUp[2] * rotDiff[1] +  -cDir[2] * rotDiff[2],
+        );
+        const out = vec3.create();
+        vec3.subtract(out, rotDiffW, vec3.subtract(out, transform.translation, perspective.target));
+        const w = transform.rotation[3];
+        quat.set(transform.rotation, out[0]/w, out[1]/w, out[2]/w, w);
     }
 
     update():void{
@@ -181,16 +229,30 @@ export class LookAtCameraControlSystem extends System implements ISystem {
             const perspective = entity.get(LookAtCameraComponent);
 
             //Update
-            transform.translation = transform.translation.add(perspective.panning).add(perspective.zooming).add(transform.rotation.toVec3());
-            perspective.target = perspective.target.add(perspective.panning);
-            transform.rotation.x = transform.rotation.y = transform.rotation.z = 0;
-            perspective.panning.x = perspective.panning.y = perspective.panning.z = 0;
-            perspective.zooming.x = perspective.zooming.y = perspective.zooming.z = 0;
+            const translation = this.calcTranslation(
+                perspective.panning,
+                perspective.zooming,
+                transform.rotation
+            );
+            vec3.add(transform.translation, transform.translation, translation);
+            vec3.add(perspective.target, perspective.target, perspective.panning);
+
+            quat.set(transform.rotation, 0, 0, 0, transform.rotation[3]);
+            vec3.set(perspective.panning, 0, 0, 0);
+            vec3.set(perspective.zooming, 0, 0, 0);
 
             //Apply to camera localMatrix
-            let target =  perspective.target.add(perspective.panning);
-            let position = transform.translation.add(perspective.panning).add(perspective.zooming);
-            Matrix.setLookAt(position,target,perspective.up,camera.viewMatrix)
+            const target = vec3.create();
+            vec3.add(target, perspective.target, perspective.panning);
+            const position = vec3.create();
+            vec3.add(position, perspective.panning, perspective.zooming);
+            vec3.add(position, position, transform.translation);
+            mat4.lookAt(
+                camera.viewMatrix,
+                position,
+                target,
+                perspective.up
+            );
         }
     }
 }

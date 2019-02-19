@@ -75,7 +75,7 @@ export class KhronosPbrShader extends Shader {
             const texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.ALBEDO].texture);
             texture.bind(TEXTURES.DIFFUSE);
             this.uniforms.u_BaseColorSampler = TEXTURES.DIFFUSE;
-            this.uniforms.u_BaseColorFactor = material.model.baseColorFactor.elements;
+            this.uniforms.u_BaseColorFactor = material.model.baseColorFactor;
         }
         //applyMaterial MetallicRoughnessSampler
         if(material.maps[MATERIAL_MAPS.METAL_ROUGHNESS]){
@@ -97,7 +97,7 @@ export class KhronosPbrShader extends Shader {
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.EMISSIVE].texture);
             texture.bind(TEXTURES.EMISSIVE);
             this.uniforms.u_EmissiveSampler = TEXTURES.EMISSIVE;
-            this.uniforms.u_EmissiveFactor = material.model.emissiveFactor.elements;
+            this.uniforms.u_EmissiveFactor = material.model.emissiveFactor;
         }
         //apply Occlusion map
         if(material.maps[MATERIAL_MAPS.OCCLUSION]) {

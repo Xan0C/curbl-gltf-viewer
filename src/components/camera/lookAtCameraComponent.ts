@@ -1,11 +1,11 @@
 import {ECS, IComponent} from "curbl-ecs";
-import {Vector} from "../../math";
+import {vec3} from "gl-matrix";
 
 export type LookAtCameraConfig = {
-    target?:Vector,
-    up?:Vector,
-    panning?:Vector,
-    zoom?:Vector,
+    target?:vec3,
+    up?:vec3,
+    panning?:vec3,
+    zoom?:vec3,
     fov?:number,
     near?:number,
     far?:number,
@@ -16,10 +16,10 @@ export type LookAtCameraConfig = {
 @ECS.Component()
 export class LookAtCameraComponent implements IComponent{
 
-    protected _target:Vector;
-    protected _up:Vector;
-    protected _panning:Vector;
-    protected _zooming:Vector;
+    protected _target:vec3;
+    protected _up:vec3;
+    protected _panning:vec3;
+    protected _zooming:vec3;
     protected _zoomPos:number;
     protected _aspect:number;
 
@@ -30,18 +30,18 @@ export class LookAtCameraComponent implements IComponent{
     init(config:LookAtCameraConfig=
              {
                  aspect:16/9,
-                 target: new Vector(0,0,0),
-                 up: new Vector(0,1,0),
-                 panning: new Vector(0,0,0),
-                 zoom: new Vector(0,0,0),
-                 fov:65,
+                 target: vec3.create(),
+                 up: vec3.fromValues(0,1,0),
+                 panning: vec3.create(),
+                 zoom: vec3.create(),
+                 fov:65 * Math.PI / 180,
                  near:0.045,
                  far:2000,
              }):void {
-        this._target = config.target||new Vector(0,0,0);
-        this._up = config.up||new Vector(0,1,0);
-        this._panning = config.panning||new Vector(0,0,0);
-        this._zooming = config.zoom||new Vector(0,0,0);
+        this._target = config.target||vec3.create();
+        this._up = config.up||vec3.fromValues(0,1,0);
+        this._panning = config.panning||vec3.create();
+        this._zooming = config.zoom||vec3.create();
         this._aspect = config.aspect||(16/9);
         this._zoomPos = 0;
     }
@@ -49,35 +49,35 @@ export class LookAtCameraComponent implements IComponent{
     remove():void {
     }
 
-    public get target():Vector {
+    public get target():vec3 {
         return this._target;
     }
 
-    public set target(value:Vector) {
+    public set target(value:vec3) {
         this._target = value;
     }
 
-    public get up():Vector {
+    public get up():vec3 {
         return this._up;
     }
 
-    public set up(value:Vector) {
+    public set up(value:vec3) {
         this._up = value;
     }
 
-    public get panning():Vector {
+    public get panning():vec3 {
         return this._panning;
     }
 
-    public set panning(value:Vector) {
+    public set panning(value:vec3) {
         this._panning = value;
     }
 
-    public get zooming():Vector {
+    public get zooming():vec3 {
         return this._zooming;
     }
 
-    public set zooming(value:Vector) {
+    public set zooming(value:vec3) {
         this._zooming = value;
     }
 

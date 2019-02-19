@@ -5,7 +5,7 @@ import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
 import {Model} from "../model";
 import {GL_PRIMITIVES} from "../gl/constants";
 import {Shader} from "../model/shader";
-import {Matrix} from "../math";
+import {mat4} from "gl-matrix";
 // import {GLBuffer} from "../gl";
 
 @ECS.System(ModelComponent,TransformComponent)
@@ -14,6 +14,7 @@ export class ForwardModelPass extends System {
     private gl:WebGL2RenderingContext;
     private cache:Cache;
     private shader: Shader;
+    private modelMatrix:mat4;
     // private vertexBuffer:GLBuffer;
     // private indexBuffer:GLBuffer;
 
@@ -22,6 +23,7 @@ export class ForwardModelPass extends System {
         this.gl = config.gl;
         this.cache = config.cache;
         this.shader = config.shader;
+        this.modelMatrix = mat4.create();
         // this.vertexBuffer = GLBuffer.createVertexBuffer(this.gl);
         // this.indexBuffer = GLBuffer.createIndexBuffer(this.gl);
     }
@@ -64,8 +66,8 @@ export class ForwardModelPass extends System {
         const model = this.cache.get<Model>(CACHE_TYPE.MODEL,key);
 
         const modelTransform = model.transform.modelMatrix;
-        const transformComponent =  entity.get(TransformComponent).modelMatrix;
-        this.shader.uniforms.u_ModelMatrix = Matrix.multiply(transformComponent, modelTransform).elements;
+        const transformMatrix =  entity.get(TransformComponent).modelMatrix;
+        this.shader.uniforms.u_ModelMatrix = mat4.multiply(this.modelMatrix, transformMatrix, modelTransform);
 
         this.shader.apply(model);
         model.draw(this.shader,this.cache);

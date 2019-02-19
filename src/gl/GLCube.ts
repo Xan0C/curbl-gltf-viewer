@@ -1,6 +1,6 @@
 import {GLBuffer} from "./GLBuffer";
 import {GLVertexArrayObject} from "./GLVertexArrayObject";
-import {Vector} from "../math";
+import {vec3} from "gl-matrix";
 /**
  * Created by Soeren on 18.05.2017.
  */
@@ -71,36 +71,40 @@ export class GLCube {
         indices[34] = 4;
         indices[35] = 2;
 
-        let a,b,c;
+        let a:vec3,b:vec3,c:vec3;
         const fVertices = [];
         for(let i=0; i < indices.length; i+=3){
-            a = new Vector();
-            a.x = vertices[indices[i]*3];
-            a.y = vertices[indices[i]*3+1];
-            a.z = vertices[indices[i]*3+2];
+            a = vec3.fromValues(
+                vertices[indices[i]*3],
+                vertices[indices[i]*3+1],
+                vertices[indices[i]*3+2]
+            );
 
-            b = new Vector();
-            b.x = vertices[indices[i+1]*3];
-            b.y = vertices[indices[i+1]*3+1];
-            b.z = vertices[indices[i+1]*3+2];
+            b = vec3.fromValues(
+                vertices[indices[i+1]*3],
+                vertices[indices[i+1]*3+1],
+                vertices[indices[i+1]*3+2]
+            );
 
-            c = new Vector();
-            c.x = vertices[indices[i+2]*3];
-            c.y = vertices[indices[i+2]*3+1];
-            c.z = vertices[indices[i+2]*3+2];
+            c = vec3.fromValues(
+                vertices[indices[i+2]*3],
+                vertices[indices[i+2]*3+1],
+                vertices[indices[i+2]*3+2]
+            );
 
-            let ab = b.substract(a);
-            let ac = c.substract(a);
+            const ab = vec3.create();
+            vec3.subtract(ab, b, a);
+            const ac = vec3.create();
+            vec3.subtract(ac, c , a);
+            const normal = vec3.create();
+            vec3.cross(normal, ab, ac);
+            vec3.normalize(normal, normal);
 
-            let normal = ab.cross(ac);
-            normal = normal.normalize();
-
-            fVertices.push(a.x,a.y,a.z,normal.x,normal.y,normal.z);
-            fVertices.push(b.x,b.y,b.z,normal.x,normal.y,normal.z);
-            fVertices.push(c.x,c.y,c.z,normal.x,normal.y,normal.z);
+            fVertices.push(a[0],a[1],a[2],normal[0],normal[1],normal[2]);
+            fVertices.push(b[0],b[1],b[2],normal[0],normal[1],normal[2]);
+            fVertices.push(c[0],c[1],c[2],normal[0],normal[1],normal[2]);
         }
-        const arrayBuffer = new Float32Array(fVertices);
-        return arrayBuffer;
+        return new Float32Array(fVertices);
     }
 
     private createVertexData(){

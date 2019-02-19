@@ -8,7 +8,6 @@ import {
     IGLTF_Primitive,
     IGLTF_Scene
 } from "./model";
-import {Matrix, Vector, Quaternion} from "../math";
 import {GL_BUFFERS, TEXTURE_WRAP} from "../gl/constants";
 import {TextureLoader, TextureLoaderConfig} from "../loader/TextureLoader";
 import {BufferView, Model, Primitive} from "../model";
@@ -17,6 +16,7 @@ import {MetallicRoughness} from "../material/metallicRoughness";
 import {ECS} from "curbl-ecs";
 import {Cache, CACHE_TYPE} from "../cache";
 import {Transform} from "../model/transform";
+import {mat4, quat, vec3} from "gl-matrix";
 
 export const GLTF_ACCESORTYPE_SIZE:{[id:string]:number} = {
     [ACCESSOR_TYPE.SCALAR] : 1,
@@ -136,13 +136,13 @@ export class GLTF_Parser {
      * @param parent
      */
     private processNode(model:Model, node:IGLTF_Node, parent?: Transform):void{
-        this.parseMesh(model,node.mesh);
-        const transform = this.parseTransform(model,node, parent);
+        this.parseMesh(model, node.mesh);
+        const transform = this.parseTransform(model, node, parent);
 
         node.children = node.children||[];
         for(let i=0,child:number; i < node.children.length ;i++){
             child = node.children[i];
-            this.processNode(model,this.gltfModel.nodes[child],transform);
+            this.processNode(model, this.gltfModel.nodes[child], transform);
         }
     }
 
@@ -156,22 +156,19 @@ export class GLTF_Parser {
     private parseTransform(model:Model, node:IGLTF_Node, parent?:Transform): Transform{
         const transform:Transform = new Transform();
         if(node.matrix !== undefined && node.matrix !== null) {
-            transform.localMatrix = new Matrix(node.matrix);
-            transform.translation = transform.localMatrix.translation;
-            transform.rotation = transform.localMatrix.getRotation();
-            transform.scale = transform.localMatrix.getScale();
+            transform.localMatrix = mat4.clone(node.matrix as any);
+            mat4.getTranslation(transform.translation, transform.localMatrix);
+            mat4.getRotation(transform.rotation, transform.localMatrix);
+            mat4.getScaling(transform.scale, transform.localMatrix);
         }
         if(node.translation !== undefined && node.translation !== null){
-            const t = node.translation;
-            transform.translation = new Vector(t[0],t[1],t[2]);
+            transform.translation = vec3.clone(node.translation);
         }
         if(node.rotation !== undefined && node.rotation !== null){
-            const r = node.rotation;
-            transform.rotation = new Quaternion(r[0],r[1],r[2],r[3]);
+            transform.rotation = quat.clone(node.rotation as any);
         }
         if(node.scale !== undefined && node.scale !== null){
-            const s = node.scale;
-            transform.scale = new Vector(s[0],s[1],s[2]);
+            transform.scale = vec3.clone(node.scale);
         }
         if(parent){
             parent.addChild(transform);
@@ -311,10 +308,7 @@ export class GLTF_Parser {
             }
 
             if(materialNode.emissiveFactor){
-                material.model.emissiveFactor.set(
-                    materialNode.emissiveFactor[0],
-                    materialNode.emissiveFactor[1],
-                    materialNode.emissiveFactor[2]);
+                material.model.emissiveFactor.set(materialNode.emissiveFactor);
             }
             //TODO: alphaMode
             //TODO: alphaCutoff
@@ -364,12 +358,7 @@ export class GLTF_Parser {
         }
 
         if(pbr.baseColorFactor){
-            material.model.baseColorFactor.set(
-                pbr.baseColorFactor[0],
-                pbr.baseColorFactor[1],
-                pbr.baseColorFactor[2],
-                pbr.baseColorFactor[3],
-            );
+            material.model.baseColorFactor.set(pbr.baseColorFactor);
         }
 
         if(pbr.metallicFactor !== null

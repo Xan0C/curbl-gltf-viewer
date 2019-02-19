@@ -1,13 +1,6 @@
 import {GLTexture} from "./GLTexture";
 
 export class GLCubemap extends GLTexture {
-    public static readonly RIGHT_FACE: number = 0;
-    public static readonly LEFT_FACE: number = 1;
-    public static readonly TOP_FACE: number = 2;
-    public static readonly BOTTOM_FACE: number = 3;
-    public static readonly FRONT_FACE: number = 4;
-    public static readonly BACK_FACE: number = 5;
-
     protected gl: WebGL2RenderingContext;
     protected _textureID: number;
     protected _texture: WebGLTexture;
