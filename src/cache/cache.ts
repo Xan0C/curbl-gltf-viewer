@@ -1,8 +1,16 @@
 import {IBaseCache} from "./caches";
 
+/**
+ * With Scene, Node and Mesh cache we can access the Model in different stages
+ * e.g. Mesh has no animation or Transform,
+ * e.g. Node has Animation, Transform etc. for one Mesh
+ * e.g. Scene has all Nodes with all Animations and Transforms
+ */
 export enum CACHE_TYPE  {
     TEXTURE,
-    MODEL,
+    MESH,
+    NODE,
+    SCENE,
     MATERIAL,
     SHADER
 }

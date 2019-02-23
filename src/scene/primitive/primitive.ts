@@ -1,15 +1,15 @@
-import {AttributeAccessor, IndexAccessor} from "./accessor";
+import {Accessor, IndexAccessor} from "./accessor";
 import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "../../gl";
 
 /**
  * GLTF Primitive wrapper
- * Primitive is a Geometric piece of the Model that uses a specific material
+ * Primitive is a Geometric piece of the Mesh that uses a specific material
  * or. a stream of vertices that can be rendered together
  */
 export class Primitive {
     private _name:string;
     private _draw_mode:number;
-    private _attributes:{[id:string]:AttributeAccessor};
+    private _attributes:{[id:string]:Accessor};
     private _indices:IndexAccessor;
     private _material:string;
     private _vertexArrayObject:GLVertexArrayObject;
@@ -37,10 +37,10 @@ export class Primitive {
      * @param {number} stride
      * @param {number} byteOffset
      * @param {number} bufferView
-     * @returns {AttributeAccessor}
+     * @returns {Accessor}
      */
-    public addAttribute(key:GL_PRIMITIVES|string, count:number, type:GL_TYPES, normalized:boolean=false, stride:number=0, byteOffset:number=0, bufferView:number):AttributeAccessor{
-        const accessor = new AttributeAccessor();
+    public addAttribute(key:GL_PRIMITIVES|string, count:number, type:GL_TYPES, normalized:boolean=false, stride:number=0, byteOffset:number=0, bufferView:number):Accessor{
+        const accessor = new Accessor();
         accessor.bufferView = bufferView;
         accessor.size = count;
         accessor.type = type;
@@ -103,11 +103,11 @@ export class Primitive {
         this._draw_mode = value;
     }
 
-    public get attributes():{ [p:string]:AttributeAccessor } {
+    public get attributes():{ [p:string]:Accessor } {
         return this._attributes;
     }
 
-    public set attributes(value:{ [p:string]:AttributeAccessor }) {
+    public set attributes(value:{ [p:string]:Accessor }) {
         this._attributes = value;
     }
 

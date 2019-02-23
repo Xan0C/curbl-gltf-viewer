@@ -3,4 +3,4 @@
  */
 
 export * from "./bufferView";
-export * from "./modelbuffer";
+export * from "./buffermap";

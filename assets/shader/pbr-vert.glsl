@@ -13,7 +13,7 @@ layout (std140) uniform Matrices
     vec3 viewPos;
 } Camera;
 
-//Model
+//Mesh
 uniform mat4 u_ModelMatrix;
 
 //out

@@ -5,7 +5,7 @@ import {TextureLoader} from "../loader/TextureLoader";
 import {GLTFLoader} from "../loader/GLTFLoader";
 import {BaseCache, Cache, CACHE_TYPE} from "../cache";
 import {GL_INTERNALFORMAT, GL_TYPES, GLTexture, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "../gl";
-import {Model} from "../model";
+import {Mesh} from "../scene";
 import {Material} from "../material";
 import {GLOBAL_TEXTURES} from "./constants";
 import {ECS} from "curbl-ecs";
@@ -13,7 +13,7 @@ import {
     CameraComponent,
     LightComponent,
     LookAtCameraComponent,
-    ModelComponent,
+    SceneComponent,
     TransformComponent
 } from "../components";
 import {CameraSystem} from "../systems/CameraSystem";
@@ -26,6 +26,8 @@ import {GUISystem} from "../systems/GUISystem";
 import {SkyboxPass} from "../systems/SkyboxPass";
 import {PrePass} from "../systems/PrePass";
 import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
+import {Scene} from "../scene/scene";
+import {SceneNode} from "../scene/sceneNode";
 
 export class Viewer {
     private cache:Cache;
@@ -48,8 +50,10 @@ export class Viewer {
 
         //Create cache
         this.cache.addCache(CACHE_TYPE.MATERIAL, new BaseCache<Material>());
-        this.cache.addCache(CACHE_TYPE.MODEL, new BaseCache<Model>());
+        this.cache.addCache(CACHE_TYPE.MESH, new BaseCache<Mesh>());
         this.cache.addCache(CACHE_TYPE.TEXTURE, new BaseCache<GLTexture>());
+        this.cache.addCache(CACHE_TYPE.SCENE, new BaseCache<Scene>());
+        this.cache.addCache(CACHE_TYPE.NODE, new BaseCache<SceneNode>());
 
         //Set loader Middlewares
         this.loader.addMiddleware(new CubemapLoader(gl), CubemapLoader);
@@ -127,7 +131,7 @@ export class Viewer {
 
     private loadModel() {
         this.loader.get(GLTFLoader).add(
-            "bottle",
+            "WaterBottle",
             "../assets/bottle/WaterBottle.gltf",
             "../assets/bottle/WaterBottle.bin"
         );
@@ -137,7 +141,8 @@ export class Viewer {
         this.shader = new KhronosPbrShader(this.gl, this.cache);
         this.skyboxShader = new SkyboxShader(this.gl, this.cache);
 
-        this.shader.initializeDefines(this.cache.get<Model>(CACHE_TYPE.MODEL, "bottle"));
+        //TODO: key must be the name used for the Mesh and the gltf file
+        this.shader.initializeDefines(this.cache.get<Mesh>(CACHE_TYPE.MESH, "WaterBottle"));
 
         this.loader.get(GLSLLoader).add("shader", "../assets/shader/pbr-vert.glsl", "../assets/shader/pbr-frag.glsl", this.shader);
         this.loader.get(GLSLLoader).add("skyboxShader", "../assets/shader/skybox-vert.glsl", "../assets/shader/skybox-frag.glsl", this.skyboxShader);
@@ -159,7 +164,8 @@ export class Viewer {
 
     private createModellEntity() {
         const entity = ECS.createEntity();
-        entity.add(new ModelComponent({key: "bottle"}));
+        //TODO: key must be the name used for the Mesh ion the gltf file
+        entity.add(new SceneComponent({key: "WaterBottle"}));
         entity.add(new TransformComponent({
             position: {x:0, y:0, z:0},
             rotation: {x:0, y:0, z:0, w:1},

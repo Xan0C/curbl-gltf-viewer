@@ -1,11 +1,13 @@
-import {Shader} from "../model/shader";
-import {Model} from "../model";
+import {Shader} from "../scene/shader";
+import {Mesh} from "../scene";
 import {Material, MATERIAL_MAPS} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {GL_PRIMITIVES, GLTexture} from "../gl";
 import {Cache, CACHE_TYPE} from "../cache";
 import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 import {GLCubemap} from "../gl/GLCubemap";
+import {SceneNode} from "../scene/sceneNode";
+import {Scene} from "../scene/scene";
 
 const TEXTURES = {
     DIFFUSE_ENVIRONMENT: 0,
@@ -27,7 +29,7 @@ export class KhronosPbrShader extends Shader {
         this.cache = cache;
     }
 
-    public initializeDefines(model:Model) {
+    public initializeDefines(model:Mesh) {
         if (model.hasAttribute(GL_PRIMITIVES.NORMAL)) {
             this.addDefine("HAS_NORMALS", 1);
         }
@@ -62,9 +64,17 @@ export class KhronosPbrShader extends Shader {
         }
     }
 
-    public apply(model:Model):void {}
+    applyMesh(model:Mesh):void {}
 
-    public applyMaterial(material?:Material<MetallicRoughness>) {
+    applyNode(node: SceneNode): void {
+        this.uniforms.u_ModelMatrix = node.transform.modelMatrix;
+    }
+
+    applyScene(scene: Scene): void {
+
+    }
+
+    applyMaterial(material?:Material<MetallicRoughness>) {
         this.applyCamera();
         this.applyTextures(material);
     }
@@ -99,7 +109,7 @@ export class KhronosPbrShader extends Shader {
             this.uniforms.u_EmissiveSampler = TEXTURES.EMISSIVE;
             this.uniforms.u_EmissiveFactor = material.model.emissiveFactor;
         }
-        //apply Occlusion map
+        //applyMesh Occlusion map
         if(material.maps[MATERIAL_MAPS.OCCLUSION]) {
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.OCCLUSION].texture);
             texture.bind(TEXTURES.OCCLUSION);

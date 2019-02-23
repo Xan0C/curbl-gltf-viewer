@@ -1,15 +1,15 @@
 import {ECS, IEntity, System} from "curbl-ecs";
 import {LightComponent} from "../components";
 import {Cache} from "../cache";
-import {ForwardModelPass} from "./ForwardModelPass";
-import {Shader} from "../model/shader";
+import {ForwardScenePass} from "./ForwardScenePass";
+import {Shader} from "../scene/shader";
 
 @ECS.System(LightComponent)
 export class ForwardLightPass extends System {
 
     private gl:WebGL2RenderingContext;
     private cache:Cache;
-    private modelPass:ForwardModelPass;
+    private scenePass:ForwardScenePass;
     private shader: Shader;
 
     constructor(config:{gl: WebGL2RenderingContext, cache: Cache, shader: Shader}){
@@ -20,11 +20,11 @@ export class ForwardLightPass extends System {
     }
 
     setUp():void{
-        this.modelPass = ECS.addSystem(new ForwardModelPass({gl:this.gl,cache:this.cache,shader:this.shader}));
+        this.scenePass = ECS.addSystem(new ForwardScenePass({gl:this.gl,cache:this.cache,shader:this.shader}));
     }
 
     tearDown():void {
-        ECS.removeSystem(this.modelPass);
+        ECS.removeSystem(this.scenePass);
     }
     
     render():void {
@@ -36,7 +36,7 @@ export class ForwardLightPass extends System {
         for(let i=0, light:IEntity; light = this.entities[i]; i++) {
             this.shader.uniforms.u_LightColor = light.get(LightComponent).color.elements;
             this.shader.uniforms.u_LightDirection = light.get(LightComponent).direction;
-            this.modelPass.draw();
+            this.scenePass.draw();
         }
         this.shader.unbind();
 

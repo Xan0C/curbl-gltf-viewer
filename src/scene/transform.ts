@@ -11,6 +11,7 @@ export class Transform {
     private _parent:Transform;
     private _children:Transform[];
     private _localMatrix:mat4;
+    private _worldMatrix:mat4;
     private _rotation:quat;
     private _translation:vec3;
     private _scale:vec3;
@@ -50,6 +51,7 @@ export class Transform {
         this._children = [];
         this._level = 0;
         this._dirty = true;
+        this._worldMatrix = mat4.create();
         this.apply();
     }
 
@@ -84,21 +86,22 @@ export class Transform {
         return this._localMatrix;
     }
 
-    public get globalMatrix():mat4 {
+    //TODO: check if we need to recalculate worldMatrix
+    get worldMatrix(): mat4 {
         if(!this._parent){
             return this.apply();
         }else{
-            //TODO: check if this is right or do we need to calculcate the parent globalMatrix?
+            mat4.identity(this._worldMatrix);
             return mat4.multiply(
-                mat4.create(),
-                this._parent.localMatrix,
+                this._worldMatrix,
+                this._parent.worldMatrix,
                 this._localMatrix
             );
         }
     }
 
-    public get modelMatrix():mat4 {
-        return this.globalMatrix;
+    get modelMatrix(): mat4 {
+        return this.worldMatrix;
     }
 
     /**
@@ -110,7 +113,10 @@ export class Transform {
     }
 
     public set localMatrix(value:mat4) {
-        this._localMatrix = value;
+        mat4.getRotation(this._rotation, value);
+        mat4.getTranslation(this._translation, value);
+        mat4.getScaling(this._scale, value);
+        this._dirty = true;
     }
 
     public get translation():vec3 {
@@ -161,5 +167,9 @@ export class Transform {
 
     set children(value: Transform[]) {
         this._children = value;
+    }
+
+    get dirty(): boolean {
+        return this._dirty;
     }
 }

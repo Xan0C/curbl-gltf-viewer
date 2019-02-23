@@ -1,20 +1,18 @@
-import {BufferView, Modelbuffer} from "./data";
-import {AttributeAccessor, Primitive} from "./mesh";
+import {Buffermap, BufferView} from "./data";
+import {Accessor, Primitive} from "./primitive";
 import {Attributes, GL_BUFFERS, GL_PRIMITIVES, GLBuffer} from "../gl";
 import {Material, MATERIAL_MAPS} from "../material";
-import GLAttribute = Attributes.GLAttribute;
-import {Transform} from "./transform";
 import {Cache, CACHE_TYPE} from "../cache";
 import {Shader} from "./shader";
+import GLAttribute = Attributes.GLAttribute;
 
-
-export class Model {
-    private _buffer:Modelbuffer;
+export class Mesh {
+    private _buffer:Buffermap;
     private _primitives:Array<Primitive>;
-    private _transform?:Transform;
+    private _name:string;
 
     constructor(){
-        this._buffer = new Modelbuffer();
+        this._buffer = new Buffermap();
         this._primitives = [];
     }
 
@@ -24,9 +22,9 @@ export class Model {
      * @param {WebGL2RenderingContext} gl
      * @param {GLBuffer} vertexBuffer - use existing VertexBuffer and add the model data into it
      * @param {GLBuffer} indexBuffer - use existing IndexBuffer and add the model indices into it
-     * @returns {Model}
+     * @returns {Mesh}
      */
-    public init(gl:WebGL2RenderingContext,vertexBuffer?:GLBuffer,indexBuffer?:GLBuffer):Model {
+    public init(gl:WebGL2RenderingContext,vertexBuffer?:GLBuffer,indexBuffer?:GLBuffer):Mesh {
         this.initBuffers(gl,vertexBuffer,indexBuffer);
         this.setIndexBuffers(gl);
         return this;
@@ -46,25 +44,9 @@ export class Model {
                     buffer = indexBuffer||GLBuffer.create(gl,view.target,null,view.drawType);
                 }
                 view.bufferOffset = buffer.byteLength;
-                let data = this.sliceBuffer(view);
-                buffer.addData(data);
-                let length = this._buffer.buffers.push(buffer);
-                view.buffer = length-1;
+                buffer.addData(view.data);
+                view.buffer = this._buffer.buffers.push(buffer) - 1;
             }
-        }
-    }
-
-    /**
-     * Slice up the Model data ArrayBuffer into smaller ArrayBuffers
-     * @param {BufferView} view
-     * @returns {ArrayBuffer}
-     */
-    private sliceBuffer(view:BufferView):ArrayBuffer{
-        let data = this._buffer.data[view.dataIdx];
-        if(data instanceof ArrayBuffer){
-            return data.slice(view.byteOffset,view.byteOffset+view.byteLength);
-        }else {
-            return data['buffer'].slice(view.byteOffset,view.byteOffset+view.byteLength);
         }
     }
 
@@ -73,44 +55,41 @@ export class Model {
      * @param {WebGL2RenderingContext} gl
      */
     private setIndexBuffers(gl:WebGL2RenderingContext):void{
-        for(let i=0,mesh:Primitive; mesh = this._primitives[i]; i++){
-            if(mesh.indices && mesh.indices.bufferView !== undefined && mesh.indices.bufferView !== null) {
-                let view = this._buffer.views[mesh.indices.bufferView];
-                mesh.initVertexArrayObject(gl, this._buffer.buffers[view.buffer]);
+        for(let i=0,primitive:Primitive; primitive = this._primitives[i]; i++){
+            if(primitive.indices && primitive.indices.bufferView !== undefined && primitive.indices.bufferView !== null) {
+                const view = this._buffer.views[primitive.indices.bufferView];
+                primitive.initVertexArrayObject(gl, this._buffer.buffers[view.buffer]);
             }
         }
     }
 
     /**
-     * Make sure to initialize(init) the Model before uploading the data
-     * Create the GPU_Buffers and upload this Model to the GPU
-     * @returns {Model}
+     * Make sure to initialize(init) the Mesh before uploading the data
+     * Create the GPU_Buffers and upload this Mesh to the GPU
+     * @returns {Mesh}
      */
-    public upload():Model{
+    public upload():Mesh {
         for(let i=0, view:BufferView; view = this._buffer.views[i]; i++){
             if(view.buffer === undefined || view.buffer === null || !this._buffer.buffers[view.buffer]){
-                throw "Model has not been initialized! Missing Buffers, make sure to initialize the model buffers first!";
+                throw "Mesh has not been initialized! Missing Buffers, make sure to initialize the model buffers first!";
             }
-            let buffer = this._buffer.buffers[view.buffer];
-            //Upload the data into the buffer
-            buffer.upload();
+            this._buffer.buffers[view.buffer].upload();
         }
         return this;
     }
 
     /**
-     * Draws all Meshes that form the Model
+     * Draws all Meshes that form the Mesh
      * @param {Shader} shader - Shader that should be used for all primitives/Materials
      * @param {Cache} cache - cache to get the materials
      */
     public draw(shader: Shader, cache: Cache):void {
-        let offset = 0;
-        let view:BufferView;
-        for(let i=0, mesh:Primitive; mesh = this._primitives[i]; i++){
-            view = this._buffer.views[mesh.indices.bufferView];
-            offset = view.bufferOffset + mesh.indices.byteOffset;
-            shader.applyMaterial(cache.get<Material>(CACHE_TYPE.MATERIAL, mesh.material));
-            mesh.draw(mesh.draw_mode,mesh.indices.count,mesh.indices.type,offset);
+        shader.applyMesh(this);
+        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
+            const view = this._buffer.views[primitive.indices.bufferView];
+            const offset = view.bufferOffset + primitive.indices.byteOffset;
+            shader.applyMaterial(cache.get<Material>(CACHE_TYPE.MATERIAL, primitive.material));
+            primitive.draw(primitive.draw_mode,primitive.indices.count,primitive.indices.type,offset);
         }
     }
 
@@ -123,11 +102,11 @@ export class Model {
     addAttribute(key:GL_PRIMITIVES,shader:Shader,glAttribute:GLAttribute):void{
         shader.bind();
         for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
-            let attribute:AttributeAccessor = primitive.attributes[key];
+            const attribute:Accessor = primitive.attributes[key];
             if(attribute !== null && attribute !== undefined) {
-                let view:BufferView = this._buffer.views[attribute.bufferView];
-                let buffer:GLBuffer = this._buffer.buffers[view.buffer];
-                let offset = view.bufferOffset + attribute.byteOffset;
+                const view:BufferView = this._buffer.views[attribute.bufferView];
+                const buffer:GLBuffer = this._buffer.buffers[view.buffer];
+                const offset = view.bufferOffset + attribute.byteOffset;
                 primitive.vertexArrayObject.addAttribute(buffer, glAttribute, attribute.size, attribute.type, attribute.normalized, attribute.stride, offset);
             }else{
                 console.warn('Primitive has no Attribute'+key);
@@ -172,11 +151,11 @@ export class Model {
         return mesh;
     }
 
-    public get buffer():Modelbuffer {
+    public get buffer():Buffermap {
         return this._buffer;
     }
 
-    public set buffer(value:Modelbuffer) {
+    public set buffer(value:Buffermap) {
         this._buffer = value;
     }
 
@@ -188,11 +167,11 @@ export class Model {
         this._primitives = value;
     }
 
-    public get transform():Transform {
-        return this._transform;
+    get name(): string {
+        return this._name;
     }
 
-    public set transform(value:Transform) {
-        this._transform = value;
+    set name(value: string) {
+        this._name = value;
     }
 }

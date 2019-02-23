@@ -46,7 +46,7 @@ export class IndexAccessor {
     }
 }
 
-export class AttributeAccessor {
+export class Accessor {
     private _bufferView:number;
     private _byteOffset:number;
     private _type:GL_TYPES; //GL_FLOAT etc.

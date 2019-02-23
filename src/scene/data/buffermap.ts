@@ -2,25 +2,15 @@ import {GLBuffer} from "../../gl";
 import {BufferView} from "./bufferView";
 
 /**
- * Stores the GLBuffers and corresponding Bufferviews for one model
+ * Stores the GLBuffers and corresponding Bufferviews for one scene
  */
-export class Modelbuffer {
-    private _data:Array<ArrayBufferView|ArrayBuffer>;
+export class Buffermap {
     private _buffers:Array<GLBuffer>;
     private _views:Array<BufferView>;
 
     constructor(){
-        this._data = [];
         this._buffers = [];
         this._views = [];
-    }
-
-    public get data():Array<ArrayBufferView | ArrayBuffer> {
-        return this._data;
-    }
-
-    public set data(value:Array<ArrayBufferView | ArrayBuffer>) {
-        this._data = value;
     }
 
     public get buffers():Array<GLBuffer> {
