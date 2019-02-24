@@ -95,7 +95,7 @@ export class Transform {
             return mat4.multiply(
                 this._worldMatrix,
                 this._parent.worldMatrix,
-                this._localMatrix
+                this.localMatrix
             );
         }
     }

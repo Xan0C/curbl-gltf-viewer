@@ -3,16 +3,19 @@ import {Attributes, GL_PRIMITIVES, GLBuffer} from "../gl";
 import {Shader} from "./shader";
 import GLAttribute = Attributes.GLAttribute;
 import {Cache} from "../cache";
+import {Animation} from "./animation/animation";
 
 export class Scene {
     private nodes:Array<SceneNode>;
+    private animations:{[name:string]: Animation};
 
     constructor() {
         this.nodes = [];
+        this.animations = Object.create(null);
     }
 
     /**
-     * init the scene creating the GPUBuffers(Vertex- and Indexbuffer) or using an existing Buffermap
+     * init the scene creating the GPUBuffers(Vertex- and Indexbuffer) or using an existing MeshBuffermap
      * or upload the data to an existing buffer
      * @param {WebGL2RenderingContext} gl
      * @param {GLBuffer} vertexBuffer - use existing VertexBuffer and add the model data into it
@@ -23,6 +26,11 @@ export class Scene {
         for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
                 node.init(gl, vertexBuffer, indexBuffer);
         }
+        const keys = Object.keys(this.animations);
+        for(let i=0, animation: Animation; animation = this.animations[keys[i]]; i++) {
+            animation.init();
+        }
+        console.log("animation",this.animations);
         return this;
     }
 
@@ -62,8 +70,16 @@ export class Scene {
         }
     }
 
-    addNode(node:SceneNode) {
-        this.nodes.push(node);
+    addNode(...nodes:SceneNode[]) {
+        for(let i=0, node:SceneNode; node = nodes[i]; i++) {
+            this.nodes.push(node);
+        }
+    }
+
+    addAnimation(...animations: Animation[]) {
+        for(let i=0, animation:Animation; animation = animations[i]; i++) {
+            this.animations[animation.name] = animation;
+        }
     }
 
 }

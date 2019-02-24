@@ -1,6 +1,6 @@
 export interface IGLTF_AnimationSampler {
     input: number;
-    interpolation?: string;
+    interpolation?: "LINEAR"|"STEP"|"CUBICSPLINE";
     output: number;
     extensions?: {[id:string]:any};
     extras?:any;

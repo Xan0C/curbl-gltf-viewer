@@ -49,9 +49,6 @@ export module Attributes{
             return !!this.attributeMap[key];
         }
         public getAttribute(key:string):GLAttribute{
-            if(!this.attributeMap[key]){
-                console.warn('Attribute '+key+' does not exist in bound shader');
-            }
             return this.attributeMap[key];
         }
     }

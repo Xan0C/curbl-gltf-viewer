@@ -101,7 +101,7 @@ export class GLUniformBufferObject {
     /**
      * upload one buffer instead of adding multiple small items
      * @param data - the buffer containing all values
-     * @param alignedSize - the aligned size of the UBO
+     * @param alignedSize - the aligned componentTypeCount of the UBO
      */
     public uploadBuffer(data:ArrayBufferView|ArrayBuffer,alignedSize:number):number {
         this._byteLength = alignedSize;

@@ -1,17 +1,7 @@
 import {ResourceLoader} from "curbl-loader";
-import {
-    ACCESSOR_TYPE,
-    IGLTF_BufferView,
-    IGLTF_Image,
-    IGLTF_Material,
-    IGLTF_Model,
-    IGLTF_Node,
-    IGLTF_Primitive,
-    IGLTF_Scene
-} from "./model";
-import {GL_BUFFERS, TEXTURE_WRAP} from "../gl/constants";
+import {ACCESSOR_TYPE, IGLTF_Image, IGLTF_Material, IGLTF_Model, IGLTF_Node, IGLTF_Scene} from "./model";
+import {TEXTURE_WRAP} from "../gl/constants";
 import {TextureLoader, TextureLoaderConfig} from "../loader/TextureLoader";
-import {BufferView, Mesh, Primitive} from "../scene";
 import {Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {ECS} from "curbl-ecs";
@@ -20,6 +10,10 @@ import {Transform} from "../scene/transform";
 import {mat4, quat, vec3} from "gl-matrix";
 import {Scene} from "../scene/scene";
 import {SceneNode} from "../scene/sceneNode";
+import {GLTFMeshProcessor} from "./GLTFMeshProcessor";
+import {GLTFBuffer} from "./GLTFBuffer";
+import {GLTFAnimationProcessor} from "./GLTFAnimationProcessor";
+import {Animation} from "../scene/animation";
 
 export const GLTF_ACCESORTYPE_SIZE:{[id:string]:number} = {
     [ACCESSOR_TYPE.SCALAR] : 1,
@@ -33,7 +27,8 @@ export const GLTF_ACCESORTYPE_SIZE:{[id:string]:number} = {
 
 /**
  * Parse the GLTF_Json to our model representation
- * Currently the gtlf format can only be used for one model, not a complete scene
+ * TODO: Create a proper DataModell to store all Scenes, Nodes, Animations etc. in and use this to reference and parse
+ * TODO: into our own Structure
  */
 export class GLTF_Parser {
     /**
@@ -62,6 +57,13 @@ export class GLTF_Parser {
      */
     private cache:Cache;
 
+    private buffer:GLTFBuffer;
+
+    /**
+     * nodes in right order
+     */
+    private nodes:Array<SceneNode>;
+
     constructor(loader:ResourceLoader,gl:WebGL2RenderingContext, cache: Cache) {
         this._path = '';
         this.loader = loader;
@@ -78,6 +80,11 @@ export class GLTF_Parser {
     public parse(buffer:ArrayBuffer,gltf_model:IGLTF_Model): Scene {
         this.gltfModel = gltf_model;
         this.buffers = [buffer]; //TODO support multiple
+        this.buffer = new GLTFBuffer(this.gltfModel, this.buffers);
+        this.nodes = [];
+
+        //create the list of nodes
+        this.createNodes();
 
         //Push the textures/material to the TextureLoader
         this.createMaterials();
@@ -89,6 +96,12 @@ export class GLTF_Parser {
         }
     }
 
+    private createNodes() {
+        for(let i=0; i < this.gltfModel.nodes.length; i++) {
+            this.nodes.push(new SceneNode())
+        }
+    }
+
     /**
      * Parse the scene by parsing each node of the GTLF File
      * @param {Mesh} model
@@ -96,12 +109,20 @@ export class GLTF_Parser {
      */
     private processScene(gltfScene:IGLTF_Scene):Scene {
         const scene = new Scene();
+
         for(let i=0, node:number; i < gltfScene.nodes.length; i++){
             node = gltfScene.nodes[i];
-            const sceneNode = this.processNode(this.gltfModel.nodes[node]);
+            const sceneNode = this.processNode(node);
             this.cache.getCache(CACHE_TYPE.NODE).add(sceneNode.name, sceneNode);
             scene.addNode(sceneNode);
         }
+
+        const animations = new GLTFAnimationProcessor(this.gltfModel, this.buffer, this.nodes).processAnimations();
+        for(let i=0, animation:Animation; animation = animations[i]; i++) {
+            this.cache.getCache(CACHE_TYPE.ANIMATION).add(animation.name, animation);
+            scene.addAnimation(animation);
+        }
+
         return scene;
     }
 
@@ -109,21 +130,27 @@ export class GLTF_Parser {
      * Parse a single node and all its children
      * a node can have multiple properties e.g. mesh,transform,weights,camera,skin etc.
      * @param {Mesh} model
-     * @param {IGLTF_Node} node
+     * @param {number} nodeIdx
      * @param parent
      */
-    private processNode(node:IGLTF_Node, parent?: SceneNode):SceneNode {
-        const sceneNode = new SceneNode();
-        sceneNode.name = node.name;
+    private processNode(nodeIdx:number, parent?: SceneNode):SceneNode {
+        const node = this.gltfModel.nodes[nodeIdx];
+        const sceneNode = this.nodes[nodeIdx];
+        sceneNode.name = node.name||ECS.uuid();
         //each node can have a transform which is a node in our tree
         sceneNode.transform = this.parseTransform(node, parent);
 
-        this.parseMesh(sceneNode,node.mesh);
+        sceneNode.mesh = new GLTFMeshProcessor(this.gltfModel, this.buffer).processMesh(node.mesh);
+        if(sceneNode.mesh) {
+            sceneNode.name = node.name||sceneNode.mesh.name||ECS.uuid();
+            sceneNode.mesh.name = sceneNode.mesh.name||sceneNode.name;
+            this.cache.getCache(CACHE_TYPE.MESH).add(sceneNode.mesh.name, sceneNode.mesh);
+        }
 
         node.children = node.children||[];
         for(let i=0,child:number; i < node.children.length ;i++){
             child = node.children[i];
-            sceneNode.addChild(this.processNode(this.gltfModel.nodes[child], sceneNode));
+            sceneNode.addChild(this.processNode(child, sceneNode));
         }
 
         return sceneNode;
@@ -156,148 +183,6 @@ export class GLTF_Parser {
             parent.transform.addChild(transform);
         }
         return transform;
-    }
-
-    /**
-     * Parse the GLTF_Primitive/Primitive at the given meshIdx
-     * each Primitive is a set of primitives and all primitives form one Mesh
-     * @param {Mesh} model
-     * @param {number} meshIdx
-     */
-    private parseMesh(node:SceneNode,meshIdx?:number): void {
-        if(meshIdx === undefined || meshIdx === null){
-            return;
-        }
-        const mesh = this.gltfModel.meshes[meshIdx];
-
-        if(mesh !== undefined && mesh !== null){
-            const sceneMesh = new Mesh();
-            //Parse each primitive
-            for(let i=0, primitive:IGLTF_Primitive; primitive = mesh.primitives[i]; i++){
-                sceneMesh.addPrimitive(this.parsePrimitives(sceneMesh, primitive));
-            }
-
-            node.mesh = sceneMesh;
-            node.name = node.name||node.mesh.name||ECS.uuid();
-            node.mesh.name = node.mesh.name||node.name||ECS.uuid();
-            this.cache.getCache(CACHE_TYPE.MESH).add(node.mesh.name, node.mesh);
-        }
-    }
-
-    /**
-     * creates a new mesh/GLTF_Primitive for the model
-     * @param {Mesh} model
-     * @param {IGLTF_Primitive} gltfPrimitive
-     */
-    private parsePrimitives(mesh: Mesh,gltfPrimitive:IGLTF_Primitive):Primitive{
-        const primitive = new Primitive();
-        //Add attributes to mesh
-        for(let id in gltfPrimitive.attributes){
-            //Create BufferView for each Accessor/GLBuffer for Position,Normal,tex,tangent etc. and map the accessor bufferViewIdx new
-            this.createTypedArrayForBufferView(mesh, gltfPrimitive.attributes[id]);
-            this.addAttribute(primitive,id,gltfPrimitive.attributes[id]);
-        }
-        //Set indices for indexBuffer
-        if(gltfPrimitive.indices !== undefined && gltfPrimitive.indices !== null) {
-            //Create BufferView for each IndexBuffer and map the accessor bufferViewIdx new
-            this.createTypedArrayForBufferView(mesh, gltfPrimitive.indices,true);
-            this.setIndices(primitive,gltfPrimitive.indices);
-        }
-        primitive.draw_mode = gltfPrimitive.mode||4; //Default GL_TRIANGLE
-        //Set the Material for the mesh if any else its default
-        this.setMeshMaterial(primitive,gltfPrimitive.material);
-        //TODO: morph targets primitive.targets
-        return primitive;
-    }
-
-
-    /**
-     * Adds an attribute to the primitive of type
-     * POSITION,NORMAL,TANGENT,TEXCOORD0,TEXCOORD1,COLOR0,JOINTS0,WEIGHTS0
-     * @param {Primitive} primitive
-     * @param {string} id
-     * @param {number} accessorIdx
-     */
-    private addAttribute(primitive:Primitive, id:string, accessorIdx:number):void{
-        const accessor = this.gltfModel.accessors[accessorIdx];
-        const typeSize = GLTF_ACCESORTYPE_SIZE[accessor.type]; //get typeSize
-        const view = this.gltfModel.bufferViews[accessor.bufferView];
-        primitive.addAttribute(id,typeSize,accessor.componentType,accessor.normalized,view.byteStride||0,accessor.byteOffset,accessor.bufferView);
-    }
-
-    /**
-     * sets the componentType of the BufferView of the model, that is used by the given accessor,
-     * so that both match the same componentType(weird GLTFSpecification)
-     * @param {Mesh} mesh
-     * @param {number} accessorIdx
-     * @param {boolean} isIndexBuffer - if the arrayBuffer is for a vertexBuffer(ARRAY_BUFFER) or indexBuffer(ELEMENT_ARRAY_BUFFER)
-     */
-    private createTypedArrayForBufferView(mesh: Mesh, accessorIdx:number, isIndexBuffer:boolean=false):void{
-        const accessor = this.gltfModel.accessors[accessorIdx];
-        if(!mesh.buffer.views[accessor.bufferView]) {
-            const view = this.createBufferView(this.gltfModel.bufferViews[accessor.bufferView]);
-            //map accessor to new Buffer
-            accessor.bufferView = mesh.buffer.views.push(view) - 1;
-            //set target for the BufferView IndexBuffer or Vertex/ArrayBuffer
-            view.target = isIndexBuffer ? view.target||GL_BUFFERS.ELEMENT_ARRAY_BUFFER : view.target||GL_BUFFERS.ARRAY_BUFFER;
-            //BufferView needs the same componentType as its accessor
-            if(view.componentType === undefined || view.componentType === null) {
-                view.componentType = accessor.componentType;
-            }
-        }
-    }
-
-    /**
-     * Create a Bufferfiew from the GLTF_Bufferview
-     * @param {IGLTF_BufferView} bufferView
-     * @returns {BufferView}
-     */
-    private createBufferView(bufferView:IGLTF_BufferView): BufferView {
-        const view = new BufferView();
-        view.data = this.sliceBuffer(bufferView);
-        view.target = bufferView.target;
-        return view;
-    }
-
-    /**
-     * Slice up the Mesh data ArrayBuffer into smaller ArrayBuffers
-     * @param {BufferView} view
-     * @returns {ArrayBuffer}
-     */
-    private sliceBuffer(view:IGLTF_BufferView):ArrayBuffer{
-        const data = this.buffers[view.buffer];
-        const offset = view.byteOffset||0;
-        if(data instanceof ArrayBuffer){
-            return data.slice(offset,offset+view.byteLength);
-        }else {
-            return data['buffer'].slice(offset,offset+view.byteLength);
-        }
-    }
-
-    /**
-     * sets the name of the material used for the mesh if any
-     * else its set to the "__default__" material
-     * @param {Primitive} mesh
-     * @param {number} materialIdx
-     */
-    private setMeshMaterial(mesh:Primitive,materialIdx?:number):void{
-        if(materialIdx === undefined || materialIdx === null){
-            return;
-        }
-        const material = this.gltfModel.materials[materialIdx];
-        if(material) {
-            mesh.material = material.name;
-        }
-    }
-
-    /**
-     * set the index accessor
-     * @param {Primitive} mesh
-     * @param {number} accessorIdx
-     */
-    private setIndices(mesh:Primitive, accessorIdx:number):void{
-        const indices = this.gltfModel.accessors[accessorIdx];
-        mesh.setIndices(indices.count, indices.componentType, indices.byteOffset||0, indices.bufferView);
     }
 
     /**

@@ -77,6 +77,33 @@ export class KhronosPbrShader extends Shader {
     applyMaterial(material?:Material<MetallicRoughness>) {
         this.applyCamera();
         this.applyTextures(material);
+        this.applyIBL();
+
+        this.uniforms.u_BaseColorFactor = material.model.baseColorFactor;
+        this.uniforms.u_RoughnessFactor = material.model.roughnessFactor;
+        this.uniforms.u_MetallicFactor = material.model.metallicFactor;
+    }
+
+    private applyIBL() {
+        /*******************************IBL*************************************/
+
+        const brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.BRDF_LUT);
+        if (brdfLUT) {
+            brdfLUT.bind(TEXTURES.BRDF_LUT);
+            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
+        }
+
+        const diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.DIFFUSE_ENVIRONMENT);
+        if(diffuseEnv){
+            diffuseEnv.bind(TEXTURES.DIFFUSE_ENVIRONMENT);
+            this.uniforms.u_DiffuseEnvSampler = TEXTURES.DIFFUSE_ENVIRONMENT;
+        }
+
+        const specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SPECULAR_ENVIRONMENT);
+        if(specularEnv){
+            specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
+            this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
+        }
     }
 
     private applyTextures(material?:Material<MetallicRoughness>):void {
@@ -85,15 +112,12 @@ export class KhronosPbrShader extends Shader {
             const texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.ALBEDO].texture);
             texture.bind(TEXTURES.DIFFUSE);
             this.uniforms.u_BaseColorSampler = TEXTURES.DIFFUSE;
-            this.uniforms.u_BaseColorFactor = material.model.baseColorFactor;
         }
         //applyMaterial MetallicRoughnessSampler
         if(material.maps[MATERIAL_MAPS.METAL_ROUGHNESS]){
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.METAL_ROUGHNESS].texture);
             texture.bind(TEXTURES.METALLIC_ROUGHNESS);
             this.uniforms.u_MetallicRoughnessSampler = TEXTURES.METALLIC_ROUGHNESS;
-            this.uniforms.u_RoughnessFactor = material.model.roughnessFactor;
-            this.uniforms.u_MetallicFactor = material.model.metallicFactor;
         }
         //applyMaterial NormalMaps
         if (material.maps[MATERIAL_MAPS.NORMAL]) {
@@ -115,26 +139,6 @@ export class KhronosPbrShader extends Shader {
             texture.bind(TEXTURES.OCCLUSION);
             this.uniforms.u_OcclusionSampler = TEXTURES.OCCLUSION;
             this.uniforms.u_OcclusionStrength = material.model.occlusionStrength;
-        }
-
-        /*******************************IBL*************************************/
-
-        const brdfLUT = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.BRDF_LUT);
-        if (brdfLUT) {
-            brdfLUT.bind(TEXTURES.BRDF_LUT);
-            this.uniforms.u_brdfLUT = TEXTURES.BRDF_LUT;
-        }
-
-        const diffuseEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.DIFFUSE_ENVIRONMENT);
-        if(diffuseEnv){
-            diffuseEnv.bind(TEXTURES.DIFFUSE_ENVIRONMENT);
-            this.uniforms.u_DiffuseEnvSampler = TEXTURES.DIFFUSE_ENVIRONMENT;
-        }
-
-        const specularEnv = this.cache.get<GLCubemap>(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SPECULAR_ENVIRONMENT);
-        if(specularEnv){
-            specularEnv.bind(TEXTURES.SPECULAR_ENVIRONMENT);
-            this.uniforms.u_SpecularEnvSampler = TEXTURES.SPECULAR_ENVIRONMENT;
         }
     }
 

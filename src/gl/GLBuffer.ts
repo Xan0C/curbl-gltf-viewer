@@ -57,7 +57,7 @@ export class GLBuffer {
     }
 
     /**
-     * Add Data to the Buffermap that should be uploaded
+     * Add Data to the MeshBuffermap that should be uploaded
      * @param {ArrayBuffer | ArrayBufferView} data
      */
     public addData(data:ArrayBuffer|ArrayBufferView):void{
@@ -66,7 +66,7 @@ export class GLBuffer {
     }
 
     /**
-     * Remove data from the Buffermap
+     * Remove data from the MeshBuffermap
      * @param {ArrayBuffer | ArrayBufferView} data
      */
     public removeData(data:ArrayBuffer|ArrayBufferView):void {
@@ -123,7 +123,7 @@ export class GLBuffer {
     }
 
     /**
-     * Length of the ArrayBuffers stored in this Buffermap
+     * Length of the ArrayBuffers stored in this MeshBuffermap
      * @returns {number}
      */
     public get length():number{

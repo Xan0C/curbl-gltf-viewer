@@ -1,5 +1,5 @@
-import {Accessor, IndexAccessor} from "./accessor";
 import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "../../gl";
+import {Accessor} from "../data/accessor";
 
 /**
  * GLTF Primitive wrapper
@@ -10,7 +10,7 @@ export class Primitive {
     private _name:string;
     private _draw_mode:number;
     private _attributes:{[id:string]:Accessor};
-    private _indices:IndexAccessor;
+    private _indices:Accessor;
     private _material:string;
     private _vertexArrayObject:GLVertexArrayObject;
 
@@ -37,12 +37,21 @@ export class Primitive {
      * @param {number} stride
      * @param {number} byteOffset
      * @param {number} bufferView
+     * @param {ACCESSOR_TYPE} componentType
      * @returns {Accessor}
      */
-    public addAttribute(key:GL_PRIMITIVES|string, count:number, type:GL_TYPES, normalized:boolean=false, stride:number=0, byteOffset:number=0, bufferView:number):Accessor{
+    public addAttribute(
+        key:GL_PRIMITIVES|string,
+        componentTypeCount:number,
+        type:GL_TYPES,
+        normalized:boolean=false,
+        stride:number=0,
+        byteOffset:number=0,
+        bufferView:number
+    ):Accessor{
         const accessor = new Accessor();
         accessor.bufferView = bufferView;
-        accessor.size = count;
+        accessor.componentTypeCount = componentTypeCount;
         accessor.type = type;
         accessor.normalized = normalized;
         accessor.stride = stride;
@@ -59,10 +68,10 @@ export class Primitive {
      * @param {number} bufferView
      * @returns {IndexAccessor}
      */
-    public setIndices(count:number, type:GL_TYPES, byteOffset:number=0, bufferView:number):IndexAccessor{
-        this._indices = new IndexAccessor();
+    public setIndices(count:number, type:GL_TYPES, byteOffset:number=0, bufferView:number):Accessor{
+        this._indices = new Accessor();
         this._indices.bufferView = bufferView;
-        this._indices.count = count;
+        this._indices.componentTypeCount = count;
         this._indices.type = type;
         this._indices.byteOffset = byteOffset;
         return this._indices;
@@ -81,7 +90,7 @@ export class Primitive {
      * @param {number} type
      * @param {number} offset
      */
-    draw(mode:number=this._draw_mode,size:number=this._indices.count,type:number=this._indices.type,offset:number=this._indices.byteOffset):void{
+    draw(mode:number=this._draw_mode, size:number=this._indices.componentTypeCount, type:number=this._indices.type, offset:number=this._indices.byteOffset):void{
         this._vertexArrayObject.bind();
         this._vertexArrayObject.draw(mode,size,type,offset);
         this._vertexArrayObject.unbind();
@@ -111,11 +120,11 @@ export class Primitive {
         this._attributes = value;
     }
 
-    public get indices():IndexAccessor {
+    public get indices():Accessor {
         return this._indices;
     }
 
-    public set indices(value:IndexAccessor) {
+    public set indices(value:Accessor) {
         this._indices = value;
     }
 

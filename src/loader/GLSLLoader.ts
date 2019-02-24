@@ -38,12 +38,12 @@ export class GLSLLoader extends Middleware<GLShader> {
         const fragment = resources.find((r) => r.config.type === "fragment");
 
         if(vertex.config.shader) {
-            vertex.config.shader.upload(vertex.request.response, fragment.request.response);
-            return vertex.config.shader;
+            const shader: Shader = vertex.config.shader;
+            shader.vertexSrc = vertex.request.response;
+            shader.fragmentSrc = fragment.request.response;
+            return shader;
         }
 
-        const shader = new Shader(this.gl);
-        shader.upload(vertex.request.response, fragment.request.response);
-        return shader;
+        return new Shader(this.gl,vertex.request.response, fragment.request.response);
     }
 }

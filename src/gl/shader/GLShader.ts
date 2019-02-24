@@ -48,9 +48,14 @@ export class GLShader {
     protected _uniforms:UniformAccessObject;
     protected _defines:{[x:string]:string|number};
 
-    constructor(gl: WebGL2RenderingContext){
+    private _vertexSrc:string;
+    private _fragmentSrc:string;
+
+    constructor(gl: WebGL2RenderingContext, vertexSrc?:string, fragmentSrc?:string){
         this.gl = gl;
         this._defines = {};
+        this._vertexSrc = vertexSrc;
+        this._fragmentSrc = fragmentSrc;
     }
 
     private getDefinesString() {
@@ -75,11 +80,11 @@ export class GLShader {
         return shaderDefines + firstLine + shaderSrc;
     }
 
-    public upload(vertexSrc:string, fragmentSrc:string): GLShader {
+    public upload(): GLShader {
         const gl = this.gl;
 
-        const vertexSrcWithDefines = this.getShaderSrcWithDefines(vertexSrc);
-        const fragmentSrcWithDefines = this.getShaderSrcWithDefines(fragmentSrc);
+        const vertexSrcWithDefines = this.getShaderSrcWithDefines(this._vertexSrc);
+        const fragmentSrcWithDefines = this.getShaderSrcWithDefines(this._fragmentSrc);
 
         this._program = ProgramCompiler.compile(gl, vertexSrcWithDefines, fragmentSrcWithDefines);
         this._attributes = Attributes.extract(gl,this._program);
@@ -153,5 +158,21 @@ export class GLShader {
         this._program = null;
         this._attributes = null;
         this._uniforms = null;
+    }
+
+    get vertexSrc(): string {
+        return this._vertexSrc;
+    }
+
+    set vertexSrc(value: string) {
+        this._vertexSrc = value;
+    }
+
+    get fragmentSrc(): string {
+        return this._fragmentSrc;
+    }
+
+    set fragmentSrc(value: string) {
+        this._fragmentSrc = value;
     }
 }

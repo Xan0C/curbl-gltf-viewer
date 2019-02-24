@@ -11,6 +11,7 @@ export enum CACHE_TYPE  {
     MESH,
     NODE,
     SCENE,
+    ANIMATION,
     MATERIAL,
     SHADER
 }

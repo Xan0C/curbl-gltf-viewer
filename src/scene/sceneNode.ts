@@ -19,6 +19,9 @@ export class SceneNode {
         if(this.mesh) {
             this.mesh.init(gl, vertexBuffer, indexBuffer);
         }
+        for(let i=0, child:SceneNode; child = this.children[i]; i++) {
+            child.init(gl, vertexBuffer, indexBuffer);
+        }
         return this;
     }
 
@@ -48,6 +51,9 @@ export class SceneNode {
     addAttribute(key:GL_PRIMITIVES,shader:Shader,glAttribute:GLAttribute):void{
         if(this.mesh) {
             this.mesh.addAttribute(key, shader, glAttribute);
+        }
+        for(let i=0, child:SceneNode; child = this.children[i]; i++) {
+            child.addAttribute(key, shader, glAttribute);
         }
     }
 

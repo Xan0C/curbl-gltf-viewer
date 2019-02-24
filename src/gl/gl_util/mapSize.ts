@@ -51,7 +51,7 @@ export module MapSize {
     };
 
     /**
-     * Returns the size in Bytes needed for the provided GLSL Type in WebGL
+     * Returns the componentTypeCount in Bytes needed for the provided GLSL Type in WebGL
      * @param type
      * @returns {any}
      */
