@@ -91,7 +91,6 @@ export class Transform {
         if(!this._parent){
             return this.apply();
         }else{
-            mat4.identity(this._worldMatrix);
             return mat4.multiply(
                 this._worldMatrix,
                 this._parent.worldMatrix,

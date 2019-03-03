@@ -6,15 +6,13 @@ import {GL_PRIMITIVES} from "../gl/constants";
 import {Shader} from "../scene/shader";
 import {Scene} from "../scene/scene";
 
-// import {GLBuffer} from "../gl";
-
 @ECS.System(SceneComponent)
 export class ForwardScenePass extends System {
 
     private gl:WebGL2RenderingContext;
     private cache:Cache;
     private shader: Shader;
-    //use the same buffers for all scenes/meshes etc.
+    //use the same data for all scenes/meshes etc.
     // private vertexBuffer:GLBuffer;
     // private indexBuffer:GLBuffer;
 
@@ -48,10 +46,12 @@ export class ForwardScenePass extends System {
     }
 
     private initShaderAttributes(scene:Scene):void{
-        scene.addAttribute(GL_PRIMITIVES.POSITION,this.shader,this.shader.attributes.getAttribute('a_Position'));
-        scene.addAttribute(GL_PRIMITIVES.NORMAL,this.shader,this.shader.attributes.getAttribute('a_Normal'));
-        scene.addAttribute(GL_PRIMITIVES.TANGENT,this.shader,this.shader.attributes.getAttribute('a_Tangent'));
-        scene.addAttribute(GL_PRIMITIVES.TEXCOORD_0,this.shader,this.shader.attributes.getAttribute('a_UV'));
+        scene.addAttribute(GL_PRIMITIVES.POSITION,this.shader.attributes.getAttribute('a_Position'));
+        scene.addAttribute(GL_PRIMITIVES.NORMAL,this.shader.attributes.getAttribute('a_Normal'));
+        scene.addAttribute(GL_PRIMITIVES.TANGENT,this.shader.attributes.getAttribute('a_Tangent'));
+        scene.addAttribute(GL_PRIMITIVES.TEXCOORD_0,this.shader.attributes.getAttribute('a_UV'));
+        scene.addAttribute(GL_PRIMITIVES.JOINTS_0,this.shader.attributes.getAttribute('a_Joint0'));
+        scene.addAttribute(GL_PRIMITIVES.WEIGHTS_0,this.shader.attributes.getAttribute('a_Weight0'));
     }
 
     draw():void{

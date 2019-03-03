@@ -1,21 +1,43 @@
 import {GL_TYPES} from "../../gl/constants";
 
+export enum ACCESSOR_TYPE  {
+    SCALAR = "SCALAR",
+    VEC2 = "VEC2",
+    VEC3 = "VEC3",
+    VEC4 = "VEC4",
+    MAT2 = "MAT2",
+    MAT3 = "MAT3",
+    MAT4 = "MAT4"
+}
+
+export const GLTF_ACCESORTYPE_SIZE:{[id:string]:number} = {
+    [ACCESSOR_TYPE.SCALAR] : 1,
+    [ACCESSOR_TYPE.VEC2]: 2,
+    [ACCESSOR_TYPE.VEC3]: 3,
+    [ACCESSOR_TYPE.VEC4]: 4,
+    [ACCESSOR_TYPE.MAT2]: 4,
+    [ACCESSOR_TYPE.MAT3]: 9,
+    [ACCESSOR_TYPE.MAT4]: 16,
+};
+
 export class Accessor {
-    private _bufferView?:number;
+    private _bufferView:number;
     private _byteOffset:number;
-    private _type:GL_TYPES; //GL_FLOAT etc.
+    private _componentType:GL_TYPES; //GL_FLOAT etc.
+    private _type:ACCESSOR_TYPE;
     private _stride?:number;
     private _normalized:boolean;
-    private _componentTypeCount?:number;
     private _count?:number;
+    private _max?:Array<number>;
+    private _min?:Array<number>;
 
     constructor(){
-        this._bufferView = 0;
         this._byteOffset = 0;
-        this._type = GL_TYPES.FLOAT;
+        this._componentType = GL_TYPES.FLOAT;
         this._stride = 0;
         this._normalized = false;
-        this._componentTypeCount = 0;
+        this._max = [];
+        this._min = [];
     }
 
     public get bufferView():number {
@@ -34,12 +56,12 @@ export class Accessor {
         this._byteOffset = value;
     }
 
-    public get type():GL_TYPES {
-        return this._type;
+    public get componentType():GL_TYPES {
+        return this._componentType;
     }
 
-    public set type(value:GL_TYPES) {
-        this._type = value;
+    public set componentType(value:GL_TYPES) {
+        this._componentType = value;
     }
 
     public get stride():number {
@@ -59,11 +81,7 @@ export class Accessor {
     }
 
     public get componentTypeCount():number {
-        return this._componentTypeCount;
-    }
-
-    public set componentTypeCount(value:number) {
-        this._componentTypeCount = value;
+        return GLTF_ACCESORTYPE_SIZE[this._type];
     }
 
     get count(): number {
@@ -72,5 +90,29 @@ export class Accessor {
 
     set count(value: number) {
         this._count = value;
+    }
+
+    get max(): Array<number> {
+        return this._max;
+    }
+
+    set max(value: Array<number>) {
+        this._max = value;
+    }
+
+    get min(): Array<number> {
+        return this._min;
+    }
+
+    set min(value: Array<number>) {
+        this._min = value;
+    }
+
+    get type(): ACCESSOR_TYPE {
+        return this._type;
+    }
+
+    set type(value: ACCESSOR_TYPE) {
+        this._type = value;
     }
 }

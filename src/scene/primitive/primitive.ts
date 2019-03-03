@@ -1,5 +1,5 @@
 import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "../../gl";
-import {Accessor} from "../data/accessor";
+import {Accessor, ACCESSOR_TYPE} from "../data/accessor";
 
 /**
  * GLTF Primitive wrapper
@@ -31,31 +31,38 @@ export class Primitive {
     /**
      * adds an attribute to the MeshPrimitive, that is later send to the GPU via an VAO
      * @param {GL_PRIMITIVES | string} key
-     * @param {number} count
-     * @param {GL_TYPES} type
+     * @param {number} accessorType
+     * @param {GL_TYPES} glType
      * @param {boolean} normalized
      * @param {number} stride
      * @param {number} byteOffset
      * @param {number} bufferView
      * @param {ACCESSOR_TYPE} componentType
+     * @param count
+     * @param min
+     * @param max
      * @returns {Accessor}
      */
     public addAttribute(
         key:GL_PRIMITIVES|string,
-        componentTypeCount:number,
-        type:GL_TYPES,
+        accessorType:ACCESSOR_TYPE,
+        glType:GL_TYPES,
         normalized:boolean=false,
         stride:number=0,
         byteOffset:number=0,
-        bufferView:number
+        bufferView:number,
+        min:Array<number>=[],
+        max:Array<number>=[]
     ):Accessor{
         const accessor = new Accessor();
         accessor.bufferView = bufferView;
-        accessor.componentTypeCount = componentTypeCount;
-        accessor.type = type;
+        accessor.type = accessorType;
+        accessor.componentType = glType;
         accessor.normalized = normalized;
         accessor.stride = stride;
         accessor.byteOffset = byteOffset;
+        accessor.min = min;
+        accessor.max = max;
         this._attributes[key] = accessor;
         return this._attributes[key];
     }
@@ -71,8 +78,8 @@ export class Primitive {
     public setIndices(count:number, type:GL_TYPES, byteOffset:number=0, bufferView:number):Accessor{
         this._indices = new Accessor();
         this._indices.bufferView = bufferView;
-        this._indices.componentTypeCount = count;
-        this._indices.type = type;
+        this._indices.count = count;
+        this._indices.componentType = type;
         this._indices.byteOffset = byteOffset;
         return this._indices;
     }
@@ -90,7 +97,7 @@ export class Primitive {
      * @param {number} type
      * @param {number} offset
      */
-    draw(mode:number=this._draw_mode, size:number=this._indices.componentTypeCount, type:number=this._indices.type, offset:number=this._indices.byteOffset):void{
+    draw(mode:number=this._draw_mode, size:number=this._indices.count, type:number=this._indices.componentType, offset:number=this._indices.byteOffset):void{
         this._vertexArrayObject.bind();
         this._vertexArrayObject.draw(mode,size,type,offset);
         this._vertexArrayObject.unbind();

@@ -42,6 +42,10 @@ export class Material<T = any> {
         this._model = model;
     }
 
+    hasMap(key:MATERIAL_MAPS):boolean {
+        return !!this._maps[key];
+    }
+
     get name(): string {
         return this._name;
     }

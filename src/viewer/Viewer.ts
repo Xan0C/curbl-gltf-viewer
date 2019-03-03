@@ -6,13 +6,12 @@ import {GLTFLoader} from "../loader/GLTFLoader";
 import {BaseCache, Cache, CACHE_TYPE} from "../cache";
 import {GLTexture} from "../gl";
 import {Animation, Mesh} from "../scene";
-import {Material} from "../material";
+import {Material, MATERIAL_MAPS, Materialmap} from "../material";
 import {ECS} from "curbl-ecs";
 import {GLSLLoader} from "../loader/GLSLLoader";
 import {KhronosPbrShader} from "../shader/khronosPbrShader";
 import {SkyboxShader} from "../shader/SkyboxShader";
 import {Scene} from "../scene/scene";
-import {SceneNode} from "../scene/sceneNode";
 import {IBLScene} from "./scenes/IBLScene";
 import {SkyboxPass} from "../systems/SkyboxPass";
 import {ForwardShadingSystem} from "../systems/ForwardShadingSystem";
@@ -21,8 +20,10 @@ import {GUISystem} from "../systems/GUISystem";
 import {LookAtCameraControlSystem} from "../systems/LookAtCameraControlSystem";
 import {CameraSystem} from "../systems/CameraSystem";
 import {ViewerScene} from "./scenes/ViewerScene";
-import {AnimatedBoxScene} from "./scenes/AnimatedBoxScene";
 import {AnimationSystem} from "../systems/AnimationSystem";
+import {MetallicRoughness} from "../material/metallicRoughness";
+import {vec4} from "gl-matrix";
+import {RiggedScene} from "./scenes/RiggedScene";
 
 
 export class Viewer {
@@ -51,7 +52,6 @@ export class Viewer {
         this.cache.addCache(CACHE_TYPE.MESH, new BaseCache<Mesh>());
         this.cache.addCache(CACHE_TYPE.TEXTURE, new BaseCache<GLTexture>());
         this.cache.addCache(CACHE_TYPE.SCENE, new BaseCache<Scene>());
-        this.cache.addCache(CACHE_TYPE.NODE, new BaseCache<SceneNode>());
         this.cache.addCache(CACHE_TYPE.ANIMATION, new BaseCache<Animation>());
 
         //Set loader Middlewares
@@ -65,9 +65,26 @@ export class Viewer {
             this.cache.add(data.type as number,data.key,data.data);
         });
 
+        this.defaultMaterial();
         //Create shader
         this.shader = new KhronosPbrShader(this.gl, this.cache);
         this.skyboxShader = new SkyboxShader(this.gl, this.cache);
+    }
+
+    private defaultMaterial() {
+        const gl = this.gl;
+        const texture = GLTexture.fromData(gl,new Uint8Array([128, 128, 128, 255]) as any,1,1,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE);
+        texture.enableNearestScaling();
+        texture.enableWrapClamp();
+
+        this.cache.getCache(CACHE_TYPE.TEXTURE).add('__default__', texture);
+
+        const mat = new MetallicRoughness();
+        mat.baseColorFactor = vec4.fromValues(0.5, 0.5, 0.5, 1);
+        const material = new Material<MetallicRoughness>(name, mat);
+        material.maps[MATERIAL_MAPS.ALBEDO] = new Materialmap('__default__');
+
+        this.cache.getCache(CACHE_TYPE.MATERIAL).add('__default__', material);
     }
 
     private createSystems() {
@@ -90,7 +107,7 @@ export class Viewer {
     loadScene() {
         this.loadShader();
         const iblScene = new IBLScene(this.loader);
-        const modelScene = new AnimatedBoxScene(this.loader, this.cache);
+        const modelScene = new RiggedScene(this.loader, this.cache);
 
         this.scenes.push(iblScene);
         this.scenes.push(modelScene);

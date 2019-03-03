@@ -80,6 +80,10 @@ export class GLUniformBufferObject {
         }
     }
 
+    public hasItem(name:string):boolean {
+        return !!this.items[name];
+    }
+
     public removeItem(name:string,updateGL:boolean=false):void {
         delete this.items[name];
         this.upload();
@@ -101,14 +105,16 @@ export class GLUniformBufferObject {
     /**
      * upload one buffer instead of adding multiple small items
      * @param data - the buffer containing all values
-     * @param alignedSize - the aligned componentTypeCount of the UBO
+     * @param byteLength - the aligned componentTypeCount of the UBO
      */
-    public uploadBuffer(data:ArrayBufferView|ArrayBuffer,alignedSize:number):number {
-        this._byteLength = alignedSize;
+    public uploadBuffer(byteLength:number, data?:ArrayBufferView|ArrayBuffer, length?:number):number {
+        this._byteLength = byteLength;
         const gl = this.gl;
         this.bind();
         gl.bufferData(this.type, this._byteLength, this.drawType);
-        gl.bufferSubData(this.type,0,data as ArrayBufferView);
+        if(data) {
+            gl.bufferSubData(this.type, 0, data as ArrayBufferView, length);
+        }
         this.unbind();
         return this._byteLength;
     }
@@ -138,11 +144,11 @@ export class GLUniformBufferObject {
         }
     }
 
-    public bind(){
+    private bind(){
         this.gl.bindBuffer(this.type,this.buffer);
     }
 
-    public unbind(){
+    private unbind(){
         this.gl.bindBuffer(this.type,null);
     }
 
@@ -164,15 +170,14 @@ export class GLUniformBufferObject {
                 continue;
             }
 
-            let sizes = GLUniformBufferObject.TYPE_TO_SIZE[item.type];
+            const sizes = GLUniformBufferObject.TYPE_TO_SIZE[item.type];
             item.alignment = item.alignedByteLength = sizes[0];
             item.blockSize = sizes[1];
 
             //check if array
             if(item.data.byteLength !== item.blockSize){
-                let length = item.data.byteLength / item.blockSize;
-                item.alignment = 16;
-                item.alignedByteLength = 16 * length;
+                const length = item.data.byteLength / item.blockSize;
+                item.alignedByteLength = item.alignment * length;
             }
 
             if(prevItem) {

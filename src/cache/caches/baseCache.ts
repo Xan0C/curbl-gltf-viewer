@@ -10,6 +10,7 @@ export interface  IBaseCache<T> {
     onAdded:EmitSignal;
     onRemoved:EmitSignal;
     add(key:string,data:T):void;
+    addMultiple(elements:Array<T>, mapFunc:(e:T)=>{key:string,data:T});
     remove(key:string):void;
     get(key:string):T;
     getAll():{[x:string]:T};
@@ -40,6 +41,13 @@ export class BaseCache<T> implements IBaseCache<T> {
     public add(key:string,data:T):void{
         this.cache[key] = data;
         this._onAdded.emit(key,data);
+    }
+
+    public addMultiple(elements:Array<T>,mapFunc: (e: T) => { key: string; data: T }) {
+        for(let i=0, element:T; element = elements[i]; i++) {
+            const value = mapFunc(element);
+            this.add(value.key, value.data);
+        }
     }
 
     public remove(key:string):void {

@@ -4,11 +4,13 @@ import {Attributes, GL_PRIMITIVES, GLBuffer} from "../gl";
 import {Shader} from "./shader";
 import GLAttribute = Attributes.GLAttribute;
 import {Cache} from "../cache";
+import {Skin} from "./skin/skin";
 
 export class SceneNode {
     children?: Array<SceneNode>;
     transform?: Transform;
     mesh?:Mesh;
+    skin?:Skin;
     name:string;
 
     constructor() {
@@ -19,6 +21,9 @@ export class SceneNode {
         if(this.mesh) {
             this.mesh.init(gl, vertexBuffer, indexBuffer);
         }
+        if(this.skin) {
+            this.skin.init(gl);
+        }
         for(let i=0, child:SceneNode; child = this.children[i]; i++) {
             child.init(gl, vertexBuffer, indexBuffer);
         }
@@ -28,6 +33,9 @@ export class SceneNode {
     upload(): SceneNode {
         if(this.mesh) {
             this.mesh.upload();
+        }
+        for(let i=0, child:SceneNode; child = this.children[i]; i++) {
+            child.upload();
         }
         return this;
     }
@@ -48,12 +56,12 @@ export class SceneNode {
      * @param {Shader} shader
      * @param {Attributes.GLAttribute} glAttribute
      */
-    addAttribute(key:GL_PRIMITIVES,shader:Shader,glAttribute:GLAttribute):void{
+    addAttribute(key:GL_PRIMITIVES,glAttribute:GLAttribute):void{
         if(this.mesh) {
-            this.mesh.addAttribute(key, shader, glAttribute);
+            this.mesh.addAttribute(key, glAttribute);
         }
         for(let i=0, child:SceneNode; child = this.children[i]; i++) {
-            child.addAttribute(key, shader, glAttribute);
+            child.addAttribute(key, glAttribute);
         }
     }
 

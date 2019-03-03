@@ -7,7 +7,7 @@ import {Cache, CACHE_TYPE} from "../../cache";
 import {Mesh} from "../../scene";
 import {AnimationComponent} from "../../components/scene/animationComponent";
 
-export class AnimatedBoxScene extends ViewerScene {
+export class SimpleSkinScene extends ViewerScene {
 
     private cache: Cache;
 
@@ -47,14 +47,13 @@ export class AnimatedBoxScene extends ViewerScene {
     }
 
     getMesh(): Mesh {
-        return this.cache.get(CACHE_TYPE.MESH,"outer_box");
+        return this.cache.get(CACHE_TYPE.MESH,"mesh0");
     }
 
     preload(): void {
         this.loader.get(GLTFLoader).add(
-            "AnimatedBox",
-            "../assets/boxAnimated/BoxAnimated.gltf",
-            "../assets/boxAnimated/BoxAnimated0.bin"
+            "RiggedSimple",
+            "../assets/simpleSkin/simpleSkin.gltf",
         );
     }
 

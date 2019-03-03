@@ -1,21 +1,12 @@
 import {GL_TYPES} from "../../gl/constants";
-
-export enum ACCESSOR_TYPE  {
-    SCALAR = "SCALAR",
-    VEC2 = "VEC2",
-    VEC3 = "VEC3",
-    VEC4 = "VEC4",
-    MAT2 = "MAT2",
-    MAT3 = "MAT3",
-    MAT4 = "MAT4"
-}
+import {ACCESSOR_TYPE} from "../../scene/data";
 
 export interface IGLTF_Accessor {
     name?:string;
     bufferView?:number;
-    byteOffset:number;
+    byteOffset?:number;
     componentType:GL_TYPES;
-    normalized:boolean;
+    normalized?:boolean;
     count:number;
     type:ACCESSOR_TYPE;
     max?:Array<number>;

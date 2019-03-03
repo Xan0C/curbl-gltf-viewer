@@ -8,6 +8,7 @@ import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 import {GLCubemap} from "../gl/GLCubemap";
 import {SceneNode} from "../scene/sceneNode";
 import {Scene} from "../scene/scene";
+import {mat4} from "gl-matrix";
 
 const TEXTURES = {
     DIFFUSE_ENVIRONMENT: 0,
@@ -39,6 +40,9 @@ export class KhronosPbrShader extends Shader {
         if (model.hasAttribute(GL_PRIMITIVES.TEXCOORD_0)) {
             this.addDefine("HAS_UV", 1);
         }
+        if(model.hasAttribute(GL_PRIMITIVES.JOINTS_0) && model.hasAttribute(GL_PRIMITIVES.WEIGHTS_0)) {
+            this.addDefine("HAS_SKIN", 1);
+        }
         if(model.hasMap(this.cache, MATERIAL_MAPS.ALBEDO)) {
             this.addDefine("HAS_BASECOLORMAP", 1);
         }
@@ -68,6 +72,19 @@ export class KhronosPbrShader extends Shader {
 
     applyNode(node: SceneNode): void {
         this.uniforms.u_ModelMatrix = node.transform.modelMatrix;
+
+        if(node.skin) {
+            const inverseTransformMatrix = mat4.create();
+            mat4.invert(inverseTransformMatrix, node.transform.modelMatrix);
+
+            for(let i=0, join:SceneNode; join = node.skin.joints[i]; i++) {
+                const joinMatrix = node.skin.jointMatrices[i];
+                mat4.mul(joinMatrix, join.transform.modelMatrix, node.skin.inverseBindMatrices[i]);
+                mat4.mul(joinMatrix, inverseTransformMatrix, joinMatrix);
+            }
+
+            node.skin.update();
+        }
     }
 
     applyScene(scene: Scene): void {
@@ -144,5 +161,6 @@ export class KhronosPbrShader extends Shader {
 
     private applyCamera():void{
         this.uniforms.Matrices = UBO_BINDINGS.CAMERA;
+        this.uniforms.JointMatrix = UBO_BINDINGS.SKIN;
     }
 }

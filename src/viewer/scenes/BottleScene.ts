@@ -18,7 +18,7 @@ export class BottleScene extends ViewerScene {
 
     private createModellEntity() {
         const entity = ECS.createEntity();
-        entity.add(new SceneComponent({key: "WaterBottle"}));
+        entity.add(new SceneComponent({key: "scene0"}));
         entity.add(new TransformComponent({
             position: {x:0, y:0, z:0},
             rotation: {x:0, y:0, z:0, w:1},

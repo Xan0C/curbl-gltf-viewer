@@ -6,5 +6,6 @@ export const GLOBAL_TEXTURES = {
 };
 
 export enum UBO_BINDINGS {
-    CAMERA = 0
+    CAMERA = 0,
+    SKIN = 1
 }

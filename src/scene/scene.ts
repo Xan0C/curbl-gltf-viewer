@@ -3,34 +3,27 @@ import {Attributes, GL_PRIMITIVES, GLBuffer} from "../gl";
 import {Shader} from "./shader";
 import GLAttribute = Attributes.GLAttribute;
 import {Cache} from "../cache";
-import {Animation} from "./animation/animation";
 
 export class Scene {
+    private _name:string;
     private nodes:Array<SceneNode>;
-    private animations:{[name:string]: Animation};
 
     constructor() {
         this.nodes = [];
-        this.animations = Object.create(null);
     }
 
     /**
      * init the scene creating the GPUBuffers(Vertex- and Indexbuffer) or using an existing MeshBuffermap
      * or upload the data to an existing buffer
      * @param {WebGL2RenderingContext} gl
-     * @param {GLBuffer} vertexBuffer - use existing VertexBuffer and add the model data into it
-     * @param {GLBuffer} indexBuffer - use existing IndexBuffer and add the model indices into it
+     * @param {GLBuffer} vertexBuffer - use existing VertexBuffer and add the gltf data into it
+     * @param {GLBuffer} indexBuffer - use existing IndexBuffer and add the gltf indices into it
      * @returns {Mesh}
      */
     init(gl:WebGL2RenderingContext,vertexBuffer?:GLBuffer,indexBuffer?:GLBuffer):Scene {
         for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
                 node.init(gl, vertexBuffer, indexBuffer);
         }
-        const keys = Object.keys(this.animations);
-        for(let i=0, animation: Animation; animation = this.animations[keys[i]]; i++) {
-            animation.init();
-        }
-        console.log("animation",this.animations);
         return this;
     }
 
@@ -64,9 +57,9 @@ export class Scene {
      * @param {Shader} shader
      * @param {Attributes.GLAttribute} glAttribute
      */
-    addAttribute(key:GL_PRIMITIVES,shader:Shader,glAttribute:GLAttribute):void{
+    addAttribute(key:GL_PRIMITIVES,glAttribute:GLAttribute):void{
         for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
-            node.addAttribute(key, shader, glAttribute);
+            node.addAttribute(key, glAttribute);
         }
     }
 
@@ -76,10 +69,11 @@ export class Scene {
         }
     }
 
-    addAnimation(...animations: Animation[]) {
-        for(let i=0, animation:Animation; animation = animations[i]; i++) {
-            this.animations[animation.name] = animation;
-        }
+    get name(): string {
+        return this._name;
     }
 
+    set name(value: string) {
+        this._name = value;
+    }
 }

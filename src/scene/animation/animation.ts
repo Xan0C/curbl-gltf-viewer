@@ -15,15 +15,6 @@ export class Animation {
         this._duration = 0;
     }
 
-    init() {
-        for(let i=0, sampler:AnimationSampler; sampler = this.samplers[i]; i++) {
-            sampler.init();
-            if(sampler.duration > this._duration) {
-                this._duration = sampler.duration;
-            }
-        }
-    }
-
     addSampler(sampler: AnimationSampler) {
         this.samplers.push(sampler);
     }
@@ -32,10 +23,6 @@ export class Animation {
         this.channels.push(channel);
     }
 
-    /*
-     * apply the animation
-     * delta time in microseconds
-     */
     animate(t:number) {
         const time = t * 0.001;
 
@@ -64,7 +51,15 @@ export class Animation {
         return this._duration;
     }
 
+    set duration(duration:number) {
+        this._duration = duration;
+    }
+
     get durationMS(): number {
         return this._duration * 1000;
+    }
+
+    set durationMS(durationMS:number) {
+        this._duration = durationMS * 0.001;
     }
 }

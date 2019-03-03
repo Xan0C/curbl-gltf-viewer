@@ -7,7 +7,7 @@ import {Cache, CACHE_TYPE} from "../../cache";
 import {Mesh} from "../../scene";
 import {AnimationComponent} from "../../components/scene/animationComponent";
 
-export class AnimatedBoxScene extends ViewerScene {
+export class RiggedScene extends ViewerScene {
 
     private cache: Cache;
 
@@ -33,13 +33,13 @@ export class AnimatedBoxScene extends ViewerScene {
         const entity = ECS.createEntity();
         entity.add(new CameraComponent());
         entity.add(new TransformComponent({
-            position: {x:0,y:0,z:-4.00},
+            position: {x:0,y:0,z:-14.00},
             rotation: {x:0,y:0,z:0,w:1},
             scale: {x:1,y:1,z:1}
         }));
         entity.add(new LookAtCameraComponent({
             aspect: (1920/1080),
-            fov: 45.0 * Math.PI / 180.0,
+            fov: 60.0 * Math.PI / 180.0,
             near: 0.01,
             far: 100.0
         }));
@@ -47,14 +47,14 @@ export class AnimatedBoxScene extends ViewerScene {
     }
 
     getMesh(): Mesh {
-        return this.cache.get(CACHE_TYPE.MESH,"outer_box");
+        return this.cache.get(CACHE_TYPE.MESH,"Cylinder");
     }
 
     preload(): void {
         this.loader.get(GLTFLoader).add(
-            "AnimatedBox",
-            "../assets/boxAnimated/BoxAnimated.gltf",
-            "../assets/boxAnimated/BoxAnimated0.bin"
+            "RiggedSimple",
+            "../assets/riggedSimple/RiggedSimple.gltf",
+            "../assets/riggedSimple/RiggedSimple0.bin"
         );
     }
 

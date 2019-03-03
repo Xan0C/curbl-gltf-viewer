@@ -2,9 +2,6 @@ import {GLBuffer} from "./GLBuffer";
 import {Attributes} from "./shader/GLAttribute";
 import Attribute = Attributes.GLAttribute;
 
-/**
- * Created by Soeren on 13.02.2017.
- */
 export interface IAttribute {
     buffer:GLBuffer,
     attribute:Attribute,
@@ -31,17 +28,11 @@ export class GLVertexArrayObject {
     }
 
     /**
-     * Binds the VAO, if its dirty it will initialize the attributes for the buffers
+     * Binds the VAO, if its dirty it will initialize the attributes for the data
      */
     public bind(): GLVertexArrayObject {
         if (this.vao) {
             this.gl.bindVertexArray(this.vao);
-            if(this.dirty){
-                this.activate();
-                this.dirty = false;
-                this.bind();
-            }
-        } else {
             if(this.dirty){
                 this.activate();
                 this.dirty = false;
@@ -53,7 +44,7 @@ export class GLVertexArrayObject {
 
     /**
      * Activates the vao,
-     * binds the buffers and the applies the Attributes
+     * binds the data and applies the Attributes
      */
     protected activate(){
         const gl = this.gl;
@@ -62,7 +53,7 @@ export class GLVertexArrayObject {
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER,null);
         for(let i=0,attribute:IAttribute; attribute = this.attributes[i]; i++){
             if(lastBuffer !== attribute.buffer){
-                //unbind previous buffer we dont want to applyMaterial the attribute to both buffers
+                //unbind previous buffer we dont want to apply the attribute to both buffers
                 if(lastBuffer) {
                     lastBuffer.unbind();
                 }

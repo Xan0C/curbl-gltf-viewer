@@ -17,6 +17,12 @@ in vec2 v_UV;
 in vec3 v_Position;
 in vec3 v_ViewPos;
 
+#ifdef HAS_SKIN
+in mat4 v_SkinMatrix;
+in vec4 v_Joint;
+in vec4 v_Weight;
+#endif
+
 uniform vec3 u_LightDirection;
 uniform vec3 u_LightColor;
 
@@ -61,7 +67,7 @@ struct PBRInfo
     float NdotH;                  // cos angle between normal and half vector
     float LdotH;                  // cos angle between light direction and half vector
     float VdotH;                  // cos angle between view direction and half vector
-    float perceptualRoughness;    // roughness value, as authored by the model creator (input to shader)
+    float perceptualRoughness;    // roughness value, as authored by the gltf creator (input to shader)
     float metalness;              // metallic value at the surface
     vec3 reflectance0;            // full reflectance color (normal incidence angle)
     vec3 reflectance90;           // reflectance color at grazing angle
@@ -160,7 +166,7 @@ float geometricOcclusion(PBRInfo pbrInputs)
     return attenuationL * attenuationV;
 }
 
-// The following equation(s) model the distribution of microfacet normals across the area being drawn (aka D())
+// The following equation(s) gltf the distribution of microfacet normals across the area being drawn (aka D())
 // Implementation from "Average Irregularity Representation of a Roughened Surface for Ray Reflection" by T. S. Trowbridge, and K. P. Reitz
 // Follows the distribution function recommended in the SIGGRAPH 2013 course notes from EPIC Games [1], Equation 3.
 float microfacetDistribution(PBRInfo pbrInputs)
@@ -238,7 +244,7 @@ void main(){
         specularColor
     );
 
-    // Calculate the shading terms for the microfacet specular shading model
+    // Calculate the shading terms for the microfacet specular shading gltf
     vec3 F = specularReflection(pbrInputs);
     float G = geometricOcclusion(pbrInputs);
     float D = microfacetDistribution(pbrInputs);
@@ -264,4 +270,5 @@ void main(){
 #endif
 
     fragmentColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
+    //fragmentColor = vec4(v_SkinMatrix[0].xyz + v_SkinMatrix[1].xyz + v_SkinMatrix[2].xyz + v_SkinMatrix[3].xyz, 1.0);
 }
