@@ -54,7 +54,7 @@ void main(){
             a_Weight1.w * u_JointMatrix.matrix[int(a_Joint1.w)];
     #endif
     #else
-        mat4 skinMatrix = mat4(0.0);
+        mat4 skinMatrix = mat4(1.0);
     #endif
 
     #ifdef HAS_NORMALS
