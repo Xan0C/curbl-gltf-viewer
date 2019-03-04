@@ -7,7 +7,7 @@ import {Cache, CACHE_TYPE} from "../../cache";
 import {Mesh} from "../../scene";
 import {AnimationComponent} from "../../components/scene/animationComponent";
 
-export class SimpleSkinScene extends ViewerScene {
+export class BrainStemScene extends ViewerScene {
 
     private cache: Cache;
 
@@ -47,13 +47,14 @@ export class SimpleSkinScene extends ViewerScene {
     }
 
     getMesh(): Mesh {
-        return this.cache.get(CACHE_TYPE.MESH,"mesh0");
+        return this.cache.get(CACHE_TYPE.MESH,"Figure_2_geometry"); //TODO
     }
 
     preload(): void {
         this.loader.get(GLTFLoader).add(
-            "RiggedSimple",
-            "../assets/simpleSkin/simpleSkin.gltf",
+            "BrainStem",
+            "../assets/brainStem/BrainStem.gltf",
+            "../assets/brainStem/BrainStem0.bin"
         );
     }
 

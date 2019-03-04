@@ -23,7 +23,7 @@ import {ViewerScene} from "./scenes/ViewerScene";
 import {AnimationSystem} from "../systems/AnimationSystem";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {vec4} from "gl-matrix";
-import {RiggedScene} from "./scenes/RiggedScene";
+import {BrainStemScene} from "./scenes/BrainStemScene";
 
 
 export class Viewer {
@@ -107,7 +107,7 @@ export class Viewer {
     loadScene() {
         this.loadShader();
         const iblScene = new IBLScene(this.loader);
-        const modelScene = new RiggedScene(this.loader, this.cache);
+        const modelScene = new BrainStemScene(this.loader, this.cache);
 
         this.scenes.push(iblScene);
         this.scenes.push(modelScene);

@@ -17,12 +17,6 @@ in vec2 v_UV;
 in vec3 v_Position;
 in vec3 v_ViewPos;
 
-#ifdef HAS_SKIN
-in mat4 v_SkinMatrix;
-in vec4 v_Joint;
-in vec4 v_Weight;
-#endif
-
 uniform vec3 u_LightDirection;
 uniform vec3 u_LightColor;
 

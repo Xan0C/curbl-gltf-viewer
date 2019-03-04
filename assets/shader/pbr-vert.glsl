@@ -25,7 +25,7 @@ layout (std140) uniform Matrices
 #ifdef HAS_SKIN
 layout (std140) uniform JointMatrix
 {
-    mat4 matrix[2];
+    mat4 matrix[65];
 } u_JointMatrix;
 #endif
 
@@ -38,9 +38,6 @@ out vec3 v_Position;
 out vec3 v_ViewPos;
 out vec2 v_UV;
 out mat3 v_TBN;
-out mat4 v_SkinMatrix;
-out vec4 v_Joint;
-out vec4 v_Weight;
 
 void main(){
     #ifdef HAS_SKIN
@@ -80,9 +77,6 @@ void main(){
 
     v_Position = vec3(u_ModelMatrix * skinMatrix * vec4(a_Position,1.0));
     v_ViewPos = Camera.viewPos;
-    v_SkinMatrix = skinMatrix;
-    v_Joint = a_Joint0;
-    v_Weight = a_Weight0;
 
     gl_Position = Camera.projectionMatrix * Camera.viewMatrix * u_ModelMatrix * skinMatrix * vec4(a_Position,1.0);
 }

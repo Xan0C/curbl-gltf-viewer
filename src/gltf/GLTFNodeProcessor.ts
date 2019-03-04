@@ -12,8 +12,7 @@ export class GLTFNodeProcessor {
         this.nodes = [];
     }
 
-
-    processNode(idx:number) {
+    processNode(idx:number): SceneNode {
         if(this.nodes[idx]) {
             return this.nodes[idx];
         }
