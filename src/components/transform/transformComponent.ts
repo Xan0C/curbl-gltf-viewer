@@ -1,7 +1,7 @@
 import {ECS, IComponent} from "curbl-ecs";
 import {mat4, quat, vec3} from "gl-matrix";
 
-export type TransformConfig = {
+export type TransformComponentConfig = {
     position:{x:number,y:number,z:number},
     rotation:{x:number,y:number,z:number,w:number},
     scale:{x:number,y:number,z:number}
@@ -18,7 +18,7 @@ export class TransformComponent implements IComponent {
     private _scale:vec3;
     private _dirty:boolean;
 
-    constructor(config:TransformConfig={
+    constructor(config:TransformComponentConfig={
         position: {x:0,y:0,z:0},
         rotation: {x:0,y:0,z:0,w:1},
         scale: {x:1,y:1,z:1}
@@ -26,7 +26,7 @@ export class TransformComponent implements IComponent {
         this.init(config);
     }
 
-    init(config:TransformConfig={
+    init(config:TransformComponentConfig={
         position: {x:0,y:0,z:0},
         rotation: {x:0,y:0,z:0,w:1},
         scale: {x:1,y:1,z:1}

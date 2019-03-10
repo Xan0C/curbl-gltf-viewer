@@ -1,5 +1,5 @@
 import {ECS, IComponent} from "curbl-ecs";
-import {SceneConfig} from "./sceneComponent";
+import {SceneComponentConfig} from "./sceneComponent";
 
 @ECS.Component()
 export class AnimationComponent implements IComponent {
@@ -18,7 +18,7 @@ export class AnimationComponent implements IComponent {
         this.init(config);
     }
 
-    init(config:SceneConfig){
+    init(config:SceneComponentConfig){
         this._key = config.key;
         this._running = false;
         this._paused = false;

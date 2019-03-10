@@ -8,18 +8,18 @@ import {CACHE_TYPE} from "../cache";
 export class GLTFMeshProcessor {
 
     private model: GLTFModel;
-    private meshes:Array<Mesh>;
+    private _meshes:Array<Mesh>;
     private cache:IBaseCache<Mesh>;
 
     constructor(model: GLTFModel) {
         this.model = model;
-        this.meshes = [];
+        this._meshes = [];
         this.cache = this.model.cache.getCache(CACHE_TYPE.MESH);
     }
 
     processMesh(idx:number): Mesh {
-        if(this.meshes[idx]) {
-            return this.meshes[idx];
+        if(this._meshes[idx]) {
+            return this._meshes[idx];
         }
 
         const sceneMesh = new Mesh();
@@ -30,7 +30,7 @@ export class GLTFMeshProcessor {
             sceneMesh.addPrimitive(this.parsePrimitives(sceneMesh, primitive));
         }
 
-        this.meshes[idx] = sceneMesh;
+        this._meshes[idx] = sceneMesh;
         this.cache.add(sceneMesh.name, sceneMesh);
         return sceneMesh;
     }
@@ -109,5 +109,13 @@ export class GLTFMeshProcessor {
      */
     private setIndices(primitive:Primitive, indices:IGLTF_Accessor):void{
         primitive.setIndices(indices.count, indices.componentType, indices.byteOffset||0, indices.bufferView);
+    }
+
+    get meshes(): Array<Mesh> {
+        return this._meshes;
+    }
+
+    set meshes(value: Array<Mesh>) {
+        this._meshes = value;
     }
 }

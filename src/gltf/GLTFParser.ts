@@ -28,7 +28,7 @@ export class GLTF_Parser {
      * @param {IGLTF_Model} gltf_model - json object in gltf format
      * @returns {Mesh}
      */
-    public parse(gltf_model:IGLTF_Model, buffer?:ArrayBuffer): Array<Scene> {
+    public parse(gltf_model:IGLTF_Model, buffer?:ArrayBuffer): Scene {
         const buffers = [];
         if(!buffer) {
             buffers.push(...this.parseBuffers(gltf_model));
@@ -49,7 +49,6 @@ export class GLTF_Parser {
         for(let i=0; i < gltfModel.buffers.length; i++) {
             const gltfBuffer = gltfModel.buffers[i];
             const buffer = Base64Binary.decode(gltfBuffer.uri, gltfBuffer.byteLength);
-            console.log(new Uint16Array(buffer));
             buffers.push(buffer);
         }
         return buffers;

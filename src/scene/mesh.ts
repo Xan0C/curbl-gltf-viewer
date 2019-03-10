@@ -107,8 +107,6 @@ export class Mesh {
                 const buffer:GLBuffer = view.buffer;
                 const offset = view.bufferOffset + attribute.byteOffset;
                 primitive.vertexArrayObject.addAttribute(buffer, glAttribute, attribute.componentTypeCount, attribute.componentType, attribute.normalized, attribute.stride, offset);
-            }else{
-                console.info('Primitive has no Attribute'+key);
             }
         }
     }

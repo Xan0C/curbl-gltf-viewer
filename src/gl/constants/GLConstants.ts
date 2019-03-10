@@ -30,7 +30,9 @@ export enum GL_PRIMITIVES {
     TEXCOORD_1 = "TEXCOORD_1",
     COLOR_0 = "COLOR_0",
     JOINTS_0 = "JOINTS_0",
-    WEIGHTS_0 = "WEIGHTS_0"
+    WEIGHTS_0 = "WEIGHTS_0",
+    JOINTS_1 = "JOINTS_1",
+    WEIGHTS_1 = "WEIGHTS_1"
 }
 
 export enum GL_BUFFERS {

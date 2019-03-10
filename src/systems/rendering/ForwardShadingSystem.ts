@@ -1,7 +1,7 @@
 import {ECS, System} from "curbl-ecs";
-import {Cache} from "../cache";
+import {Cache} from "../../cache";
 import {ForwardLightPass} from "./ForwardLightPass";
-import {Shader} from "../scene/shader";
+import {Shader} from "../../scene/shader";
 
 @ECS.System()
 export class ForwardShadingSystem extends System {

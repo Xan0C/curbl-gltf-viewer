@@ -1,8 +1,8 @@
 import {ECS, System} from "curbl-ecs";
-import {Shader} from "../scene/shader";
-import {GLCube} from "../gl";
-import {Cache, CACHE_TYPE} from "../cache";
-import {GLOBAL_TEXTURES} from "../viewer/constants";
+import {Shader} from "../../scene/shader";
+import {GLCube} from "../../gl";
+import {Cache, CACHE_TYPE} from "../../cache";
+import {GLOBAL_TEXTURES} from "../../viewer/constants";
 
 @ECS.System()
 export class SkyboxPass extends System {
@@ -33,6 +33,7 @@ export class SkyboxPass extends System {
 
     render():void{
         if(this.cache.has(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SKYBOX)) {
+            this.gl.enable(this.gl.DEPTH_TEST);
             this.gl.depthFunc(this.gl.LEQUAL);
 
             this.shader.bind();
@@ -41,6 +42,7 @@ export class SkyboxPass extends System {
             this.shader.unbind();
 
             this.gl.depthFunc(this.gl.LESS);
+            this.gl.disable(this.gl.DEPTH_TEST);
         }
     }
 }

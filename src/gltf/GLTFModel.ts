@@ -44,11 +44,12 @@ export class GLTFModel {
         this.skinProcessor = new GLTFSkinProcessor(this);
     }
 
-    process(): Array<Scene> {
-        const scenes =  new GLTFSceneProcessor(this).processScenes();
-        new GLTFAnimationProcessor(this).processAnimations();
+    process(): Scene {
+        const scene =  new GLTFSceneProcessor(this).processScenes();
+        scene.animations = new GLTFAnimationProcessor(this).processAnimations();
+        scene.meshes = this.meshProcessor.meshes;
 
-        return scenes;
+        return scene;
     }
 
     getSkin(idx:number):Skin {

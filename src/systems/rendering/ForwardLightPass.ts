@@ -1,8 +1,8 @@
 import {ECS, IEntity, System} from "curbl-ecs";
-import {LightComponent} from "../components";
-import {Cache} from "../cache";
+import {LightComponent} from "../../components";
+import {Cache} from "../../cache";
 import {ForwardScenePass} from "./ForwardScenePass";
-import {Shader} from "../scene/shader";
+import {Shader} from "../../scene/shader";
 
 @ECS.System(LightComponent)
 export class ForwardLightPass extends System {

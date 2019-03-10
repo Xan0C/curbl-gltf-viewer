@@ -1,19 +1,19 @@
-import {ViewerScene} from "./ViewerScene";
-import {CubemapLoader} from "../../loader/CubemapLoader";
-import {GLOBAL_TEXTURES} from "../constants";
-import {GL_INTERNALFORMAT, GL_TYPES, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "../../gl/constants";
-import {TextureLoader} from "../../loader/TextureLoader";
+import {
+    WorldScene,
+    CubemapLoader,
+    GLOBAL_TEXTURES,
+    GL_INTERNALFORMAT,
+    GL_TYPES,
+    MAG_FILTER,
+    MIN_FILTER,
+    TEXTURE_WRAP,
+    LightComponent,
+    GUIComponent,
+    TextureLoader
+} from "../../../lib";
 import {ECS} from "curbl-ecs";
-import {LightComponent} from "../../components/light";
-import {GUIComponent} from "../../components/gui/GUIComponent";
-import {ResourceLoader} from "curbl-loader";
 
-export class IBLScene extends ViewerScene {
-
-    constructor(loader: ResourceLoader) {
-        super(loader);
-    }
-
+export class EnvironmentScene extends WorldScene {
     preload(): void {
         this.loader.get(CubemapLoader).add(GLOBAL_TEXTURES.SKYBOX,
             [{
@@ -117,6 +117,12 @@ export class IBLScene extends ViewerScene {
                 }
             ]
         }));
-        ECS.addEntity(entity);
+        this.add(entity);
+    }
+
+    shutdown(): void {
+    }
+
+    update(): void {
     }
 }

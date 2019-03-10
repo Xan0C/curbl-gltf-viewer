@@ -1,16 +1,16 @@
 import {ECS, IComponent} from "curbl-ecs";
 
-export type SceneConfig = {key:string};
+export type SceneComponentConfig = {key:string};
 
 @ECS.Component()
 export class SceneComponent implements IComponent {
     private _key:string;
 
-    constructor(config:SceneConfig){
+    constructor(config:SceneComponentConfig){
         this._key = config.key;
     }
 
-    init(config:SceneConfig){
+    init(config:SceneComponentConfig){
         this._key = config.key;
     }
 

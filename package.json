@@ -9,12 +9,13 @@
   "license": "MIT",
   "scripts": {
     "watch": "webpack --watch",
-    "build": "webpack",
-    "start:dev": "webpack-dev-server"
+    "build": "tsc && webpack --config ./example/webpack.config.js",
+    "start:dev": "webpack-dev-server --config ./example/webpack.config.js",
+    "generate-barrels": "barrelsby --delete --location all --directory ./src"
   },
   "dependencies": {
     "curbl-ecs": "^1.0.5",
-    "curbl-loader": "^0.1.1",
+    "curbl-loader": "^0.1.5",
     "dat.gui": "^0.7.5",
     "eventemitter3": "^3.1.0",
     "gl-matrix": "^3.0.0"
@@ -23,6 +24,7 @@
     "@types/dat.gui": "^0.7.2",
     "@types/gl-matrix": "^2.4.5",
     "@types/webgl2": "^0.0.4",
+    "barrelsby": "^2.0.0",
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.4",
     "webpack": "^4.29.0",

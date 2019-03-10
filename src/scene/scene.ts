@@ -3,13 +3,19 @@ import {Attributes, GL_PRIMITIVES, GLBuffer} from "../gl";
 import {Shader} from "./shader";
 import GLAttribute = Attributes.GLAttribute;
 import {Cache} from "../cache";
+import {Mesh} from "./mesh";
+import {Animation} from "./animation";
 
 export class Scene {
     private _name:string;
-    private nodes:Array<SceneNode>;
+    private _meshes:Array<Mesh>;
+    private _animations:Array<Animation>;
+    private _nodes:Array<SceneNode>;
 
     constructor() {
-        this.nodes = [];
+        this._nodes = [];
+        this._meshes = [];
+        this._animations = [];
     }
 
     /**
@@ -21,7 +27,7 @@ export class Scene {
      * @returns {Mesh}
      */
     init(gl:WebGL2RenderingContext,vertexBuffer?:GLBuffer,indexBuffer?:GLBuffer):Scene {
-        for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
+        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
                 node.init(gl, vertexBuffer, indexBuffer);
         }
         return this;
@@ -33,7 +39,7 @@ export class Scene {
      * @returns {Mesh}
      */
     upload():Scene {
-        for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
+        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
             node.upload();
         }
         return this;
@@ -45,7 +51,7 @@ export class Scene {
      * @param {Cache} cache - cache to get the materials
      */
     draw(shader: Shader, cache: Cache):void {
-        for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
+        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
             shader.applyScene(this);
             node.draw(shader, cache);
         }
@@ -58,14 +64,14 @@ export class Scene {
      * @param {Attributes.GLAttribute} glAttribute
      */
     addAttribute(key:GL_PRIMITIVES,glAttribute:GLAttribute):void{
-        for(let i=0, node: SceneNode; node = this.nodes[i]; i++) {
+        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
             node.addAttribute(key, glAttribute);
         }
     }
 
     addNode(...nodes:SceneNode[]) {
         for(let i=0, node:SceneNode; node = nodes[i]; i++) {
-            this.nodes.push(node);
+            this._nodes.push(node);
         }
     }
 
@@ -75,5 +81,26 @@ export class Scene {
 
     set name(value: string) {
         this._name = value;
+    }
+
+
+    get meshes(): Array<Mesh> {
+        return this._meshes;
+    }
+
+    set meshes(value: Array<Mesh>) {
+        this._meshes = value;
+    }
+
+    get animations(): Array<Animation> {
+        return this._animations;
+    }
+
+    set animations(value: Array<Animation>) {
+        this._animations = value;
+    }
+
+    get root():SceneNode {
+        return this._nodes[0];
     }
 }

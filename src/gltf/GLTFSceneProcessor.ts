@@ -16,7 +16,7 @@ export class GLTFSceneProcessor {
     /**
      * Parse the scenes by parsing each node of the GTLF File
      */
-    processScenes():Array<Scene> {
+    processScenes():Scene {
         const gltf = this.model.gltf;
         const scenes = [];
 
@@ -24,7 +24,7 @@ export class GLTFSceneProcessor {
            scenes.push(this.processScene(scene,i));
         }
 
-        return scenes;
+        return scenes[0];
     }
 
     private processScene(gltfScene:IGLTF_Scene,idx:number):Scene {

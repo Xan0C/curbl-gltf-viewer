@@ -1,10 +1,10 @@
 import {ECS, IEntity, System} from "curbl-ecs";
-import {SceneComponent} from "../components";
-import {Cache, CACHE_TYPE} from "../cache";
+import {SceneComponent} from "../../components";
+import {Cache, CACHE_TYPE} from "../../cache";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
-import {GL_PRIMITIVES} from "../gl/constants";
-import {Shader} from "../scene/shader";
-import {Scene} from "../scene/scene";
+import {GL_PRIMITIVES} from "../../gl/constants";
+import {Scene, Shader} from "../../scene";
+
 
 @ECS.System(SceneComponent)
 export class ForwardScenePass extends System {

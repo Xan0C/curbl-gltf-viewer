@@ -1,29 +1,31 @@
-import {CameraComponent, LookAtCameraComponent, TransformComponent} from "../components";
+import {CameraComponent, LookAtCameraComponent, TransformComponent} from "../../components";
 import {ECS, IEntity, ISystem, System} from "curbl-ecs";
-import {Math3d} from "../math";
-import {DomEvents} from "../events/DomEvents";
+import {Math3d} from "../../math";
+import {DomEvents} from "../../events/DomEvents";
 import {mat4, quat, vec3} from "gl-matrix";
+import {Canvas} from "../../canvas";
 
 @ECS.System(TransformComponent,CameraComponent,LookAtCameraComponent)
 export class LookAtCameraControlSystem extends System implements ISystem {
     private lastMouseX:number;
     private lastMouseY:number;
     private drag:boolean;
-    private display: {width: number, height: number};
+    private canvas:Canvas;
 
-    constructor(config:{width: number, height:number}){
+    constructor(canvas:Canvas){
         super();
-        this.display = config;
+        this.canvas = canvas;
         this.lastMouseX = -1;
         this.lastMouseY = -1;
         this.drag = false;
     }
 
     setUp():void{
-        DomEvents.onMouseDown.add(this.onMouseDown,this);
-        DomEvents.onMouseUp.add(this.onMouseUp,this);
-        //DomEvents.onMouseWheel.add(this.onMouseWheel,this);
-        DomEvents.onMouseMove.add(this.onMouseMove,this);
+        this.canvas.element.addEventListener('mousedown', (ev)=>this.onMouseDown(ev));
+        this.canvas.element.addEventListener('mouseup', (ev)=>this.onMouseUp(ev));
+        this.canvas.element.addEventListener('mousemove', (ev)=>this.onMouseMove(ev));
+
+        DomEvents.onWheel.add(this.onMouseWheel,this);
         DomEvents.onKeyDown.add(this.onKeyDown,this);
     }
 
@@ -71,13 +73,12 @@ export class LookAtCameraControlSystem extends System implements ISystem {
         this.lastMouseY = -1;
     }
 
-    public onMouseWheel(ev:MouseWheelEvent){
+    public onMouseWheel(ev:WheelEvent){
         for(let i=0,entity:IEntity; entity = this.entities[i]; i++) {
             let transform = entity.get(TransformComponent);
             let perspective = entity.get(LookAtCameraComponent);
 
-            const delta = (ev.deltaX + ev.deltaY + ev.deltaZ)/3;
-            this.zoom(entity, delta, 0.001);
+            this.zoom(entity, ev.deltaY, 0.001);
             const translation = this.calcTranslation(
                 perspective.panning,
                 perspective.zooming,
@@ -103,19 +104,19 @@ export class LookAtCameraControlSystem extends System implements ISystem {
         let x = 0;
         //W
         if(ev.key === "w") {
-            y -= 0.1;
+            y += 0.1;
         }
         //S
         if(ev.key === "s"){
-            y += 0.1;
+            y -= 0.1;
         }
         //A
         if(ev.key === "a"){
-            x -= 0.1;
+            x += 0.1;
         }
         //D
         if(ev.key === "d"){
-            x += 0.1;
+            x -= 0.1;
         }
 
         for(let i=0,entity:IEntity; entity = this.entities[i]; i++) {
@@ -160,7 +161,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     protected zoom(entity:IEntity,wheelDelta:number,delta:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
-        let dz = (perspective.zoomPos + wheelDelta)*delta;
+        const dz = (perspective.zoomPos - wheelDelta) * delta;
         const aDir = vec3.create();
         vec3.subtract(aDir, perspective.target, transform.translation);
         const dist = vec3.length(aDir);
@@ -175,8 +176,8 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     protected rotate(entity:IEntity,x:number,y:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
-        const po = Math3d.getVSpherePos(this.lastMouseX,this.lastMouseY,this.display.width,this.display.height);
-        const pn = Math3d.getVSpherePos(x,y,this.display.width,this.display.height);
+        const po = Math3d.getVSpherePos(this.lastMouseX,this.lastMouseY,this.canvas.width,this.canvas.height);
+        const pn = Math3d.getVSpherePos(x,y,this.canvas.width,this.canvas.height);
 
         const poPn = vec3.create();
         vec3.subtract(poPn, po, pn);

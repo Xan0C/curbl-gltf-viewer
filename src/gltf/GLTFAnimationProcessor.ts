@@ -12,6 +12,7 @@ export class GLTFAnimationProcessor {
 
     private model:GLTFModel;
     private cache:IBaseCache<Animation>;
+    private _animations:Array<Animation>;
 
     constructor(model:GLTFModel) {
         this.model = model;
@@ -19,15 +20,15 @@ export class GLTFAnimationProcessor {
     }
 
     processAnimations():Array<Animation> {
-        const animations = [];
+        this._animations = [];
         const gltf = this.model.gltf;
 
         gltf.animations = gltf.animations||[];
         for(let i=0; i < gltf.animations.length; i++) {
-            animations.push(this.processAnimation(i));
+            this._animations.push(this.processAnimation(i));
         }
 
-        return animations;
+        return this._animations;
     }
 
     private processAnimation(idx:number): Animation {
@@ -92,5 +93,13 @@ export class GLTFAnimationProcessor {
         accessor.stride = gltf.bufferViews[gltfAccessor.bufferView].byteStride||0;
 
         return accessor;
+    }
+
+    get animations(): Array<Animation> {
+        return this._animations;
+    }
+
+    set animations(value: Array<Animation>) {
+        this._animations = value;
     }
 }

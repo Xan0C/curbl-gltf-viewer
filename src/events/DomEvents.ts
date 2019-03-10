@@ -12,7 +12,8 @@ enum DOM_EVENTS {
     MOUSEOUT = "MOUSE_OUT",
     MOUSEOVER = "MOUSE_OVER",
     MOUSEUP = "MOUSE_UP",
-    MOUSEMOVE = "MOUSE_MOVE"
+    MOUSEMOVE = "MOUSE_MOVE",
+    WHEEL = "WHEEL"
 }
 
 const emitter = new EventEmitter();
@@ -28,7 +29,8 @@ export const DomEvents = {
     onMouseOut: new EmitSignal(emitter,DOM_EVENTS.MOUSEOUT),
     onMouseOver: new EmitSignal(emitter,DOM_EVENTS.MOUSEOVER),
     onMouseUp: new EmitSignal(emitter,DOM_EVENTS.MOUSEUP),
-    onMouseMove: new EmitSignal(emitter,DOM_EVENTS.MOUSEMOVE)
+    onMouseMove: new EmitSignal(emitter,DOM_EVENTS.MOUSEMOVE),
+    onWheel: new EmitSignal(emitter, DOM_EVENTS.WHEEL)
 };
 
 (function()  {
@@ -65,4 +67,7 @@ export const DomEvents = {
     document.onmousemove = (ev: MouseEvent) => {
         DomEvents.onMouseMove.dispatch(ev)
     };
+    document.onwheel = (ev: WheelEvent) => {
+        DomEvents.onWheel.dispatch(ev);
+    }
 })();

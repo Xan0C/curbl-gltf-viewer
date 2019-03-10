@@ -43,6 +43,9 @@ export class KhronosPbrShader extends Shader {
         if(model.hasAttribute(GL_PRIMITIVES.JOINTS_0) && model.hasAttribute(GL_PRIMITIVES.WEIGHTS_0)) {
             this.addDefine("HAS_SKIN", 1);
         }
+        if(model.hasAttribute(GL_PRIMITIVES.JOINTS_1) && model.hasAttribute(GL_PRIMITIVES.WEIGHTS_1)) {
+            this.addDefine("SKIN_VEC8", 1);
+        }
         if(model.hasMap(this.cache, MATERIAL_MAPS.ALBEDO)) {
             this.addDefine("HAS_BASECOLORMAP", 1);
         }
@@ -75,6 +78,7 @@ export class KhronosPbrShader extends Shader {
 
         if(node.skin) {
             const inverseTransformMatrix = mat4.create();
+            //TODO: skin.skeleton.transform.modelMatrix if skeleton provided
             mat4.invert(inverseTransformMatrix, node.transform.modelMatrix);
 
             for(let i=0, join:SceneNode; join = node.skin.joints[i]; i++) {
@@ -125,33 +129,33 @@ export class KhronosPbrShader extends Shader {
 
     private applyTextures(material?:Material<MetallicRoughness>):void {
         //applyMaterial BaseColor Texture
-        if (material.maps[MATERIAL_MAPS.ALBEDO]) {
+        if (material.maps[MATERIAL_MAPS.ALBEDO] && this.cache.get(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.ALBEDO].texture)) {
             const texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.ALBEDO].texture);
             texture.bind(TEXTURES.DIFFUSE);
             this.uniforms.u_BaseColorSampler = TEXTURES.DIFFUSE;
         }
         //applyMaterial MetallicRoughnessSampler
-        if(material.maps[MATERIAL_MAPS.METAL_ROUGHNESS]){
+        if(material.maps[MATERIAL_MAPS.METAL_ROUGHNESS] && this.cache.get(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.METAL_ROUGHNESS].texture)){
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.METAL_ROUGHNESS].texture);
             texture.bind(TEXTURES.METALLIC_ROUGHNESS);
             this.uniforms.u_MetallicRoughnessSampler = TEXTURES.METALLIC_ROUGHNESS;
         }
         //applyMaterial NormalMaps
-        if (material.maps[MATERIAL_MAPS.NORMAL]) {
+        if (material.maps[MATERIAL_MAPS.NORMAL] && this.cache.get(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.NORMAL].texture)) {
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.NORMAL].texture);
             texture.bind(TEXTURES.NORMAL);
             this.uniforms.u_NormalSampler = TEXTURES.NORMAL;
             this.uniforms.u_NormalScale = material.model.normalScale;
         }
         //applyMaterial emissive map
-        if(material.maps[MATERIAL_MAPS.EMISSIVE]){
+        if(material.maps[MATERIAL_MAPS.EMISSIVE] && this.cache.get(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.EMISSIVE].texture)){
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.EMISSIVE].texture);
             texture.bind(TEXTURES.EMISSIVE);
             this.uniforms.u_EmissiveSampler = TEXTURES.EMISSIVE;
             this.uniforms.u_EmissiveFactor = material.model.emissiveFactor;
         }
         //applyMesh Occlusion map
-        if(material.maps[MATERIAL_MAPS.OCCLUSION]) {
+        if(material.maps[MATERIAL_MAPS.OCCLUSION] && this.cache.get(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.OCCLUSION].texture)) {
             let texture = this.cache.get<GLTexture>(CACHE_TYPE.TEXTURE, material.maps[MATERIAL_MAPS.OCCLUSION].texture);
             texture.bind(TEXTURES.OCCLUSION);
             this.uniforms.u_OcclusionSampler = TEXTURES.OCCLUSION;

@@ -8,6 +8,7 @@ export type GUIComponentConfig = {
         propName: string;
         min?: number;
         max?: number;
+        items?: Array<string>|{[x:string]:any};
         onChange?: (value) => void;
         onFinishChange?: (value) => void;
     }>

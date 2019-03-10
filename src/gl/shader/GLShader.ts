@@ -53,7 +53,7 @@ export class GLShader {
 
     constructor(gl: WebGL2RenderingContext, vertexSrc?:string, fragmentSrc?:string){
         this.gl = gl;
-        this._defines = {};
+        this._defines = Object.create(null);
         this._vertexSrc = vertexSrc;
         this._fragmentSrc = fragmentSrc;
     }
@@ -88,7 +88,7 @@ export class GLShader {
 
         this._program = ProgramCompiler.compile(gl, vertexSrcWithDefines, fragmentSrcWithDefines);
         this._attributes = Attributes.extract(gl,this._program);
-        let uniformData = Uniforms.extract(gl,this._program);
+        const uniformData = Uniforms.extract(gl,this._program);
         this._uniforms = Uniforms.generateUniformAccessObject(gl,uniformData,this._program);
         return this;
     }
@@ -150,6 +150,17 @@ export class GLShader {
     }
 
     /**
+     * Destroy the program unloads it from the gpu
+     */
+    public unload() {
+        this.gl.deleteProgram(this.program);
+        this._program = null;
+        this._attributes = null;
+        this._uniforms = null;
+        this._defines = Object.create(null);
+    }
+
+    /**
      * Destroys the program in the WebGLContext nulls all objects in the Shader
      */
     public destroy(){
@@ -158,6 +169,9 @@ export class GLShader {
         this._program = null;
         this._attributes = null;
         this._uniforms = null;
+        this._defines = null;
+        this._vertexSrc = null;
+        this._fragmentSrc = null;
     }
 
     get vertexSrc(): string {

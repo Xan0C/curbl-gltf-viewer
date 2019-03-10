@@ -98,9 +98,11 @@ export class Primitive {
      * @param {number} offset
      */
     draw(mode:number=this._draw_mode, size:number=this._indices.count, type:number=this._indices.componentType, offset:number=this._indices.byteOffset):void{
-        this._vertexArrayObject.bind();
-        this._vertexArrayObject.draw(mode,size,type,offset);
-        this._vertexArrayObject.unbind();
+        if(this._vertexArrayObject) {
+            this._vertexArrayObject.bind();
+            this._vertexArrayObject.draw(mode, size, type, offset);
+            this._vertexArrayObject.unbind();
+        }
     }
 
     public get name():string {

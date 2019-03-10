@@ -1,9 +1,13 @@
 import {ECS, IComponent} from "curbl-ecs";
-import {mat4, vec3} from "gl-matrix";
+import {mat4} from "gl-matrix";
 
 export type CameraConfig = {
     viewMatrix?:mat4,
-    projMatrix?:mat4
+    projMatrix?:mat4,
+    fovy?: number,
+    aspect?: number,
+    near?: number,
+    far?: number
 };
 
 @ECS.Component('CameraComponent')
@@ -12,25 +16,24 @@ export class CameraComponent implements IComponent{
     private _viewMatrix:mat4;
     private _projMatrix:mat4;
 
-    constructor(config:CameraConfig={}){
+    constructor(config:CameraConfig={
+        fovy: 0.785,
+        aspect: 16/9,
+        near: 0.01,
+        far: 100
+    }){
        this.init(config);
     }
 
     init(config?:CameraConfig):void {
         if(!config.projMatrix) {
             this._viewMatrix = mat4.create();
-            mat4.lookAt(
-                this._viewMatrix,
-                vec3.fromValues(0,0,8),
-                vec3.fromValues(0,0,0),
-                vec3.fromValues(0,1,0),
-            );
         }else {
             this._viewMatrix = config.viewMatrix;
         }
         if(!config.projMatrix) {
             this._projMatrix = mat4.create();
-            mat4.perspective(this._projMatrix, 45.0 * Math.PI / 180.0, 16 / 9, 0.01, 100.0);
+            mat4.perspective(this._projMatrix, config.fovy||0.785, config.aspect||(16/9), config.near||0.01, config.far||100);
         }else {
             this._projMatrix = config.projMatrix;
         }

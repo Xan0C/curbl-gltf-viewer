@@ -1,7 +1,7 @@
 import {ECS, IEntity, System} from "curbl-ecs";
 import * as dat from "dat.gui";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
-import {GUIComponent} from "../components/gui/GUIComponent";
+import {GUIComponent} from "../../components/gui/GUIComponent";
 import {GUIController} from "dat.gui";
 
 @ECS.System(GUIComponent)
@@ -30,7 +30,9 @@ export class GUISystem extends System {
         for(let property of config.properties) {
             if (property.isColor) {
                 controller = folder.addColor(property.prop, property.propName);
-            } else {
+            } else if(property.items){
+                controller = folder.add(property.prop, property.propName, property.items);
+            }else {
                 controller = folder.add(property.prop, property.propName, property.min, property.max);
             }
 

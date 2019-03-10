@@ -1,7 +1,8 @@
 import {ECS, IEntity, System} from "curbl-ecs";
-import {AnimationComponent} from "../components/scene/animationComponent";
-import {Cache, CACHE_TYPE} from "../cache";
-import {Animation} from "../scene/animation";
+import {AnimationComponent} from "../../components/scene/animationComponent";
+import {Animation} from "../../scene/animation";
+import {Cache,CACHE_TYPE} from "../../cache";
+
 
 @ECS.System(AnimationComponent)
 export class AnimationSystem extends System {

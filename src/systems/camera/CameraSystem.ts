@@ -1,7 +1,7 @@
 import {ECS, IEntity, System} from "curbl-ecs";
-import {CameraComponent, TransformComponent} from "../components";
-import {GLUniformBufferObject} from "../gl/GLUniformBufferObject";
-import {UBO_BINDINGS} from "../viewer/constants";
+import {CameraComponent, TransformComponent} from "../../components";
+import {GLUniformBufferObject} from "../../gl/GLUniformBufferObject";
+import {UBO_BINDINGS} from "../../viewer/constants";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
 import {mat4, vec3} from "gl-matrix";
 
@@ -27,10 +27,16 @@ export class CameraSystem extends System {
     }
 
     setUp():void{
+        const initMatrix = mat4.create();
         this.cameraUBO = new GLUniformBufferObject(this.gl,UBO_BINDINGS.CAMERA);
         this.cameraUBO.addItem("projectionMatrix","mat4");
         this.cameraUBO.addItem("viewMatrix","mat4");
         this.cameraUBO.addItem("viewPos","vec3");
+        this.cameraUBO.updateItem("projectionMatrix", initMatrix);
+        this.cameraUBO.updateItem("viewMatrix", initMatrix);
+        this.cameraUBO.updateItem("viewPos", this.translation);
+        this.cameraUBO.upload();
+        this.cameraUBO.bindUBO();
         this.events.on(SYSTEM_EVENTS.ENTITY_ADDED,this.initEntity,this);
         this.events.on(SYSTEM_EVENTS.ENTITY_REMOVED,this.removeEntity,this);
     }
