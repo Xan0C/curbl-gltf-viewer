@@ -23,7 +23,6 @@ import {vec4} from "gl-matrix";
 import {AnimationSystem} from "../systems/animation/AnimationSystem";
 import {WorldSystem} from "../systems/world/worldSystem";
 
-
 export class Viewer {
     private _cache:Cache;
     private _canvas:Canvas;
@@ -92,8 +91,7 @@ export class Viewer {
     private createSystems() {
         //Create Systems
         ECS.systemUpdateMethods = ['update', 'render'];
-        this._world = new WorldSystem({loader: this._loader, cache: this._cache});
-        ECS.addSystem(this._world);
+        this._world = ECS.addSystem(new WorldSystem({loader: this._loader, cache: this._cache}));
         ECS.addSystem(new CameraSystem({gl: this._gl}));
         ECS.addSystem(new LookAtCameraControlSystem(this._canvas));
         ECS.addSystem(new GUISystem());
