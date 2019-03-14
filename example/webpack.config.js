@@ -1,7 +1,8 @@
 const path = require("path");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const  CompressionPlugin = require('compression-webpack-plugin');
 
 module.exports = {
-    mode:'development',
     context: path.join(__dirname),
     entry: {
         viewer:"./src/index.ts",
@@ -14,9 +15,30 @@ module.exports = {
     resolve: {
         extensions: ['.webpack.js', '.web.js', '.ts', '.tsx', '.js']
     },
+    optimization: {
+        minimizer: [
+            new UglifyJsPlugin({
+                uglifyOptions: {
+                    keep_fnames: true
+                },
+            }),
+        ],
+    },
     module: {
         rules: [
-            {test: /\.tsx?$/, loader: "ts-loader", exclude: /node_modules/ }
+            {
+                test: /\.(ts|js)x?$/,
+                loader: 'babel-loader'
+            }
         ]
-    }
+    },
+    plugins: [
+        new CompressionPlugin({
+            filename: "[path].gz[query]",
+            algorithm: "gzip",
+            test: /\.(js|css|html|svg)$/,
+            threshold: 10240,
+            minRatio: 0.8
+        })
+    ]
 };

@@ -100,13 +100,15 @@ export class Example {
     }
 
     private onResize() {
-        mat4.perspective(
-            this.camera.get(CameraComponent).projMatrix,
-            45.0 * Math.PI / 180.0,
-            (window.innerWidth/window.innerHeight),
-            0.01,
-            100
-        );
+        if(this.camera) {
+            mat4.perspective(
+                this.camera.get(CameraComponent).projMatrix,
+                45.0 * Math.PI / 180.0,
+                (window.innerWidth / window.innerHeight),
+                0.01,
+                100
+            );
+        }
     }
 
     private createSceneSelector() {
