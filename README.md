@@ -1,2 +1,2 @@
-# curbl_gtlf_viewer
-gltf viewer for experimenting with my own webgl2 library
+# curbl-gltf-viewer
+simple gltf viewer
