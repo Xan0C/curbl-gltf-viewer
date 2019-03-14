@@ -66,8 +66,18 @@ export class Viewer {
         this._shader = new KhronosPbrShader(this._gl, this._cache);
         this._skyboxShader = new SkyboxShader(this._gl, this._cache);
         //Load shader
-        this._loader.get(GLSLLoader).add("shader", "../assets/shader/pbr-vert.glsl", "../assets/shader/pbr-frag.glsl", this._shader);
-        this._loader.get(GLSLLoader).add("skyboxShader", "../assets/shader/skybox-vert.glsl", "../assets/shader/skybox-frag.glsl", this._skyboxShader);
+        this._loader.get(GLSLLoader).add(
+            "shader",
+            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-vert.glsl",
+            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-frag.glsl",
+            this._shader
+        );
+        this._loader.get(GLSLLoader).add(
+            "skyboxShader",
+            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-vert.glsl",
+            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-frag.glsl",
+            this._skyboxShader
+        );
 
         this.load(onLoaded);
     }
