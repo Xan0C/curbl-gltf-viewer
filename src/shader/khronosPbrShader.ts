@@ -1,6 +1,6 @@
 import {Shader} from "../scene/shader";
 import {Mesh} from "../scene";
-import {Material, MATERIAL_MAPS} from "../material";
+import {ALPHA_MODE, Material, MATERIAL_MAPS} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {GL_PRIMITIVES, GLTexture} from "../gl";
 import {Cache, CACHE_TYPE} from "../cache";
@@ -103,6 +103,17 @@ export class KhronosPbrShader extends Shader {
         this.uniforms.u_BaseColorFactor = material.model.baseColorFactor;
         this.uniforms.u_RoughnessFactor = material.model.roughnessFactor;
         this.uniforms.u_MetallicFactor = material.model.metallicFactor;
+
+        //TODO: sort after materials
+        if(!material.doubleSided) {
+            this.gl.enable(this.gl.CULL_FACE);
+        } else {
+            this.gl.disable(this.gl.CULL_FACE);
+        }
+
+        //TODO: BLEND Mode
+        this.uniforms.u_AlphaCutoff = material.alphaCutoff;
+        this.uniforms.u_IgnoreAlpha = material.alphaMode === ALPHA_MODE.OPAQUE ? 1 : 0;
     }
 
     private applyIBL() {

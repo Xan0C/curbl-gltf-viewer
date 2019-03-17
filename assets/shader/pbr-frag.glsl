@@ -50,6 +50,8 @@ uniform float u_OcclusionStrength;
 uniform float u_MetallicFactor;
 uniform float u_RoughnessFactor;
 uniform vec4 u_BaseColorFactor;
+uniform float u_AlphaCutoff;
+uniform int u_IgnoreAlpha;
 
 // Encapsulate the various inputs used by the various functions in the shading equation
 // We store values in this struct to simplify the integration of alternative implementations
@@ -262,7 +264,12 @@ void main(){
     vec3 emissive = texture(u_EmissiveSampler, v_UV).rgb * u_EmissiveFactor;
     color += emissive;
 #endif
+    //TODO: sort by distance and use alpha blending
+    if(baseColor.a < u_AlphaCutoff) {
+        discard;
+    }
 
+    baseColor.a = baseColor.a * (1.0 - float(u_IgnoreAlpha)) + float(u_IgnoreAlpha); //set to 1 if u_IngoreAlpha is true / 1
     fragmentColor = vec4(pow(color,vec3(1.0/2.2)), baseColor.a);
     //fragmentColor = vec4(v_SkinMatrix[0].xyz + v_SkinMatrix[1].xyz + v_SkinMatrix[2].xyz + v_SkinMatrix[3].xyz, 1.0);
 }

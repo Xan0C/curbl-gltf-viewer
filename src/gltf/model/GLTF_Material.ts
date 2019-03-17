@@ -1,9 +1,3 @@
-export enum ALPHA_MODE  {
-    OPAQUE = "OPAQUE",
-    MASK = "MASK",
-    BLEND = "BLEND"
-}
-
 export interface IGLTF_Material {
     name?:string;
     extensions?:{[id:string]:any};
@@ -14,7 +8,7 @@ export interface IGLTF_Material {
     occlusionTexture?:IOcclusionTextureinfo;
     emissiveTexture?:ITextureinfo;
     emissiveFactor:Array<number>;
-    alphaMode:ALPHA_MODE;
+    alphaMode:"OPAQUE"|"MASK"|"BLEND";
     alphaCutoff:number;
     doubleSided:boolean;
 }

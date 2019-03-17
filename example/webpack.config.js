@@ -29,6 +29,11 @@ module.exports = {
             {
                 test: /\.(ts|js)x?$/,
                 loader: 'babel-loader'
+            },
+            {
+                test: /\.js$/,
+                use: ["source-map-loader"],
+                enforce: "pre"
             }
         ]
     },

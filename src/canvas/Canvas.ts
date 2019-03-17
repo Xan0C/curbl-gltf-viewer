@@ -29,7 +29,7 @@ export class Canvas {
 
     public get context():WebGL2RenderingContext{
         if(!this._context) {
-            this._context = WebGLUtils.setupWebGL(this._element,{ antialias: true, stencil: true} ) as WebGL2RenderingContext;
+            this._context = WebGLUtils.setupWebGL(this._element,{ antialias: true, stencil: true, premultipliedAlpha: false} ) as WebGL2RenderingContext;
         }
         return this._context;
     }

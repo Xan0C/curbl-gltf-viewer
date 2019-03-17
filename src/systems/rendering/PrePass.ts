@@ -28,6 +28,6 @@ export class PrePass extends System {
     }
 
     render() {
-        this.clearContext(true,true, {r: 0.2, g:0.2, b: 0.2, a:1});
+        this.clearContext(true,true, {r: 0, g:0, b: 0, a:0});
     }
 }

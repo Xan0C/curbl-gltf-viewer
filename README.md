@@ -9,7 +9,8 @@ webgl 2 gltf viewer [example](https://xan0c.github.io/curbl-gltf-viewer/)
 
 - [x] animation
 - [x] mesh skinning
-- [ ] AlphaMode, AlphaCutoff, DoubleSided materials
+- [x] AlphaMode, AlphaCutoff, DoubleSided materials
+    - [ ] sort after material/distance for BLEND materials
 - [ ] morph targets
 - [ ] camera
 - [ ] load image from base64

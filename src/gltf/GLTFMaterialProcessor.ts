@@ -1,5 +1,5 @@
 import {GLTFModel} from "./GLTFModel";
-import {Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap} from "../material";
+import {ALPHA_MODE, Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap} from "../material";
 import {CACHE_TYPE, IBaseCache} from "../cache";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {IGLTF_Image, IGLTF_Material} from "./model";
@@ -43,9 +43,10 @@ export class GLTFMaterialProcessor {
         if(materialNode.emissiveFactor){
             material.model.emissiveFactor.set(materialNode.emissiveFactor);
         }
-        //TODO: alphaMode
-        //TODO: alphaCutoff
-        //TODO: double sided
+
+        material.alphaMode = materialNode.alphaMode as ALPHA_MODE || ALPHA_MODE.OPAQUE;
+        material.alphaCutoff = materialNode.alphaCutoff || 0.5;
+        material.doubleSided = !!materialNode.doubleSided;
 
         if(materialNode.emissiveTexture){
             this.parseTexture(material,materialNode.emissiveTexture.index,MATERIAL_MAPS.EMISSIVE,{

@@ -17,3 +17,4 @@ export * from "./GLTF_Sampler";
 export * from "./GLTF_Scene";
 export * from "./GLTF_Skin";
 export * from "./GLTF_Texture";
+export {ALPHA_MODE} from "../../material";

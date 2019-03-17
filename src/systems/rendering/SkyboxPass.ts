@@ -35,6 +35,7 @@ export class SkyboxPass extends System {
         if(this.cache.has(CACHE_TYPE.TEXTURE, GLOBAL_TEXTURES.SKYBOX)) {
             this.gl.enable(this.gl.DEPTH_TEST);
             this.gl.depthFunc(this.gl.LEQUAL);
+            this.gl.disable(this.gl.CULL_FACE);
 
             this.shader.bind();
             this.shader.apply();
