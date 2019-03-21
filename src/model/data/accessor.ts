@@ -1,4 +1,6 @@
 import {GL_TYPES} from "../../gl/constants";
+import {BufferView} from "./bufferView";
+import {TypedArray} from "../../gltf";
 
 export enum ACCESSOR_TYPE  {
     SCALAR = "SCALAR",
@@ -21,7 +23,7 @@ export const GLTF_ACCESORTYPE_SIZE:{[id:string]:number} = {
 };
 
 export class Accessor {
-    private _bufferView:number;
+    private _bufferView:BufferView;
     private _byteOffset:number;
     private _componentType:GL_TYPES; //GL_FLOAT etc.
     private _type:ACCESSOR_TYPE;
@@ -36,15 +38,41 @@ export class Accessor {
         this._componentType = GL_TYPES.FLOAT;
         this._stride = 0;
         this._normalized = false;
-        this._max = [];
-        this._min = [];
     }
 
-    public get bufferView():number {
+    private toTypedArray(buffer:ArrayBuffer, byteOffset:number, count:number, componentType:GL_TYPES): TypedArray {
+        switch (componentType) {
+            case GL_TYPES.BYTE:
+                return new Int8Array(buffer, byteOffset, count);
+            case GL_TYPES.UNSIGNED_BYTE:
+                return new Uint8Array(buffer, byteOffset, count);
+            case GL_TYPES.SHORT:
+                return new Int16Array(buffer, byteOffset, count);
+            case GL_TYPES.UNSIGNED_SHORT:
+                return new Int16Array(buffer, byteOffset, count);
+            case GL_TYPES.INT:
+                return new Int32Array(buffer, byteOffset, count);
+            case GL_TYPES.UNSIGNED_INT:
+                return new Int32Array(buffer, byteOffset, count);
+            case GL_TYPES.FLOAT:
+                return new Float32Array(buffer, byteOffset, count);
+        }
+    }
+
+    getData(): TypedArray {
+        return this.toTypedArray(
+            this.bufferView.data,
+            this.byteOffset,
+            this.componentTypeSize * this.count,
+            this.componentType
+        );
+    }
+
+    public get bufferView():BufferView {
         return this._bufferView;
     }
 
-    public set bufferView(value:number) {
+    public set bufferView(value:BufferView) {
         this._bufferView = value;
     }
 
@@ -80,7 +108,7 @@ export class Accessor {
         this._normalized = value;
     }
 
-    public get componentTypeCount():number {
+    public get componentTypeSize():number {
         return GLTF_ACCESORTYPE_SIZE[this._type];
     }
 

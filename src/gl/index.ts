@@ -3,11 +3,11 @@
  */
 
 export * from "./GLBuffer";
-export * from "./GLCube";
+export * from "./primitives/GLCube";
 export * from "./GLCubemap";
 export * from "./GLFramebuffer";
-export * from "./GLQuad";
-export * from "./GLSphere";
+export * from "./primitives/GLQuad";
+export * from "./primitives/GLSphere";
 export * from "./GLTexture";
 export * from "./GLUniformBufferObject";
 export * from "./GLVertexArrayObject";

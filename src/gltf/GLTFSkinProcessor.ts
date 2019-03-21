@@ -1,36 +1,35 @@
 import {GLTFModel} from "./GLTFModel";
-import {Skin} from "../scene/skin/skin";
+import {Skin} from "../model/skin/skin";
 import {mat4} from "gl-matrix";
 
 export class GLTFSkinProcessor {
     private model: GLTFModel;
-    private skins: Array<Skin>;
+    private _skins: Array<Skin>;
 
     constructor(model: GLTFModel) {
         this.model = model;
-        this.skins = [];
+        this._skins = [];
     }
 
     processSkin(idx:number): Skin {
-        if(this.skins[idx]) {
-            return this.skins[idx];
+        if(this._skins[idx]) {
+            return this._skins[idx];
         }
 
         const skin = new Skin();
         const gltf = this.model.gltf;
         const gltfSkin = gltf.skins[idx];
-        const accessor = gltf.accessors[gltfSkin.inverseBindMatrices];
 
         if(gltfSkin.skeleton !== undefined && gltfSkin.skeleton !== null) {
-            skin.skeleton = this.model.getNode(gltfSkin.skeleton);
+            skin.skeleton = this.model.getNode(gltfSkin.skeleton).transform;
         }
 
         for(let i=0; i < gltfSkin.joints.length; i++) {
-            skin.joints.push(this.model.getNode(gltfSkin.joints[i]));
+            skin.joints.push(this.model.getNode(gltfSkin.joints[i]).transform);
         }
 
-        if(accessor) {
-            const inverseBindMatrices = this.model.getAccessorData(accessor);
+        if(gltf.accessors[gltfSkin.inverseBindMatrices]) {
+            const inverseBindMatrices = this.model.getAccessor(gltfSkin.inverseBindMatrices).getData();
 
             for(let i=0; i < inverseBindMatrices.length; i+=16) {
                 skin.inverseBindMatrices.push(mat4.fromValues(
@@ -54,7 +53,15 @@ export class GLTFSkinProcessor {
             }
         }
 
-        this.skins[idx] = skin;
+        this._skins[idx] = skin;
         return skin;
+    }
+
+    get skins(): Array<Skin> {
+        return this._skins;
+    }
+
+    set skins(value: Array<Skin>) {
+        this._skins = value;
     }
 }

@@ -1,4 +1,3 @@
-
 export type UBOType = "float"|"int"|"bool"|"boolean"|"mat4"|"mat3"|"vec2"|"vec3"|"vec4";
 
 export interface UBOItem {

@@ -1,7 +1,7 @@
 import {ResourceLoader} from "curbl-loader";
 import {IGLTF_Model} from "./model";
 import {Cache} from "../cache";
-import {Scene} from "../scene/scene";
+import {Model} from "../model/model";
 import {GLTFModel} from "./GLTFModel";
 import {Base64Binary} from "./Base64Binary";
 
@@ -28,7 +28,7 @@ export class GLTF_Parser {
      * @param {IGLTF_Model} gltf_model - json object in gltf format
      * @returns {Mesh}
      */
-    public parse(gltf_model:IGLTF_Model, buffer?:ArrayBuffer): Scene {
+    public parse(gltf_model:IGLTF_Model, buffer?:ArrayBuffer): Model {
         const buffers = [];
         if(!buffer) {
             buffers.push(...this.parseBuffers(gltf_model));

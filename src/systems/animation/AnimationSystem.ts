@@ -1,6 +1,6 @@
 import {ECS, IEntity, System} from "curbl-ecs";
 import {AnimationComponent} from "../../components/scene/animationComponent";
-import {Animation} from "../../scene/animation";
+import {Animation} from "../../model/animation";
 import {Cache,CACHE_TYPE} from "../../cache";
 
 

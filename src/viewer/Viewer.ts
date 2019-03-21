@@ -5,15 +5,13 @@ import {TextureLoader} from "../loader/TextureLoader";
 import {GLTFLoader} from "../loader/GLTFLoader";
 import {BaseCache, Cache, CACHE_TYPE} from "../cache";
 import {GLTexture} from "../gl";
-import {Animation, Mesh} from "../scene";
+import {Animation, Mesh, Shader} from "../model";
 import {Material, MATERIAL_MAPS, Materialmap} from "../material";
 import {ECS} from "curbl-ecs";
 import {GLSLLoader} from "../loader/GLSLLoader";
 import {KhronosPbrShader} from "../shader/khronosPbrShader";
 import {SkyboxShader} from "../shader/SkyboxShader";
-import {Scene} from "../scene/scene";
-import {SkyboxPass} from "../systems/rendering/SkyboxPass";
-import {ForwardShadingSystem} from "../systems/rendering/ForwardShadingSystem";
+import {Model} from "../model/model";
 import {PrePass} from "../systems/rendering/PrePass";
 import {GUISystem} from "../systems/gui/GUISystem";
 import {LookAtCameraControlSystem} from "../systems/camera/LookAtCameraControlSystem";
@@ -22,6 +20,7 @@ import {MetallicRoughness} from "../material/metallicRoughness";
 import {vec4} from "gl-matrix";
 import {AnimationSystem} from "../systems/animation/AnimationSystem";
 import {WorldSystem} from "../systems/world/worldSystem";
+import {ForwardShadingSystem, SkyboxPass} from "../systems/rendering";
 
 export class Viewer {
     private _cache:Cache;
@@ -47,8 +46,9 @@ export class Viewer {
         this._cache.addCache(CACHE_TYPE.MATERIAL, new BaseCache<Material>());
         this._cache.addCache(CACHE_TYPE.MESH, new BaseCache<Mesh>());
         this._cache.addCache(CACHE_TYPE.TEXTURE, new BaseCache<GLTexture>());
-        this._cache.addCache(CACHE_TYPE.SCENE, new BaseCache<Scene>());
+        this._cache.addCache(CACHE_TYPE.MODEL, new BaseCache<Model>());
         this._cache.addCache(CACHE_TYPE.ANIMATION, new BaseCache<Animation>());
+        this._cache.addCache(CACHE_TYPE.SHADER, new BaseCache<Shader>());
 
         //Set loader Middlewares
         this._loader.addMiddleware(new CubemapLoader(gl), CubemapLoader);

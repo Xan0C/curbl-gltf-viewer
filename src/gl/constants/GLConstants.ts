@@ -1,7 +1,3 @@
-/**
- * Created by Soeren on 31.10.2017.
- */
-
 export enum GL_TYPES {
     BYTE = 0x1400, //5120
     UNSIGNED_BYTE = 0x1401, //5121

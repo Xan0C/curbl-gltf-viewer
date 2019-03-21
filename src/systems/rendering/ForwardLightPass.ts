@@ -2,7 +2,7 @@ import {ECS, IEntity, System} from "curbl-ecs";
 import {LightComponent} from "../../components";
 import {Cache} from "../../cache";
 import {ForwardScenePass} from "./ForwardScenePass";
-import {Shader} from "../../scene/shader";
+import {Shader} from "../../shader/shader";
 
 @ECS.System(LightComponent)
 export class ForwardLightPass extends System {
@@ -31,8 +31,8 @@ export class ForwardLightPass extends System {
 
         //this.gl.enable(this.gl.CULL_FACE);
         this.gl.enable(this.gl.DEPTH_TEST);
-        //this.gl.enable(this.gl.BLEND);
-        //this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
         this.shader.bind();
         for(let i=0, light:IEntity; light = this.entities[i]; i++) {
@@ -43,7 +43,7 @@ export class ForwardLightPass extends System {
         this.shader.unbind();
 
         //this.gl.disable(this.gl.CULL_FACE);
-        //this.gl.disable(this.gl.BLEND);
+        this.gl.disable(this.gl.BLEND);
         this.gl.disable(this.gl.DEPTH_TEST);
     }
 

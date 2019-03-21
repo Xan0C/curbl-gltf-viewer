@@ -1,11 +1,11 @@
 import {GLShader} from "../gl/shader";
+import {Mesh} from "../model/mesh/mesh";
 import {Material} from "../material";
-import {Mesh} from "./mesh";
-import {SceneNode} from "./sceneNode";
-import {Scene} from "./scene";
 
 export interface IShader extends Shader {
-    applyMaterial(...args):void;
+    apply(...args):void;
+    applyMaterial(material: Material):void;
+    applyMesh(mesh: Mesh):void;
 }
 
 export class Shader extends GLShader implements IShader {
@@ -14,9 +14,7 @@ export class Shader extends GLShader implements IShader {
         super(gl, vertexSrc, fragmentSrc);
     }
 
-    apply():void {}
+    apply(...args):void {}
     applyMaterial(material: Material):void {}
     applyMesh(mesh: Mesh):void {}
-    applyNode(node: SceneNode): void {}
-    applyScene(scene: Scene): void {}
 }

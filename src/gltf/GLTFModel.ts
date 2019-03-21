@@ -1,16 +1,18 @@
-import {IGLTF_Accessor, IGLTF_Model} from "./model";
-import {BufferView, Mesh, Scene, SceneNode} from "../scene";
+import {IGLTF_Model, IGLTF_Primitive} from "./model";
+import {Accessor, BufferView, Mesh, Primitive, Model} from "../model";
 import {Cache} from "../cache";
 import {ResourceLoader} from "curbl-loader";
 import {GLTFMaterialProcessor} from "./GLTFMaterialProcessor";
 import {GLTFMeshProcessor} from "./GLTFMeshProcessor";
-import {GLTFNodeProcessor} from "./GLTFNodeProcessor";
-import {Skin} from "../scene/skin/skin";
+import {GLTFNode, GLTFNodeProcessor} from "./GLTFNodeProcessor";
+import {Skin} from "../model/skin/skin";
 import {GLTFAccessorProcessor} from "./GLTFAccessorProcessor";
 import {Material} from "../material";
 import {GLTFSkinProcessor} from "./GLTFSkinProcessor";
 import {GLTFAnimationProcessor} from "./GLTFAnimationProcessor";
 import {GLTFSceneProcessor} from "./GLTFSceneProcessor";
+import {GLTFBufferViewProcessor} from "./GLTFBufferViewProcessor";
+import {GLTFPrimitiveProcessor} from "./GLTFPrimitiveProcessor";
 
 export type TypedArray = Int8Array|Uint8Array|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array;
 
@@ -24,7 +26,9 @@ export class GLTFModel {
     path: string;
 
     private accessorProcessor:GLTFAccessorProcessor;
+    private bufferViewProcessor:GLTFBufferViewProcessor;
     private meshProcessor:GLTFMeshProcessor;
+    private primitiveProcessor:GLTFPrimitiveProcessor;
     private nodeProcessor:GLTFNodeProcessor;
     private materialProcessor:GLTFMaterialProcessor;
     private skinProcessor:GLTFSkinProcessor;
@@ -38,17 +42,23 @@ export class GLTFModel {
         this.path = config.path;
 
         this.accessorProcessor = new GLTFAccessorProcessor(this);
+        this.bufferViewProcessor = new GLTFBufferViewProcessor(this);
         this.meshProcessor = new GLTFMeshProcessor(this);
+        this.primitiveProcessor = new GLTFPrimitiveProcessor(this);
         this.nodeProcessor = new GLTFNodeProcessor(this);
         this.materialProcessor = new GLTFMaterialProcessor(this);
         this.skinProcessor = new GLTFSkinProcessor(this);
     }
 
-    process(): Scene {
+    process(): Model {
         const scene =  new GLTFSceneProcessor(this).processScenes();
         scene.animations = new GLTFAnimationProcessor(this).processAnimations();
         scene.meshes = this.meshProcessor.meshes;
-
+        scene.bufferViews = this.bufferViewProcessor.buffers;
+        scene.skins = this.skinProcessor.skins;
+        scene.primitives = this.primitiveProcessor.primitives;
+        scene.transforms = this.nodeProcessor.transforms;
+        scene.materials = this.materialProcessor.materials;
         return scene;
     }
 
@@ -60,7 +70,7 @@ export class GLTFModel {
         return this.materialProcessor.processMaterial(idx);
     }
 
-    getNode(idx:number):SceneNode {
+    getNode(idx:number):GLTFNode {
         return this.nodeProcessor.processNode(idx);
     }
 
@@ -68,11 +78,15 @@ export class GLTFModel {
         return this.meshProcessor.processMesh(idx);
     }
 
-    getBufferView(idx:number, isIndexBuffer?:boolean): BufferView {
-        return this.accessorProcessor.getBufferView(idx, isIndexBuffer);
+    getBufferView(idx:number, isIndexBuffer?: boolean): BufferView {
+        return this.bufferViewProcessor.getBufferView(idx, isIndexBuffer);
     }
 
-    getAccessorData(accessor: IGLTF_Accessor): TypedArray {
-        return this.accessorProcessor.getAccessorData(accessor);
+    getAccessor(idx:number, isIndexBuffer?: boolean): Accessor {
+        return this.accessorProcessor.getAccessor(idx, isIndexBuffer);
+    }
+
+    getPrimitive(primitive: IGLTF_Primitive): Primitive {
+        return this.primitiveProcessor.processPrimitive(primitive);
     }
 }

@@ -1,5 +1,5 @@
-import {GLBuffer} from "./GLBuffer";
-import {GLVertexArrayObject} from "./GLVertexArrayObject";
+import {GLBuffer} from "../GLBuffer";
+import {GLVertexArrayObject} from "../GLVertexArrayObject";
 /**
  * Created by Soeren on 12.02.2017.
  */
@@ -65,9 +65,9 @@ export class GLQuad {
         this._vertexArrayObject = value;
     }
 
-    public draw(){
+    public draw(drawType:number = this.gl.TRIANGLES){
         this.vertexArrayObject.bind();
-        this.gl.drawElements(this.gl.TRIANGLES,GLQuad.INDEX_LENGTH,this.gl.UNSIGNED_BYTE,0);
+        this.gl.drawElements(drawType,GLQuad.INDEX_LENGTH,this.gl.UNSIGNED_BYTE,0);
         this.vertexArrayObject.unbind();
     }
 }

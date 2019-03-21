@@ -9,7 +9,7 @@ import {IBaseCache} from "./caches";
 export enum CACHE_TYPE  {
     TEXTURE,
     MESH,
-    SCENE,
+    MODEL,
     ANIMATION,
     MATERIAL,
     SHADER,

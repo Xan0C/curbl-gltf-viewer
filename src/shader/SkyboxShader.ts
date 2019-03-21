@@ -1,4 +1,4 @@
-import {Shader} from "../scene/shader";
+import {Shader} from "./shader";
 import {GLTexture} from "../gl";
 import {Cache, CACHE_TYPE} from "../cache";
 import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";

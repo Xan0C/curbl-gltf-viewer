@@ -1,5 +1,5 @@
 import {GL_TYPES} from "../../gl/constants";
-import {ACCESSOR_TYPE} from "../../scene/data";
+import {ACCESSOR_TYPE} from "../../model/data";
 
 export interface IGLTF_Accessor {
     name?:string;

@@ -1,14 +1,11 @@
-import {Shader} from "../scene/shader";
-import {Mesh} from "../scene";
+import {Shader} from "./shader";
+import {Mesh} from "../model";
 import {ALPHA_MODE, Material, MATERIAL_MAPS} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {GL_PRIMITIVES, GLTexture} from "../gl";
 import {Cache, CACHE_TYPE} from "../cache";
 import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 import {GLCubemap} from "../gl/GLCubemap";
-import {SceneNode} from "../scene/sceneNode";
-import {Scene} from "../scene/scene";
-import {mat4} from "gl-matrix";
 
 const TEXTURES = {
     DIFFUSE_ENVIRONMENT: 0,
@@ -30,7 +27,7 @@ export class KhronosPbrShader extends Shader {
         this.cache = cache;
     }
 
-    public initializeDefines(model:Mesh) {
+    initializeDefines(model:Mesh) {
         if (model.hasAttribute(GL_PRIMITIVES.NORMAL)) {
             this.addDefine("HAS_NORMALS", 1);
         }
@@ -71,28 +68,12 @@ export class KhronosPbrShader extends Shader {
         }
     }
 
-    applyMesh(model:Mesh):void {}
+    applyMesh(mesh:Mesh):void {
+        this.uniforms.u_ModelMatrix = mesh.transform.modelMatrix;
 
-    applyNode(node: SceneNode): void {
-        this.uniforms.u_ModelMatrix = node.transform.modelMatrix;
-
-        if(node.skin) {
-            const inverseTransformMatrix = mat4.create();
-            //TODO: skin.skeleton.transform.modelMatrix if skeleton provided
-            mat4.invert(inverseTransformMatrix, node.transform.modelMatrix);
-
-            for(let i=0, join:SceneNode; join = node.skin.joints[i]; i++) {
-                const joinMatrix = node.skin.jointMatrices[i];
-                mat4.mul(joinMatrix, join.transform.modelMatrix, node.skin.inverseBindMatrices[i]);
-                mat4.mul(joinMatrix, inverseTransformMatrix, joinMatrix);
-            }
-
-            node.skin.update();
+        if(mesh.skin) {
+            mesh.skin.update(mesh.transform);
         }
-    }
-
-    applyScene(scene: Scene): void {
-
     }
 
     applyMaterial(material?:Material<MetallicRoughness>) {

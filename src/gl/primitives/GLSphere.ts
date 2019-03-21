@@ -1,5 +1,5 @@
-import {GLBuffer} from "./GLBuffer";
-import {GLVertexArrayObject} from "./GLVertexArrayObject";
+import {GLBuffer} from "../GLBuffer";
+import {GLVertexArrayObject} from "../GLVertexArrayObject";
 
 export class GLSphere {
     private readonly gl:WebGL2RenderingContext;
@@ -64,9 +64,9 @@ export class GLSphere {
         this._vertexArrayObject.setIndexBuffer(this._indexBuffer);
     }
 
-    public draw(){
+    public draw(drawType: number = this.gl.TRIANGLES){
         this.vertexArrayObject.bind();
-        this.gl.drawElements(this.gl.TRIANGLES,this._indexcount,this.gl.UNSIGNED_INT,0);
+        this.gl.drawElements(drawType,this._indexcount,this.gl.UNSIGNED_INT,0);
         this.vertexArrayObject.unbind();
     }
 

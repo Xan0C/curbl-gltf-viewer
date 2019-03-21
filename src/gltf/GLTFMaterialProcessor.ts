@@ -10,12 +10,13 @@ export class GLTFMaterialProcessor {
 
     private model: GLTFModel;
     private materialCache: IBaseCache<Material>;
+    private _materials: Array<Material>;
 
     constructor(model:GLTFModel) {
         this.model = model;
         this.materialCache = this.model.cache.getCache<Material>(CACHE_TYPE.MATERIAL);
+        this._materials = [];
     }
-
 
     public processMaterial(materialIdx:number):Material {
         const gltf = this.model.gltf;
@@ -78,6 +79,7 @@ export class GLTFMaterialProcessor {
         }
 
         this.materialCache.add(material.name,material);
+        this._materials.push(material);
         return material;
     }
 
@@ -158,5 +160,13 @@ export class GLTFMaterialProcessor {
         loader.get(TextureLoader).add(img.name||img.uri,path+img.uri,config);
         material.maps[map] = new Materialmap(img.name||img.uri);
         material.maps[map].sampler = config.sampler;
+    }
+
+    get materials(): Array<Material> {
+        return this._materials;
+    }
+
+    set materials(value: Array<Material>) {
+        this._materials = value;
     }
 }

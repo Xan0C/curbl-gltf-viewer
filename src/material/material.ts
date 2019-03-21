@@ -114,4 +114,16 @@ export class Material<T = any> {
     set doubleSided(value: boolean) {
         this._doubleSided = value;
     }
+
+    get transparent(): boolean {
+        return this._alphaMode !== ALPHA_MODE.OPAQUE;
+    }
+
+    get mask(): boolean {
+        return this._alphaMode === ALPHA_MODE.MASK;
+    }
+
+    get blend(): boolean {
+        return this._alphaMode === ALPHA_MODE.BLEND;
+    }
 }

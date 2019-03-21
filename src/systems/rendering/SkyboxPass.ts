@@ -1,5 +1,5 @@
 import {ECS, System} from "curbl-ecs";
-import {Shader} from "../../scene/shader";
+import {Shader} from "../../shader/shader";
 import {GLCube} from "../../gl";
 import {Cache, CACHE_TYPE} from "../../cache";
 import {GLOBAL_TEXTURES} from "../../viewer/constants";
@@ -23,7 +23,7 @@ export class SkyboxPass extends System {
     setUp(){
         this.shader.bind();
         this.cube.vertexArrayObject.bind();
-        this.cube.vertexArrayObject.addAttribute(this.cube.vertexBuffer,this.shader.attributes.getAttribute('a_Position'),3,this.gl.FLOAT,false,24,0);
+        this.cube.vertexArrayObject.addAttribute(this.cube.vertexBuffer,this.shader.attributes.getAttribute('a_Position'),3,this.gl.FLOAT,false,0,0);
         this.cube.vertexArrayObject.unbind();
         this.shader.unbind();
     }

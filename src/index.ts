@@ -11,7 +11,7 @@ export * from "./gltf/index";
 export * from "./loader/index";
 export * from "./material/index";
 export * from "./math/index";
-export * from "./scene/index";
+export * from "./model/index";
 export * from "./shader/index";
 export * from "./systems/index";
 export * from "./viewer/index";

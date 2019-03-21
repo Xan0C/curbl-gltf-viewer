@@ -1,73 +1,48 @@
-import {IGLTF_Accessor, IGLTF_BufferView} from "./model";
-import {BufferView, GLTF_ACCESORTYPE_SIZE} from "../scene/data";
-import {GL_BUFFERS, GL_TYPES} from "../gl/constants";
+import {Accessor} from "../model/data";
+import {GL_TYPES} from "../gl/constants";
 import {GLTFModel, TypedArray} from "./GLTFModel";
 
 export class GLTFAccessorProcessor {
 
     private model:GLTFModel;
-    private buffers:Array<BufferView>;
+    private accessors:Array<Accessor>;
 
     constructor(model:GLTFModel) {
-        this.buffers = [];
+        this.accessors = [];
         this.model = model;
     }
 
-    /**
-     * get/create the BufferViewObject for this accessor
-     * @param accessor
-     * @param idx
-     * @param isIndexBuffer
-     */
-    public getBufferView(idx:number, isIndexBuffer:boolean=false): BufferView {
+    getAccessor(idx:number, indexBuffer?:boolean): Accessor {
         const gltf = this.model.gltf;
 
-        if(!this.buffers[idx]) {
-            this.buffers[idx] = this.createBufferView(gltf.bufferViews[idx]);
+        if(this.accessors[idx]) {
+            return this.accessors[idx];
         }
-        //get the bufferView
-        const view = this.buffers[idx];
-        //set target for the BufferView IndexBuffer or Vertex/ArrayBuffer
-        view.target = isIndexBuffer ? view.target||GL_BUFFERS.ELEMENT_ARRAY_BUFFER : view.target||GL_BUFFERS.ARRAY_BUFFER;
-        return view;
+
+        const accessor = new Accessor();
+        const gltfAccessor = gltf.accessors[idx];
+
+        accessor.count = gltfAccessor.count;
+        accessor.type = gltfAccessor.type;
+        accessor.bufferView = this.model.getBufferView(gltfAccessor.bufferView, indexBuffer);
+        accessor.byteOffset = gltfAccessor.byteOffset||0;
+        accessor.componentType = gltfAccessor.componentType;
+        accessor.max = gltfAccessor.max;
+        accessor.min = gltfAccessor.min;
+        accessor.normalized = gltfAccessor.normalized;
+        accessor.stride = gltf.bufferViews[gltfAccessor.bufferView].byteStride||0;
+
+        this.accessors[idx] = accessor;
+        return this.accessors[idx];
     }
 
-    public getAccessorData(accessor: IGLTF_Accessor): TypedArray {
+    getAccessorData(accessor: Accessor): TypedArray {
         return this.accessor2TypedArray(
-            this.getBufferView(accessor.bufferView).data,
+            accessor.bufferView.data,
             accessor.byteOffset,
-            GLTF_ACCESORTYPE_SIZE[accessor.type] * accessor.count,
+            accessor.componentTypeSize * accessor.count,
             accessor.componentType
         );
-    }
-
-    /**
-     * Create a Bufferfiew from the GLTF_Bufferview
-     * @param {Array<ArrayBuffer|ArrayBufferView>} buffers
-     * @param {IGLTF_BufferView} bufferView
-     * @returns {BufferView}
-     */
-    private createBufferView(bufferView:IGLTF_BufferView): BufferView {
-        const view = new BufferView();
-        view.data = this.sliceBuffer(bufferView);
-        view.target = bufferView.target;
-        return view;
-    }
-
-    /**
-     * Slice up the Mesh data ArrayBuffer into smaller ArrayBuffers
-     * @param {Array<ArrayBuffer|ArrayBufferView>} buffers
-     * @param {BufferView} view
-     * @returns {ArrayBuffer}
-     */
-    private sliceBuffer(view:IGLTF_BufferView): ArrayBuffer {
-        const data = this.model.data[view.buffer];
-        const offset = view.byteOffset||0;
-        if(data instanceof ArrayBuffer){
-            return data.slice(offset,offset+view.byteLength);
-        }else {
-            return data['buffer'].slice(offset,offset+view.byteLength);
-        }
     }
 
     private accessor2TypedArray(buffer:ArrayBuffer, byteOffset:number, count:number, componentType:GL_TYPES): TypedArray {

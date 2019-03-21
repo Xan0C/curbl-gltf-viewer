@@ -1,22 +1,22 @@
 import {GLTFModel} from "./GLTFModel";
 import {IGLTF_Scene} from "./model";
-import {Scene} from "../scene";
+import {Model} from "../model";
 import {IBaseCache} from "../cache/caches";
 import {CACHE_TYPE} from "../cache";
 
 export class GLTFSceneProcessor {
     private model: GLTFModel;
-    private cache:IBaseCache<Scene>;
+    private cache:IBaseCache<Model>;
 
     constructor(model: GLTFModel) {
         this.model = model;
-        this.cache = this.model.cache.getCache(CACHE_TYPE.SCENE);
+        this.cache = this.model.cache.getCache(CACHE_TYPE.MODEL);
     }
 
     /**
-     * Parse the scenes by parsing each node of the GTLF File
+     * Parse the scenes by parsing each node of the GLTF File
      */
-    processScenes():Scene {
+    processScenes():Model {
         const gltf = this.model.gltf;
         const scenes = [];
 
@@ -27,11 +27,11 @@ export class GLTFSceneProcessor {
         return scenes[0];
     }
 
-    private processScene(gltfScene:IGLTF_Scene,idx:number):Scene {
-        const scene = new Scene();
+    private processScene(gltfScene:IGLTF_Scene,idx:number):Model {
+        const scene = new Model();
         scene.name = gltfScene.name||"scene"+idx;
         for(let i=0; i < gltfScene.nodes.length; i++){
-            scene.addNode(this.model.getNode(gltfScene.nodes[i]));
+            this.model.getNode(gltfScene.nodes[i]);
         }
 
         this.cache.add(scene.name, scene);

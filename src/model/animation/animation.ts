@@ -1,7 +1,7 @@
 import {AnimationSampler} from "./animationSampler";
 import {AnimationChannel} from "./animationChannel";
-import {SceneNode} from "../sceneNode";
 import {quat, vec3} from "gl-matrix";
+import {Transform} from "../transform";
 
 export class Animation {
     name: string;
@@ -31,17 +31,17 @@ export class Animation {
         }
         for(let i=0, channel: AnimationChannel; channel = this.channels[i]; i++) {
             const sampler = this.samplers[channel.sampler];
-            const node:SceneNode = channel.node;
+            const transform:Transform = channel.transform;
 
             switch(channel.path) {
                 case "rotation":
-                    quat.copy(node.transform.rotation, sampler.value as any);
+                    quat.copy(transform.rotation, sampler.value as any);
                     break;
                 case "translation":
-                    vec3.copy(node.transform.translation, sampler.value);
+                    vec3.copy(transform.translation, sampler.value);
                     break;
                 case "scale":
-                    vec3.copy(node.transform.scale, sampler.value);
+                    vec3.copy(transform.scale, sampler.value);
                     break;
             }
         }

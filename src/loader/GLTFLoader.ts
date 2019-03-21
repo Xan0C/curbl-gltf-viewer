@@ -1,19 +1,19 @@
 import {LOAD_TYPE, Middleware, Resource} from "curbl-loader";
 import {GLTF_Parser} from "../gltf/GLTFParser";
 import {Cache, CACHE_TYPE} from "../cache";
-import {Scene} from "../scene/scene";
+import {Model} from "../model/model";
 
-export class GLTFLoader extends Middleware<Scene> {
+export class GLTFLoader extends Middleware<Model> {
     private readonly gl: WebGL2RenderingContext;
     private readonly cache: Cache;
 
     constructor(gl: WebGL2RenderingContext, cache: Cache) {
-        super(CACHE_TYPE.SCENE);
+        super(CACHE_TYPE.MODEL);
         this.gl = gl;
         this.cache = cache;
     }
 
-    add(key:string, gltfJson:string, gltfBin?:string): Middleware<Scene> {
+    add(key:string, gltfJson:string, gltfBin?:string): Middleware<Model> {
         const bufferResource = gltfBin ? {
             resource: new Resource<XMLHttpRequest>({
                 url: gltfBin,
@@ -42,7 +42,7 @@ export class GLTFLoader extends Middleware<Scene> {
         });
     }
 
-    transform(...resources: Resource<XMLHttpRequest>[]): Scene {
+    transform(...resources: Resource<XMLHttpRequest>[]): Model {
         const jsonResource = resources.find((resource)=>resource.config.type === 'json');
         const bufferResource = resources.find((resource)=>resource.config.type === 'buffer');
 

@@ -1,9 +1,7 @@
 import {IGLTF_AnimationSampler, IGLTF_Channel} from "./model/GLTF_Animation";
-import {IGLTF_Accessor} from "./model";
-import {AnimationSampler, Interpolation} from "../scene/animation/animationSampler";
-import {Accessor} from "../scene/data/accessor";
-import {AnimationChannel} from "../scene/animation/animationChannel";
-import {Animation} from "../scene/animation";
+import {AnimationSampler, Interpolation} from "../model/animation/animationSampler";
+import {AnimationChannel} from "../model/animation/animationChannel";
+import {Animation} from "../model/animation";
 import {GLTFModel} from "./GLTFModel";
 import {IBaseCache} from "../cache/caches";
 import {CACHE_TYPE} from "../cache";
@@ -51,18 +49,16 @@ export class GLTFAnimationProcessor {
     }
 
     private processSampler(sampler: IGLTF_AnimationSampler): AnimationSampler {
-        const gltf = this.model.gltf;
-
         const animationSampler = new AnimationSampler();
         animationSampler.interpolation = sampler.interpolation||Interpolation.LINEAR;
 
-        const inputAccessor = this.createAccessor(gltf.accessors[sampler.input]);
-        const outputAccessor = this.createAccessor(gltf.accessors[sampler.output]);
+        const inputAccessor = this.model.getAccessor(sampler.input);
+        const outputAccessor = this.model.getAccessor(sampler.output);
 
-        animationSampler.inputData = this.model.getAccessorData(inputAccessor);
-        animationSampler.outputData = this.model.getAccessorData(outputAccessor);
+        animationSampler.inputData = inputAccessor.getData();
+        animationSampler.outputData = outputAccessor.getData();
 
-        animationSampler.componentTypeCount = outputAccessor.componentTypeCount;
+        animationSampler.componentTypeCount = outputAccessor.componentTypeSize;
         animationSampler.duration = animationSampler.inputData[animationSampler.inputData.length-1];
 
         return animationSampler;
@@ -72,27 +68,10 @@ export class GLTFAnimationProcessor {
         const animationChannel = new AnimationChannel();
 
         animationChannel.sampler = channel.sampler;
-        animationChannel.node = this.model.getNode(channel.target.node);
+        animationChannel.transform = this.model.getNode(channel.target.node).transform;
         animationChannel.path = channel.target.path;
 
         return animationChannel;
-    }
-
-    private createAccessor(gltfAccessor: IGLTF_Accessor): Accessor {
-        const gltf = this.model.gltf;
-
-        const accessor = new Accessor();
-        accessor.bufferView = gltfAccessor.bufferView;
-        accessor.byteOffset = gltfAccessor.byteOffset||0;
-        accessor.normalized = gltfAccessor.normalized;
-        accessor.type = gltfAccessor.type;
-        accessor.componentType = gltfAccessor.componentType;
-        accessor.count = gltfAccessor.count;
-        accessor.min = gltfAccessor.min||[];
-        accessor.max = gltfAccessor.max||[];
-        accessor.stride = gltf.bufferViews[gltfAccessor.bufferView].byteStride||0;
-
-        return accessor;
     }
 
     get animations(): Array<Animation> {

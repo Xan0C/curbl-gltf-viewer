@@ -1,7 +1,7 @@
-import {SceneNode} from "../sceneNode";
+import {Transform} from "../transform";
 
 export class AnimationChannel {
     sampler: number;
-    node: SceneNode;
+    transform: Transform;
     path:"translation"|"rotation"|"scale"|"weights";
 }
