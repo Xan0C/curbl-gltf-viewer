@@ -8,6 +8,7 @@ import {Primitive} from "./mesh";
 import {Skin} from "./skin";
 import {Transform} from "./transform";
 import {Material} from "../material";
+import {BVHNode} from "./bvh/bvhNode";
 import GLAttribute = Attributes.GLAttribute;
 
 // type RenderList = {
@@ -27,6 +28,7 @@ export class Model {
     private _skins:Array<Skin>;
     private _transforms:Array<Transform>;
     private _materials:Array<Material>;
+    private _bvh:BVHNode;
 
     constructor() {
         this._meshes = [];
@@ -36,12 +38,14 @@ export class Model {
         this._skins = [];
         this._transforms = [];
         this._materials = [];
+        this._bvh = new BVHNode();
     }
 
     init(cache:Cache) {
         for(let i=0, mesh: Mesh; mesh = this._meshes[i]; i++) {
             mesh.init(cache);
         }
+        this._bvh = BVHNode.constructTree(this._primitives);
     }
 
     /**
@@ -161,5 +165,13 @@ export class Model {
 
     set materials(value: Array<Material>) {
         this._materials = value;
+    }
+
+    get bvh(): BVHNode {
+        return this._bvh;
+    }
+
+    set bvh(value: BVHNode) {
+        this._bvh = value;
     }
 }

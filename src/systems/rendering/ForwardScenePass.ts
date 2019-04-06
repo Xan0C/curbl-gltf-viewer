@@ -4,7 +4,6 @@ import {Cache, CACHE_TYPE} from "../../cache";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
 import {GL_PRIMITIVES} from "../../gl/constants";
 import {Model, Shader} from "../../model";
-import {GLWiredCube} from "../../gl/primitives/GLWiredCube";
 import {GLBuffer} from "../../gl";
 
 
@@ -14,7 +13,6 @@ export class ForwardScenePass extends System {
     private gl:WebGL2RenderingContext;
     private cache:Cache;
     private shader: Shader;
-    private cube: GLWiredCube;
     //use the same buffers for all scenes/meshes etc.
     private vertexBuffer:GLBuffer;
     private indexBuffer:GLBuffer;
@@ -24,16 +22,12 @@ export class ForwardScenePass extends System {
         this.gl = config.gl;
         this.cache = config.cache;
         this.shader = config.shader;
-        this.cube = new GLWiredCube(this.gl);
         this.vertexBuffer = GLBuffer.createVertexBuffer(this.gl);
         this.indexBuffer = GLBuffer.createIndexBuffer(this.gl);
     }
 
     setUp():void{
         this.events.on(SYSTEM_EVENTS.ENTITY_ADDED,this.initEntity,this);
-        this.cube.vertexArrayObject.bind();
-        this.cube.vertexArrayObject.addAttribute(this.cube.vertexBuffer,this.shader.attributes.getAttribute('a_Position'),3,this.gl.FLOAT,false,0,0);
-        this.cube.vertexArrayObject.unbind();
     }
 
     /**
@@ -73,28 +67,5 @@ export class ForwardScenePass extends System {
         const scene = this.cache.get<Model>(CACHE_TYPE.MODEL,key);
         this.shader.apply();
         scene.draw(this.shader);
-
-        // //test
-        // const shader = this.cache.get<Shader>(CACHE_TYPE.SHADER, "bboxShader");
-        // const meshes = scene.meshes;
-        // shader.bind();
-        // for(let k=0,mesh:Mesh; mesh = meshes[k]; k++) {
-        //     const boxes = this.getBBoxes(mesh.primitives);
-        //     for (let i = 0, bbox: BoundingBox; bbox = boxes[i]; i++) {
-        //         shader.apply(mesh, bbox);
-        //         this.cube.draw(this.gl.LINES);
-        //     }
-        // }
-        //shader.unbind();
     }
-
-    // private getBBoxes(primitives:Array<Primitive>): BoundingBox[] {
-    //     const boxes = [];
-    //     for(let i=0, primitive:Primitive; primitive = primitives[i]; i++){
-    //         if(primitive.boundingBox) {
-    //             boxes.push(primitive.boundingBox);
-    //         }
-    //     }
-    //     return boxes;
-    // }
 }

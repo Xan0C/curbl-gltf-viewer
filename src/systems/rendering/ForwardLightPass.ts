@@ -28,7 +28,6 @@ export class ForwardLightPass extends System {
     }
     
     render():void {
-
         //this.gl.enable(this.gl.CULL_FACE);
         this.gl.enable(this.gl.DEPTH_TEST);
         this.gl.enable(this.gl.BLEND);

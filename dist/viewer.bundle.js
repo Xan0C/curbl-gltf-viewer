@@ -108,7 +108,7 @@ var CACHE_TYPE;
 (function (CACHE_TYPE) {
   CACHE_TYPE[CACHE_TYPE["TEXTURE"] = 0] = "TEXTURE";
   CACHE_TYPE[CACHE_TYPE["MESH"] = 1] = "MESH";
-  CACHE_TYPE[CACHE_TYPE["SCENE"] = 2] = "SCENE";
+  CACHE_TYPE[CACHE_TYPE["MODEL"] = 2] = "MODEL";
   CACHE_TYPE[CACHE_TYPE["ANIMATION"] = 3] = "ANIMATION";
   CACHE_TYPE[CACHE_TYPE["MATERIAL"] = 4] = "MATERIAL";
   CACHE_TYPE[CACHE_TYPE["SHADER"] = 5] = "SHADER";
@@ -510,6 +510,11 @@ function () {
     set: function set(value) {
       this._projMatrix = value;
     }
+  }, {
+    key: "projViewMatrix",
+    get: function get() {
+      return gl_matrix__WEBPACK_IMPORTED_MODULE_1__["mat4"].mul(gl_matrix__WEBPACK_IMPORTED_MODULE_1__["mat4"].create(), this._projMatrix, this._viewMatrix);
+    }
   }]);
 
   return CameraComponent;
@@ -639,6 +644,14 @@ function () {
     },
     set: function set(value) {
       this._zoomPos = value;
+    }
+  }, {
+    key: "position",
+    get: function get() {
+      return this._position;
+    },
+    set: function set(value) {
+      this._position = value;
     }
   }]);
 
@@ -6335,7 +6348,7 @@ var GLTFSceneProcessor =
 function () {
   function GLTFSceneProcessor(model) {
     this.model = model;
-    this.cache = this.model.cache.getCache(_cache__WEBPACK_IMPORTED_MODULE_1__["CACHE_TYPE"].SCENE);
+    this.cache = this.model.cache.getCache(_cache__WEBPACK_IMPORTED_MODULE_1__["CACHE_TYPE"].MODEL);
   }
   /**
    * Parse the scenes by parsing each node of the GLTF File
@@ -6528,7 +6541,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!***********************!*\
   !*** ../lib/index.js ***!
   \***********************/
-/*! exports provided: CACHE_TYPE, Cache, Canvas, CameraComponent, LookAtCameraComponent, GUIComponent, LightComponent, SkyboxComponent, AnimationComponent, SceneComponent, TransformComponent, DomEvents, EmitSignal, GLBuffer, GLCube, GLCubemap, GLFramebuffer, GLQuad, GLSphere, GLTexture, GLUniformBufferObject, GLVertexArrayObject, Base64Binary, GLTFAccessorProcessor, GLTFAnimationProcessor, GLTFMaterialProcessor, GLTFMeshProcessor, GLTFModel, GLTFNode, GLTFNodeProcessor, GLTF_Parser, GLTFSceneProcessor, GLTFSkinProcessor, ALPHA_MODE, CubemapLoader, GLSLLoader, GLTFLoader, TextureLoader, MATERIAL_TYPES, MATERIAL_MAPS, Material, Materialmap, MetallicRoughness, Color, Math3d, Math2d, Mesh, Model, Shader, Transform, KhronosPbrShader, SkyboxShader, AnimationSystem, CameraSystem, LookAtCameraControlSystem, GUISystem, PrePass, WorldSystem, GLOBAL_TEXTURES, UBO_BINDINGS, Viewer, CACHE_EVENTS, BaseCache, GL_TYPES, GL_TYPES_BYTESIZE, GL_PRIMITIVES, GL_BUFFERS, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP, GL_INTERNALFORMAT, DefaultValue, glGetCurrentState, glResetState, MapSize, MapType, WebGLUtils, Attributes, GLShader, ProgramCompiler, Uniforms, Animation, AnimationChannel, Interpolation, AnimationSampler, ACCESSOR_TYPE, GLTF_ACCESORTYPE_SIZE, Accessor, BufferView, Primitive, Skin, ForwardLightPass, ForwardScenePass, ForwardShadingSystem, SkyboxPass, WorldScene */
+/*! exports provided: CACHE_TYPE, Cache, Canvas, DomEvents, EmitSignal, GLBuffer, GLCube, GLCubemap, GLFramebuffer, GLQuad, GLSphere, GLTexture, GLUniformBufferObject, GLVertexArrayObject, Base64Binary, GLTFAccessorProcessor, GLTFAnimationProcessor, GLTFMaterialProcessor, GLTFMeshProcessor, GLTFModel, GLTFNode, GLTFNodeProcessor, GLTF_Parser, GLTFSceneProcessor, GLTFSkinProcessor, ALPHA_MODE, CubemapLoader, GLSLLoader, GLTFLoader, TextureLoader, MATERIAL_TYPES, MATERIAL_MAPS, Material, Materialmap, MetallicRoughness, Color, Math3d, Math2d, Mesh, Model, Shader, Transform, KhronosPbrShader, SkyboxShader, AnimationSystem, LookAtCameraControlSystem, GUISystem, PrePass, WorldSystem, GLOBAL_TEXTURES, UBO_BINDINGS, Viewer, CACHE_EVENTS, BaseCache, CameraComponent, LookAtCameraComponent, GUIComponent, LightComponent, SkyboxComponent, AnimationComponent, SceneComponent, TransformComponent, GL_TYPES, GL_TYPES_BYTESIZE, GL_PRIMITIVES, GL_BUFFERS, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP, GL_INTERNALFORMAT, DefaultValue, glGetCurrentState, glResetState, MapSize, MapType, WebGLUtils, Attributes, GLShader, ProgramCompiler, Uniforms, Animation, AnimationChannel, Interpolation, AnimationSampler, ACCESSOR_TYPE, GLTF_ACCESORTYPE_SIZE, Accessor, BufferView, Primitive, Skin, CameraSystem, ForwardLightPass, ForwardScenePass, ForwardShadingSystem, SkyboxPass, WorldScene */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -6711,8 +6724,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _systems_index__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./systems/index */ "../lib/systems/index.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AnimationSystem", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["AnimationSystem"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["CameraSystem"]; });
-
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LookAtCameraControlSystem", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["LookAtCameraControlSystem"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "GUISystem", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["GUISystem"]; });
@@ -6720,6 +6731,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "PrePass", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["PrePass"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "WorldSystem", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["WorldSystem"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["CameraSystem"]; });
 
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "ForwardLightPass", function() { return _systems_index__WEBPACK_IMPORTED_MODULE_11__["ForwardLightPass"]; });
 
@@ -6986,7 +6999,7 @@ function (_Middleware) {
   function GLTFLoader(gl, cache) {
     var _this;
 
-    _this = _Middleware.call(this, _cache__WEBPACK_IMPORTED_MODULE_2__["CACHE_TYPE"].SCENE) || this;
+    _this = _Middleware.call(this, _cache__WEBPACK_IMPORTED_MODULE_2__["CACHE_TYPE"].MODEL) || this;
     _this.gl = gl;
     _this.cache = cache;
     return _this;
@@ -7620,6 +7633,24 @@ __webpack_require__.r(__webpack_exports__);
 var Math3d;
 
 (function (Math3d) {
+  function getWorldCornersFromMatrix(mat) {
+    var inverse = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["mat4"].invert(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["mat4"].create(), mat);
+    var corners = [];
+
+    for (var x = 0; x < 2; x++) {
+      for (var y = 0; y < 2; y++) {
+        for (var z = 0; z < 2; z++) {
+          var clipSpacePos = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec4"].fromValues(x * 2.0 - 1.0, y * 2.0 - 1.0, z * 2.0 - 1.0, 1.0);
+          gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec4"].transformMat4(clipSpacePos, clipSpacePos, inverse);
+          corners.push(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].fromValues(clipSpacePos[0] / clipSpacePos[3], clipSpacePos[1] / clipSpacePos[3], clipSpacePos[2] / clipSpacePos[3]));
+        }
+      }
+    }
+
+    return corners;
+  }
+
+  Math3d.getWorldCornersFromMatrix = getWorldCornersFromMatrix;
   /**
    * Return a vector point on a position of a sphere
    * @param {number} x
@@ -7628,6 +7659,7 @@ var Math3d;
    * @param {number} height
    * @returns {Vector}
    */
+
   function getVSpherePos(x, y, width, height) {
     var out = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].fromValues(1.0 * x / width * 2.0 - 1.0, -(1.0 * y / height * 2.0 - 1.0), 0);
     gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].squaredLength(out);
@@ -7942,6 +7974,556 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "../lib/model/bvh/boundingBox.js":
+/*!***************************************!*\
+  !*** ../lib/model/bvh/boundingBox.js ***!
+  \***************************************/
+/*! exports provided: BoundingBox */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BoundingBox", function() { return BoundingBox; });
+/* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+var BoundingBox =
+/*#__PURE__*/
+function () {
+  function BoundingBox(min, max) {
+    this._min = min;
+    this._max = max;
+    this._transform = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["mat4"].create();
+    this._center = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    this.update(this);
+  }
+
+  var _proto = BoundingBox.prototype;
+
+  _proto.update = function update(bbox) {
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(this._min, this._min, bbox.min);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(this._max, this._max, bbox.max);
+    this.calculateTransform();
+    this.calculateCenter();
+  };
+
+  _proto.calculateTransform = function calculateTransform() {
+    // scale
+    this._transform[0] = this._max[0] - this._min[0];
+    this._transform[5] = this._max[1] - this._min[1];
+    this._transform[10] = this._max[2] - this._min[2]; // translate
+
+    this._transform[12] = this._min[0];
+    this._transform[13] = this._min[1];
+    this._transform[14] = this._min[2];
+    return this._transform;
+  };
+
+  _proto.calculateCenter = function calculateCenter() {
+    this._center[0] = (this._min[0] + this._max[0]) / 2.0;
+    this._center[1] = (this._min[1] + this._max[1]) / 2.0;
+    this._center[2] = (this._min[2] + this._max[2]) / 2.0;
+    return this._center;
+  };
+
+  _proto.getAABB = function getAABB(matrix) {
+    return BoundingBox.getAABBFromOBB(this, matrix);
+  };
+
+  BoundingBox.getAABBFromOBB = function getAABBFromOBB(obb, matrix) {
+    var transformRight = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    var transformUp = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    var transformBackward = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    var tmpVec3a = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    var tmpVec3b = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].set(transformRight, matrix[0], matrix[1], matrix[2]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].set(transformUp, matrix[4], matrix[5], matrix[6]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].set(transformBackward, matrix[8], matrix[9], matrix[10]);
+    var min = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].fromValues(matrix[12], matrix[13], matrix[14]); // init with matrix translation
+
+    var max = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].clone(min);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3a, transformRight, obb.min[0]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3b, transformRight, obb.max[0]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(transformRight, tmpVec3a, tmpVec3b);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(min, min, transformRight);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].max(transformRight, tmpVec3a, tmpVec3b);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(max, max, transformRight);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3a, transformUp, obb.min[1]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3b, transformUp, obb.max[1]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(transformUp, tmpVec3a, tmpVec3b);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(min, min, transformUp);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].max(transformUp, tmpVec3a, tmpVec3b);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(max, max, transformUp);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3a, transformBackward, obb.min[2]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3b, transformBackward, obb.max[2]);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(transformBackward, tmpVec3a, tmpVec3b);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(min, min, transformBackward);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].max(transformBackward, tmpVec3a, tmpVec3b);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(max, max, transformBackward);
+    var bbox = new BoundingBox(min, max);
+    bbox.calculateTransform();
+    return bbox;
+  };
+
+  _createClass(BoundingBox, [{
+    key: "min",
+    get: function get() {
+      return this._min;
+    },
+    set: function set(value) {
+      this._min = value;
+    }
+  }, {
+    key: "max",
+    get: function get() {
+      return this._max;
+    },
+    set: function set(value) {
+      this._max = value;
+    }
+  }, {
+    key: "transform",
+    get: function get() {
+      return this.calculateTransform();
+    }
+  }, {
+    key: "center",
+    get: function get() {
+      return this.calculateCenter();
+    }
+  }]);
+
+  return BoundingBox;
+}();
+
+/***/ }),
+
+/***/ "../lib/model/bvh/bvhNode.js":
+/*!***********************************!*\
+  !*** ../lib/model/bvh/bvhNode.js ***!
+  \***********************************/
+/*! exports provided: BVHNode */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BVHNode", function() { return BVHNode; });
+/* harmony import */ var _boundingBox__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./boundingBox */ "../lib/model/bvh/boundingBox.js");
+/* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
+/* harmony import */ var _frustum__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./frustum */ "../lib/model/bvh/frustum.js");
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+
+
+
+var BVHNode =
+/*#__PURE__*/
+function () {
+  function BVHNode() {
+    this._primitives = [];
+    this._debugColor = gl_matrix__WEBPACK_IMPORTED_MODULE_1__["vec3"].fromValues(Math.random(), Math.random(), Math.random());
+  }
+
+  var _proto = BVHNode.prototype;
+
+  _proto.frustumTestPrimitives = function frustumTestPrimitives(frustum, modelMat) {
+    switch (frustum.intersectAABB(this._volume.getAABB(modelMat))) {
+      case _frustum__WEBPACK_IMPORTED_MODULE_2__["FRUSTUM_INTERSECT"].OUTSIDE:
+        return [];
+
+      case _frustum__WEBPACK_IMPORTED_MODULE_2__["FRUSTUM_INTERSECT"].INSIDE:
+        return this._primitives;
+
+      case _frustum__WEBPACK_IMPORTED_MODULE_2__["FRUSTUM_INTERSECT"].INTERSECTING:
+        if (this._left && this._right) {
+          return [].concat(this._left.frustumTestPrimitives(frustum, modelMat), this._right.frustumTestPrimitives(frustum, modelMat));
+        } else {
+          return this._primitives;
+        }
+
+    }
+  };
+
+  _proto.debugRender = function debugRender(drawMode, cube, shader, modelMatrix) {
+    var model = gl_matrix__WEBPACK_IMPORTED_MODULE_1__["mat4"].mul(gl_matrix__WEBPACK_IMPORTED_MODULE_1__["mat4"].create(), modelMatrix, this._volume.transform);
+    shader.apply(model, this._debugColor);
+    cube.draw(drawMode);
+
+    if (this._left) {
+      this._left.debugRender(drawMode, cube, shader, modelMatrix);
+    }
+
+    if (this._right) {
+      this._right.debugRender(drawMode, cube, shader, modelMatrix);
+    }
+  };
+
+  BVHNode.constructTree = function constructTree(primitives, weightLeft) {
+    var root = new BVHNode();
+    var aabb = BVHNode.getMaxAABB(primitives);
+    root.volume = aabb;
+    root.primitives = primitives;
+
+    if (primitives.length < BVHNode.MAX_VOLUMES_PER_NODE) {
+      return root;
+    }
+
+    var sortDimension = BVHNode.calculateSortingDimension(aabb);
+    primitives = primitives.sort(function (a, b) {
+      return a.boundingBox.max[sortDimension] - b.boundingBox.max[sortDimension];
+    });
+    var midIndex = weightLeft ? Math.ceil(primitives.length / 2) : Math.floor(primitives.length / 2);
+    root.left = BVHNode.constructTree(primitives.slice(0, midIndex), !weightLeft);
+    root.right = BVHNode.constructTree(primitives.slice(midIndex, primitives.length), !weightLeft);
+    return root;
+  };
+
+  BVHNode.calculateSortingDimension = function calculateSortingDimension(box) {
+    var max = Math.max.apply(Math, _toConsumableArray(box.max));
+
+    if (max === box.max[0]) {
+      return 0;
+    } else if (max === box.max[1]) {
+      return 1;
+    } else {
+      return 2;
+    }
+  };
+
+  BVHNode.getMaxAABB = function getMaxAABB(primitives) {
+    var box = new _boundingBox__WEBPACK_IMPORTED_MODULE_0__["BoundingBox"](gl_matrix__WEBPACK_IMPORTED_MODULE_1__["vec3"].fromValues(Infinity, Infinity, Infinity), gl_matrix__WEBPACK_IMPORTED_MODULE_1__["vec3"].fromValues(-Infinity, -Infinity, -Infinity));
+
+    for (var i = 0, primitive; primitive = primitives[i]; i++) {
+      var pBox = primitive.boundingBox;
+      box.min[0] = box.min[0] < pBox.min[0] ? box.min[0] : pBox.min[0];
+      box.min[1] = box.min[1] < pBox.min[1] ? box.min[1] : pBox.min[1];
+      box.min[2] = box.min[2] < pBox.min[2] ? box.min[2] : pBox.min[2];
+      box.max[0] = box.max[0] > pBox.max[0] ? box.max[0] : pBox.max[0];
+      box.max[1] = box.max[1] > pBox.max[1] ? box.max[1] : pBox.max[1];
+      box.max[2] = box.max[2] > pBox.max[2] ? box.max[2] : pBox.max[2];
+    }
+
+    return box;
+  };
+
+  _createClass(BVHNode, [{
+    key: "volume",
+    get: function get() {
+      return this._volume;
+    },
+    set: function set(value) {
+      this._volume = value;
+    }
+  }, {
+    key: "left",
+    get: function get() {
+      return this._left;
+    },
+    set: function set(value) {
+      this._left = value;
+    }
+  }, {
+    key: "right",
+    get: function get() {
+      return this._right;
+    },
+    set: function set(value) {
+      this._right = value;
+    }
+  }, {
+    key: "primitives",
+    get: function get() {
+      return this._primitives;
+    },
+    set: function set(value) {
+      this._primitives = value;
+    }
+  }]);
+
+  return BVHNode;
+}();
+BVHNode.MAX_VOLUMES_PER_NODE = 4;
+
+/***/ }),
+
+/***/ "../lib/model/bvh/frustum.js":
+/*!***********************************!*\
+  !*** ../lib/model/bvh/frustum.js ***!
+  \***********************************/
+/*! exports provided: FRUSTUM_INTERSECT, HALFSPACE, Plane, Frustum */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FRUSTUM_INTERSECT", function() { return FRUSTUM_INTERSECT; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "HALFSPACE", function() { return HALFSPACE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Plane", function() { return Plane; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Frustum", function() { return Frustum; });
+/* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
+
+var FRUSTUM_INTERSECT;
+
+(function (FRUSTUM_INTERSECT) {
+  FRUSTUM_INTERSECT[FRUSTUM_INTERSECT["INSIDE"] = 0] = "INSIDE";
+  FRUSTUM_INTERSECT[FRUSTUM_INTERSECT["INTERSECTING"] = 1] = "INTERSECTING";
+  FRUSTUM_INTERSECT[FRUSTUM_INTERSECT["OUTSIDE"] = 2] = "OUTSIDE";
+})(FRUSTUM_INTERSECT || (FRUSTUM_INTERSECT = {}));
+
+var HALFSPACE;
+
+(function (HALFSPACE) {
+  HALFSPACE[HALFSPACE["NEGATIVE"] = -1] = "NEGATIVE";
+  HALFSPACE[HALFSPACE["ON_PLANE"] = 0] = "ON_PLANE";
+  HALFSPACE[HALFSPACE["POSITIVE"] = 1] = "POSITIVE";
+})(HALFSPACE || (HALFSPACE = {}));
+/**
+ * Plane representation as ax+by+cz+d = 0, with (a,b,c) = normal
+ */
+
+
+var Plane =
+/*#__PURE__*/
+function () {
+  function Plane(normal, distance) {
+    this.normal = normal || gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
+    this.distance = distance || 0;
+  }
+
+  var _proto = Plane.prototype;
+
+  _proto.distanceToPoint = function distanceToPoint(p) {
+    return gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].dot(this.normal, p) + this.distance;
+  };
+
+  _proto.halfspace = function halfspace(p) {
+    var distance = this.distanceToPoint(p);
+    if (distance < 0) return HALFSPACE.NEGATIVE;
+    if (distance > 0) return HALFSPACE.POSITIVE;
+    return HALFSPACE.ON_PLANE;
+  }
+  /**
+   * flips the normal vectors of the plane
+   * by default they point to the inside
+   */
+  ;
+
+  _proto.flip = function flip() {
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(this.normal, this.normal, -1);
+    this.distance *= -1;
+    return this;
+  };
+
+  Plane.create = function create() {
+    return new Plane();
+  } //Plane from normal and support vector p0
+  ;
+
+  Plane.fromNormalAndPoint = function fromNormalAndPoint(n, p0) {
+    var normal = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].normalize(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), n);
+    var d = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].dot(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), normal, -1), p0);
+    return new Plane(normal, d);
+  };
+
+  Plane.fromPoints = function fromPoints(p0, p1, p2, flip) {
+    var v = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].subtract(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), p1, p0);
+    var u = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].subtract(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), p2, p0);
+    var n = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].cross(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), u, v);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].normalize(n, n);
+    var d = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].dot(n, p0) * -1.0;
+    return flip ? new Plane(n, d).flip() : new Plane(n, d);
+  };
+
+  return Plane;
+}();
+var Frustum =
+/*#__PURE__*/
+function () {
+  function Frustum() {
+    this.planes = [Plane.create(), Plane.create(), Plane.create(), Plane.create(), Plane.create(), Plane.create()];
+  }
+
+  var _proto2 = Frustum.prototype;
+
+  _proto2.normalize = function normalize() {
+    for (var i = 0; i < 6; i++) {
+      var magnitude = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].length(this.planes[i].normal);
+      gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(this.planes[i].normal, this.planes[i].normal, 1 / magnitude);
+      this.planes[i].distance /= magnitude;
+    }
+
+    return this;
+  }
+  /**
+   * flip the normals of the frustum planes
+   */
+  ;
+
+  _proto2.flip = function flip() {
+    for (var i = 0, plane; plane = this.planes[i]; i++) {
+      plane.flip();
+    }
+
+    return this;
+  }
+  /**
+   * https://fgiesen.wordpress.com/2010/10/17/view-frustum-culling/
+   * intersection with boundingBox assuming the plane normals are facing inside
+   * @param box
+   */
+  ;
+
+  _proto2.intersectAABB = function intersectAABB(box) {
+    var result = FRUSTUM_INTERSECT.INSIDE;
+
+    for (var i = 0, plane; plane = this.planes[i]; i++) {
+      var p = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].clone(box.min);
+      p[0] = plane.normal[0] >= 0 ? box.max[0] : p[0];
+      p[1] = plane.normal[1] >= 0 ? box.max[1] : p[1];
+      p[2] = plane.normal[2] >= 0 ? box.max[2] : p[2];
+      var n = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].clone(box.max);
+      n[0] = plane.normal[0] >= 0 ? box.min[0] : n[0];
+      n[1] = plane.normal[1] >= 0 ? box.min[1] : n[1];
+      n[2] = plane.normal[2] >= 0 ? box.min[2] : n[2]; //point nearest to the plane is outside
+
+      if (plane.distanceToPoint(p) < 0) {
+        return FRUSTUM_INTERSECT.OUTSIDE;
+      } //p inside but n outside
+
+
+      if (plane.distanceToPoint(n) < 0) {
+        result = FRUSTUM_INTERSECT.INTERSECTING;
+      }
+    }
+
+    return result;
+  }
+  /**
+   * http://cgvr.cs.uni-bremen.de/teaching/cg_literatur/lighthouse3d_view_frustum_culling/index.html
+   * @param cam
+   * @param lookAt
+   */
+  ;
+
+  Frustum.createFromCameraDefinition = function createFromCameraDefinition(cam, lookAt) {
+    var nh = cam.near * cam.fovy;
+    var nw = nh * cam.aspect;
+    var fh = cam.far * cam.fovy;
+    var fw = fh * cam.fovy; //z axis of the camera opposite direction of the looking direction (points towards the near and far plane)
+
+    var z = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].subtract(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), lookAt.position, lookAt.target);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].normalize(z, z); // x axis
+
+    var x = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].cross(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), lookAt.up, z);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].normalize(x, x); //y axis (real up vector)
+
+    var y = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].cross(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), z, x);
+    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].normalize(y, y); //center of the near and far planes
+
+    var nc = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].subtract(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), lookAt.position, gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), z, cam.near));
+    var fc = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].subtract(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), lookAt.position, gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), z, cam.far)); //4 corners of the frustum of the near plane (ntl = near top left etc.)
+
+    var ynh = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), y, nh);
+    var xnw = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), x, nw);
+    var ntl = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), nc, ynh), xnw);
+    var ntr = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), nc, ynh), xnw);
+    var nbl = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), nc, ynh), xnw);
+    var nbr = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), nc, ynh), xnw); //4 corners of the frustum far plane
+
+    var yfh = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), y, fh);
+    var xfw = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), x, fw);
+    var ftl = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), fc, yfh), xfw);
+    var ftr = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), fc, yfh), xfw);
+    var fbl = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), fc, yfh), xfw);
+    var fbr = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].sub(gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create(), fc, yfh), xfw); //six planes from the corner points
+
+    var frustum = new Frustum(); //top
+
+    frustum.planes[0] = Plane.fromPoints(ntl, ntr, ftl); //bottom
+
+    frustum.planes[1] = Plane.fromPoints(nbr, nbl, fbr); //left
+
+    frustum.planes[2] = Plane.fromPoints(nbl, ntl, fbl); //right
+
+    frustum.planes[3] = Plane.fromPoints(nbr, ntr, fbr); //near
+
+    frustum.planes[4] = Plane.fromPoints(ntr, ntl, nbr); //far
+
+    frustum.planes[5] = Plane.fromPoints(ftl, ftr, fbl);
+    return frustum;
+  }
+  /**
+   * TODO: is this right?
+   * create frustum from orthogonal matrix
+   * where the normals point inside
+   * @param mat
+   * @param flip - flip the planes of the frustum, so the normals point outside
+   */
+  ;
+
+  Frustum.createFromMat4 = function createFromMat4(mat, flip) {
+    var frustum = new Frustum(); //left clipping plane
+
+    for (var i = 0; i < 3; i++) {
+      frustum.planes[0].normal[i] = mat[12 + i] + mat[i];
+    }
+
+    frustum.planes[0].distance = mat[15] + mat[3]; //right clipping plane
+
+    for (var _i = 0; _i < 3; _i++) {
+      frustum.planes[1].normal[_i] = mat[12 + _i] - mat[_i];
+    }
+
+    frustum.planes[1].distance = mat[15] - mat[3]; //top clipping plane
+
+    for (var _i2 = 0; _i2 < 3; _i2++) {
+      frustum.planes[2].normal[_i2] = mat[12 + _i2] - mat[4 + _i2];
+    }
+
+    frustum.planes[2].distance = mat[15] - mat[7]; //bottom clipping lane
+
+    for (var _i3 = 0; _i3 < 3; _i3++) {
+      frustum.planes[3].normal[_i3] = mat[12 + _i3] + mat[4 + _i3];
+    }
+
+    frustum.planes[3].distance = mat[15] + mat[7]; //near clipping plane
+
+    for (var _i4 = 0; _i4 < 3; _i4++) {
+      frustum.planes[4].normal[_i4] = mat[12 + _i4] + mat[8 + _i4];
+    }
+
+    frustum.planes[4].distance = mat[15] + mat[11]; //far clipping plane
+
+    for (var _i5 = 0; _i5 < 3; _i5++) {
+      frustum.planes[5].normal[_i5] = mat[12 + _i5] - mat[8 + _i5];
+    }
+
+    frustum.planes[5].distance = mat[15] - mat[11];
+
+    if (flip) {
+      return frustum.flip().normalize();
+    }
+
+    return frustum.normalize();
+  };
+
+  return Frustum;
+}();
+
+/***/ }),
+
 /***/ "../lib/model/data/accessor.js":
 /*!*************************************!*\
   !*** ../lib/model/data/accessor.js ***!
@@ -8234,117 +8816,6 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "../lib/model/mesh/boundingBox.js":
-/*!****************************************!*\
-  !*** ../lib/model/mesh/boundingBox.js ***!
-  \****************************************/
-/*! exports provided: BoundingBox */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BoundingBox", function() { return BoundingBox; });
-/* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-var BoundingBox =
-/*#__PURE__*/
-function () {
-  function BoundingBox(min, max) {
-    this._min = min;
-    this._max = max;
-    this._transform = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["mat4"].create();
-  }
-
-  var _proto = BoundingBox.prototype;
-
-  _proto.update = function update(bbox) {
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(this._min, this._min, bbox.min);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(this._max, this._max, bbox.max);
-  };
-
-  _proto.calculateTransform = function calculateTransform() {
-    // scale
-    this._transform[0] = this._max[0] - this._min[0];
-    this._transform[5] = this._max[1] - this._min[1];
-    this._transform[10] = this._max[2] - this._min[2]; // translate
-
-    this._transform[12] = this._min[0];
-    this._transform[13] = this._min[1];
-    this._transform[14] = this._min[2];
-    return this._transform;
-  };
-
-  _proto.getAABB = function getAABB(matrix) {
-    return BoundingBox.getAABBFromOBB(this, matrix);
-  };
-
-  BoundingBox.getAABBFromOBB = function getAABBFromOBB(obb, matrix) {
-    var transformRight = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
-    var transformUp = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
-    var transformBackward = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
-    var tmpVec3a = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
-    var tmpVec3b = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].create();
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].set(transformRight, matrix[0], matrix[1], matrix[2]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].set(transformUp, matrix[4], matrix[5], matrix[6]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].set(transformBackward, matrix[8], matrix[9], matrix[10]);
-    var min = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].fromValues(matrix[12], matrix[13], matrix[14]); // init with matrix translation
-
-    var max = gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].clone(min);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3a, transformRight, obb.min[0]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3b, transformRight, obb.max[0]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(transformRight, tmpVec3a, tmpVec3b);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(min, min, transformRight);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].max(transformRight, tmpVec3a, tmpVec3b);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(max, max, transformRight);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3a, transformUp, obb.min[1]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3b, transformUp, obb.max[1]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(transformUp, tmpVec3a, tmpVec3b);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(min, min, transformUp);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].max(transformUp, tmpVec3a, tmpVec3b);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(max, max, transformUp);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3a, transformBackward, obb.min[2]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].scale(tmpVec3b, transformBackward, obb.max[2]);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].min(transformBackward, tmpVec3a, tmpVec3b);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(min, min, transformBackward);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].max(transformBackward, tmpVec3a, tmpVec3b);
-    gl_matrix__WEBPACK_IMPORTED_MODULE_0__["vec3"].add(max, max, transformBackward);
-    var bbox = new BoundingBox(min, max);
-    bbox.calculateTransform();
-    return bbox;
-  };
-
-  _createClass(BoundingBox, [{
-    key: "min",
-    get: function get() {
-      return this._min;
-    },
-    set: function set(value) {
-      this._min = value;
-    }
-  }, {
-    key: "max",
-    get: function get() {
-      return this._max;
-    },
-    set: function set(value) {
-      this._max = value;
-    }
-  }, {
-    key: "transform",
-    get: function get() {
-      return this.calculateTransform();
-    }
-  }]);
-
-  return BoundingBox;
-}();
-
-/***/ }),
-
 /***/ "../lib/model/mesh/index.js":
 /*!**********************************!*\
   !*** ../lib/model/mesh/index.js ***!
@@ -8544,7 +9015,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Primitive", function() { return Primitive; });
 /* harmony import */ var _gl__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../gl */ "../lib/gl/index.js");
 /* harmony import */ var _data_accessor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../data/accessor */ "../lib/model/data/accessor.js");
-/* harmony import */ var _boundingBox__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./boundingBox */ "../lib/model/mesh/boundingBox.js");
+/* harmony import */ var _bvh_boundingBox__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../bvh/boundingBox */ "../lib/model/bvh/boundingBox.js");
 /* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
@@ -8564,6 +9035,7 @@ var Primitive =
 /*#__PURE__*/
 function () {
   function Primitive() {
+    this.drawing = true;
     this._attributes = Object.create(null);
     this._draw_mode = 4; //GL_TRIANGLE
 
@@ -8582,7 +9054,7 @@ function () {
 
     if (position && position.type === _data_accessor__WEBPACK_IMPORTED_MODULE_1__["ACCESSOR_TYPE"].VEC3) {
       if (position.max && position.min) {
-        this._boundingBox = new _boundingBox__WEBPACK_IMPORTED_MODULE_2__["BoundingBox"](gl_matrix__WEBPACK_IMPORTED_MODULE_3__["vec3"].fromValues(position.min[0], position.min[1], position.min[2]), gl_matrix__WEBPACK_IMPORTED_MODULE_3__["vec3"].fromValues(position.max[0], position.max[1], position.max[2]));
+        this._boundingBox = new _bvh_boundingBox__WEBPACK_IMPORTED_MODULE_2__["BoundingBox"](gl_matrix__WEBPACK_IMPORTED_MODULE_3__["vec3"].fromValues(position.min[0], position.min[1], position.min[2]), gl_matrix__WEBPACK_IMPORTED_MODULE_3__["vec3"].fromValues(position.max[0], position.max[1], position.max[2]));
       } else {
         var min = gl_matrix__WEBPACK_IMPORTED_MODULE_3__["vec3"].fromValues(Infinity, Infinity, Infinity);
         var max = gl_matrix__WEBPACK_IMPORTED_MODULE_3__["vec3"].fromValues(-Infinity, -Infinity, -Infinity);
@@ -8597,7 +9069,7 @@ function () {
           max[2] = max[2] < buffer[i + 2] ? buffer[i + 2] : max[2];
         }
 
-        this._boundingBox = new _boundingBox__WEBPACK_IMPORTED_MODULE_2__["BoundingBox"](min, max);
+        this._boundingBox = new _bvh_boundingBox__WEBPACK_IMPORTED_MODULE_2__["BoundingBox"](min, max);
       }
     }
 
@@ -8637,7 +9109,7 @@ function () {
     var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this._indices.componentType;
     var offset = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : this._indices.byteOffset + this._indices.bufferView.bufferOffset;
 
-    if (this._vertexArrayObject) {
+    if (this._vertexArrayObject && this.drawing) {
       this._vertexArrayObject.bind();
 
       this._vertexArrayObject.draw(mode, size, type, offset);
@@ -8689,10 +9161,7 @@ function () {
   }, {
     key: "boundingBox",
     get: function get() {
-      return this._boundingBox;
-    },
-    set: function set(value) {
-      this._boundingBox = value;
+      return this._boundingBox || this.initBoundingBox();
     }
   }, {
     key: "vertexArrayObject",
@@ -8719,17 +9188,19 @@ function () {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Model", function() { return Model; });
+/* harmony import */ var _bvh_bvhNode__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./bvh/bvhNode */ "../lib/model/bvh/bvhNode.js");
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-// type RenderList = {
+ // type RenderList = {
 //     material: Material; //apply mat
 //     meshes: Array<{
 //         mesh: Mesh, //apply mesh
 //         primitives: Primitive // draw primitives
 //     }>
 // }
+
 var Model =
 /*#__PURE__*/
 function () {
@@ -8741,6 +9212,7 @@ function () {
     this._skins = [];
     this._transforms = [];
     this._materials = [];
+    this._bvh = new _bvh_bvhNode__WEBPACK_IMPORTED_MODULE_0__["BVHNode"]();
   }
 
   var _proto = Model.prototype;
@@ -8749,6 +9221,8 @@ function () {
     for (var i = 0, mesh; mesh = this._meshes[i]; i++) {
       mesh.init(cache);
     }
+
+    this._bvh = _bvh_bvhNode__WEBPACK_IMPORTED_MODULE_0__["BVHNode"].constructTree(this._primitives);
   }
   /**
    * init the scene creating the GPUBuffers(Vertex- and Indexbuffer) or using an existing MeshBuffermap
@@ -8877,6 +9351,14 @@ function () {
     },
     set: function set(value) {
       this._materials = value;
+    }
+  }, {
+    key: "bvh",
+    get: function get() {
+      return this._bvh;
+    },
+    set: function set(value) {
+      this._bvh = value;
     }
   }]);
 
@@ -9280,10 +9762,9 @@ function (_Shader) {
 
   var _proto = BBoxShader.prototype;
 
-  _proto.apply = function apply(mesh, bbox) {
-    var model = gl_matrix__WEBPACK_IMPORTED_MODULE_2__["mat4"].create();
-    gl_matrix__WEBPACK_IMPORTED_MODULE_2__["mat4"].multiply(model, mesh.transform.modelMatrix, bbox.transform);
-    this.uniforms.u_ModelMatrix = model;
+  _proto.apply = function apply(modelMatrix, color) {
+    this.uniforms.u_ModelMatrix = modelMatrix;
+    this.uniforms.u_Color = color || gl_matrix__WEBPACK_IMPORTED_MODULE_2__["vec3"].fromValues(0, 0, 1);
     this.applyCamera();
   };
 
@@ -10120,7 +10601,7 @@ LookAtCameraControlSystem = __decorate([curbl_ecs__WEBPACK_IMPORTED_MODULE_1__["
 /*!**************************************!*\
   !*** ../lib/systems/camera/index.js ***!
   \**************************************/
-/*! exports provided: CameraSystem, LookAtCameraControlSystem */
+/*! exports provided: LookAtCameraControlSystem, CameraSystem */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10267,7 +10748,7 @@ __webpack_require__.r(__webpack_exports__);
 /*!*******************************!*\
   !*** ../lib/systems/index.js ***!
   \*******************************/
-/*! exports provided: AnimationSystem, CameraSystem, LookAtCameraControlSystem, GUISystem, PrePass, WorldSystem, ForwardLightPass, ForwardScenePass, ForwardShadingSystem, SkyboxPass, WorldScene */
+/*! exports provided: AnimationSystem, LookAtCameraControlSystem, GUISystem, PrePass, WorldSystem, CameraSystem, ForwardLightPass, ForwardScenePass, ForwardShadingSystem, SkyboxPass, WorldScene */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -10276,9 +10757,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "AnimationSystem", function() { return _animation_index__WEBPACK_IMPORTED_MODULE_0__["AnimationSystem"]; });
 
 /* harmony import */ var _camera_index__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./camera/index */ "../lib/systems/camera/index.js");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return _camera_index__WEBPACK_IMPORTED_MODULE_1__["CameraSystem"]; });
-
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "LookAtCameraControlSystem", function() { return _camera_index__WEBPACK_IMPORTED_MODULE_1__["LookAtCameraControlSystem"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "CameraSystem", function() { return _camera_index__WEBPACK_IMPORTED_MODULE_1__["CameraSystem"]; });
 
 /* harmony import */ var _gui_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./gui/index */ "../lib/systems/gui/index.js");
 /* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "GUISystem", function() { return _gui_index__WEBPACK_IMPORTED_MODULE_2__["GUISystem"]; });
@@ -10306,6 +10787,88 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
+
+/***/ }),
+
+/***/ "../lib/systems/rendering/DebugBVHThreePass.js":
+/*!*****************************************************!*\
+  !*** ../lib/systems/rendering/DebugBVHThreePass.js ***!
+  \*****************************************************/
+/*! exports provided: DebugBVHThreePass */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "DebugBVHThreePass", function() { return DebugBVHThreePass; });
+/* harmony import */ var curbl_ecs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! curbl-ecs */ "../node_modules/curbl-ecs/lib/index.js");
+/* harmony import */ var curbl_ecs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(curbl_ecs__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../cache */ "../lib/cache/index.js");
+/* harmony import */ var ___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../.. */ "../lib/index.js");
+/* harmony import */ var _gl_primitives_GLWiredCube__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../gl/primitives/GLWiredCube */ "../lib/gl/primitives/GLWiredCube.js");
+function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
+
+function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+var __decorate = undefined && undefined.__decorate || function (decorators, target, key, desc) {
+  var c = arguments.length,
+      r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+      d;
+  if ((typeof Reflect === "undefined" ? "undefined" : _typeof(Reflect)) === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);else for (var i = decorators.length - 1; i >= 0; i--) {
+    if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  }
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
+
+
+
+
+
+var DebugBVHThreePass =
+/*#__PURE__*/
+function (_System) {
+  _inheritsLoose(DebugBVHThreePass, _System);
+
+  function DebugBVHThreePass(config) {
+    var _this;
+
+    _this = _System.call(this) || this;
+    _this.gl = config.gl;
+    _this.cache = config.cache;
+    _this.shader = config.shader;
+    _this.cube = new _gl_primitives_GLWiredCube__WEBPACK_IMPORTED_MODULE_3__["GLWiredCube"](_this.gl);
+    return _this;
+  }
+
+  var _proto = DebugBVHThreePass.prototype;
+
+  _proto.setUp = function setUp() {
+    this.cube.vertexArrayObject.bind();
+    this.cube.vertexArrayObject.addAttribute(this.cube.vertexBuffer, this.shader.attributes.getAttribute('a_Position'), 3, this.gl.FLOAT, false, 0, 0);
+    this.cube.vertexArrayObject.unbind();
+  };
+
+  _proto.render = function render() {
+    for (var i = 0, entity; entity = this.entities[i]; i++) {
+      this.drawScene(entity);
+    }
+  };
+
+  _proto.drawScene = function drawScene(entity) {
+    var key = entity.get(___WEBPACK_IMPORTED_MODULE_2__["SceneComponent"]).key;
+    var scene = this.cache.get(_cache__WEBPACK_IMPORTED_MODULE_1__["CACHE_TYPE"].MODEL, key);
+    this.gl.enable(this.gl.DEPTH_TEST);
+    this.shader.bind();
+    scene.bvh.debugRender(this.gl.LINES, this.cube, this.shader, scene.meshes[0].transform.modelMatrix);
+    this.shader.unbind();
+    this.gl.disable(this.gl.DEPTH_TEST);
+  };
+
+  return DebugBVHThreePass;
+}(curbl_ecs__WEBPACK_IMPORTED_MODULE_0__["System"]);
+
+DebugBVHThreePass = __decorate([curbl_ecs__WEBPACK_IMPORTED_MODULE_0__["ECS"].System(___WEBPACK_IMPORTED_MODULE_2__["SceneComponent"])], DebugBVHThreePass);
 
 
 /***/ }),
@@ -10415,8 +10978,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var curbl_ecs_lib_Events__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! curbl-ecs/lib/Events */ "../node_modules/curbl-ecs/lib/Events.js");
 /* harmony import */ var curbl_ecs_lib_Events__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(curbl_ecs_lib_Events__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _gl_constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../gl/constants */ "../lib/gl/constants/index.js");
-/* harmony import */ var _gl_primitives_GLWiredCube__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../gl/primitives/GLWiredCube */ "../lib/gl/primitives/GLWiredCube.js");
-/* harmony import */ var _gl__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../gl */ "../lib/gl/index.js");
+/* harmony import */ var _gl__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../gl */ "../lib/gl/index.js");
 function _inheritsLoose(subClass, superClass) { subClass.prototype = Object.create(superClass.prototype); subClass.prototype.constructor = subClass; subClass.__proto__ = superClass; }
 
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -10438,7 +11000,6 @@ var __decorate = undefined && undefined.__decorate || function (decorators, targ
 
 
 
-
 var ForwardScenePass =
 /*#__PURE__*/
 function (_System) {
@@ -10451,9 +11012,8 @@ function (_System) {
     _this.gl = config.gl;
     _this.cache = config.cache;
     _this.shader = config.shader;
-    _this.cube = new _gl_primitives_GLWiredCube__WEBPACK_IMPORTED_MODULE_5__["GLWiredCube"](_this.gl);
-    _this.vertexBuffer = _gl__WEBPACK_IMPORTED_MODULE_6__["GLBuffer"].createVertexBuffer(_this.gl);
-    _this.indexBuffer = _gl__WEBPACK_IMPORTED_MODULE_6__["GLBuffer"].createIndexBuffer(_this.gl);
+    _this.vertexBuffer = _gl__WEBPACK_IMPORTED_MODULE_5__["GLBuffer"].createVertexBuffer(_this.gl);
+    _this.indexBuffer = _gl__WEBPACK_IMPORTED_MODULE_5__["GLBuffer"].createIndexBuffer(_this.gl);
     return _this;
   }
 
@@ -10461,9 +11021,6 @@ function (_System) {
 
   _proto.setUp = function setUp() {
     this.events.on(curbl_ecs_lib_Events__WEBPACK_IMPORTED_MODULE_3__["SYSTEM_EVENTS"].ENTITY_ADDED, this.initEntity, this);
-    this.cube.vertexArrayObject.bind();
-    this.cube.vertexArrayObject.addAttribute(this.cube.vertexBuffer, this.shader.attributes.getAttribute('a_Position'), 3, this.gl.FLOAT, false, 0, 0);
-    this.cube.vertexArrayObject.unbind();
   }
   /**
    * Init Shader for the Meshes
@@ -10473,7 +11030,7 @@ function (_System) {
 
   _proto.initEntity = function initEntity(entity) {
     var sceneComponent = entity.get(_components__WEBPACK_IMPORTED_MODULE_1__["SceneComponent"]);
-    var scene = this.cache.get(_cache__WEBPACK_IMPORTED_MODULE_2__["CACHE_TYPE"].SCENE, sceneComponent.key);
+    var scene = this.cache.get(_cache__WEBPACK_IMPORTED_MODULE_2__["CACHE_TYPE"].MODEL, sceneComponent.key);
 
     if (scene) {
       scene.init(this.cache);
@@ -10502,20 +11059,9 @@ function (_System) {
 
   _proto.drawScene = function drawScene(entity) {
     var key = entity.get(_components__WEBPACK_IMPORTED_MODULE_1__["SceneComponent"]).key;
-    var scene = this.cache.get(_cache__WEBPACK_IMPORTED_MODULE_2__["CACHE_TYPE"].SCENE, key);
+    var scene = this.cache.get(_cache__WEBPACK_IMPORTED_MODULE_2__["CACHE_TYPE"].MODEL, key);
     this.shader.apply();
-    scene.draw(this.shader); // //test
-    // const shader = this.cache.get<Shader>(CACHE_TYPE.SHADER, "bboxShader");
-    // const meshes = scene.meshes;
-    // shader.bind();
-    // for(let k=0,mesh:Mesh; mesh = meshes[k]; k++) {
-    //     const boxes = this.getBBoxes(mesh.primitives);
-    //     for (let i = 0, bbox: BoundingBox; bbox = boxes[i]; i++) {
-    //         shader.apply(mesh, bbox);
-    //         this.cube.draw(this.gl.LINES);
-    //     }
-    // }
-    //shader.unbind();
+    scene.draw(this.shader);
   };
 
   return ForwardScenePass;
@@ -11129,16 +11675,18 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _systems_rendering_PrePass__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../systems/rendering/PrePass */ "../lib/systems/rendering/PrePass.js");
 /* harmony import */ var _systems_gui_GUISystem__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ../systems/gui/GUISystem */ "../lib/systems/gui/GUISystem.js");
 /* harmony import */ var _systems_camera_LookAtCameraControlSystem__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ../systems/camera/LookAtCameraControlSystem */ "../lib/systems/camera/LookAtCameraControlSystem.js");
-/* harmony import */ var _systems_camera_CameraSystem__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../systems/camera/CameraSystem */ "../lib/systems/camera/CameraSystem.js");
-/* harmony import */ var _material_metallicRoughness__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ../material/metallicRoughness */ "../lib/material/metallicRoughness.js");
-/* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
-/* harmony import */ var _systems_animation_AnimationSystem__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../systems/animation/AnimationSystem */ "../lib/systems/animation/AnimationSystem.js");
-/* harmony import */ var _systems_world_worldSystem__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../systems/world/worldSystem */ "../lib/systems/world/worldSystem.js");
-/* harmony import */ var _shader_BBoxShader__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../shader/BBoxShader */ "../lib/shader/BBoxShader.js");
+/* harmony import */ var _material_metallicRoughness__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ../material/metallicRoughness */ "../lib/material/metallicRoughness.js");
+/* harmony import */ var gl_matrix__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! gl-matrix */ "../node_modules/gl-matrix/esm/index.js");
+/* harmony import */ var _systems_animation_AnimationSystem__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ../systems/animation/AnimationSystem */ "../lib/systems/animation/AnimationSystem.js");
+/* harmony import */ var _systems_world_worldSystem__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ../systems/world/worldSystem */ "../lib/systems/world/worldSystem.js");
+/* harmony import */ var _shader_BBoxShader__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ../shader/BBoxShader */ "../lib/shader/BBoxShader.js");
+/* harmony import */ var _systems_camera__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ../systems/camera */ "../lib/systems/camera/index.js");
 /* harmony import */ var _systems_rendering__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ../systems/rendering */ "../lib/systems/rendering/index.js");
+/* harmony import */ var _systems_rendering_DebugBVHThreePass__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ../systems/rendering/DebugBVHThreePass */ "../lib/systems/rendering/DebugBVHThreePass.js");
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -11194,7 +11742,7 @@ function () {
 
     this._cache.addCache(_cache__WEBPACK_IMPORTED_MODULE_5__["CACHE_TYPE"].TEXTURE, new _cache__WEBPACK_IMPORTED_MODULE_5__["BaseCache"]());
 
-    this._cache.addCache(_cache__WEBPACK_IMPORTED_MODULE_5__["CACHE_TYPE"].SCENE, new _cache__WEBPACK_IMPORTED_MODULE_5__["BaseCache"]());
+    this._cache.addCache(_cache__WEBPACK_IMPORTED_MODULE_5__["CACHE_TYPE"].MODEL, new _cache__WEBPACK_IMPORTED_MODULE_5__["BaseCache"]());
 
     this._cache.addCache(_cache__WEBPACK_IMPORTED_MODULE_5__["CACHE_TYPE"].ANIMATION, new _cache__WEBPACK_IMPORTED_MODULE_5__["BaseCache"]());
 
@@ -11218,13 +11766,13 @@ function () {
 
     this._shader = new _shader_khronosPbrShader__WEBPACK_IMPORTED_MODULE_10__["KhronosPbrShader"](this._gl, this._cache);
     this._skyboxShader = new _shader_SkyboxShader__WEBPACK_IMPORTED_MODULE_11__["SkyboxShader"](this._gl, this._cache);
-    this._bboxShader = new _shader_BBoxShader__WEBPACK_IMPORTED_MODULE_20__["BBoxShader"](this._gl); //Load shader
+    this._bboxShader = new _shader_BBoxShader__WEBPACK_IMPORTED_MODULE_19__["BBoxShader"](this._gl); //Load shader
 
-    this._loader.get(_loader_GLSLLoader__WEBPACK_IMPORTED_MODULE_9__["GLSLLoader"]).add("shader", "./assets/shader/pbr-vert.glsl", "./assets/shader/pbr-frag.glsl", this._shader);
+    this._loader.get(_loader_GLSLLoader__WEBPACK_IMPORTED_MODULE_9__["GLSLLoader"]).add("shader", "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-vert.glsl", "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-frag.glsl", this._shader);
 
     this._loader.get(_loader_GLSLLoader__WEBPACK_IMPORTED_MODULE_9__["GLSLLoader"]).add("skyboxShader", "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-vert.glsl", "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-frag.glsl", this._skyboxShader);
 
-    this._loader.get(_loader_GLSLLoader__WEBPACK_IMPORTED_MODULE_9__["GLSLLoader"]).add("bboxShader", "./assets/shader/bbox-vert.glsl", "./assets/shader/bbox-frag.glsl", this._bboxShader);
+    this._loader.get(_loader_GLSLLoader__WEBPACK_IMPORTED_MODULE_9__["GLSLLoader"]).add("bboxShader", "/assets/shader/bbox-vert.glsl", "/assets/shader/bbox-frag.glsl", this._bboxShader);
 
     this.load(onLoaded);
   };
@@ -11237,8 +11785,8 @@ function () {
 
     this._cache.getCache(_cache__WEBPACK_IMPORTED_MODULE_5__["CACHE_TYPE"].TEXTURE).add('__default__', texture);
 
-    var mat = new _material_metallicRoughness__WEBPACK_IMPORTED_MODULE_16__["MetallicRoughness"]();
-    mat.baseColorFactor = gl_matrix__WEBPACK_IMPORTED_MODULE_17__["vec4"].fromValues(0.5, 0.5, 0.5, 1);
+    var mat = new _material_metallicRoughness__WEBPACK_IMPORTED_MODULE_15__["MetallicRoughness"]();
+    mat.baseColorFactor = gl_matrix__WEBPACK_IMPORTED_MODULE_16__["vec4"].fromValues(0.5, 0.5, 0.5, 1);
     var material = new _material__WEBPACK_IMPORTED_MODULE_7__["Material"](name, mat);
     material.maps[_material__WEBPACK_IMPORTED_MODULE_7__["MATERIAL_MAPS"].ALBEDO] = new _material__WEBPACK_IMPORTED_MODULE_7__["Materialmap"]('__default__');
 
@@ -11248,21 +11796,26 @@ function () {
   _proto.createSystems = function createSystems() {
     //Create Systems
     curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].systemUpdateMethods = ['update', 'render'];
-    this._world = curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_world_worldSystem__WEBPACK_IMPORTED_MODULE_19__["WorldSystem"]({
+    this._world = curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_world_worldSystem__WEBPACK_IMPORTED_MODULE_18__["WorldSystem"]({
       loader: this._loader,
       cache: this._cache
     }));
-    curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_camera_CameraSystem__WEBPACK_IMPORTED_MODULE_15__["CameraSystem"]({
+    curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_camera__WEBPACK_IMPORTED_MODULE_20__["CameraSystem"]({
       gl: this._gl
     }));
     curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_camera_LookAtCameraControlSystem__WEBPACK_IMPORTED_MODULE_14__["LookAtCameraControlSystem"](this._canvas));
     curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_gui_GUISystem__WEBPACK_IMPORTED_MODULE_13__["GUISystem"]());
-    curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_animation_AnimationSystem__WEBPACK_IMPORTED_MODULE_18__["AnimationSystem"](this._cache));
+    curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_animation_AnimationSystem__WEBPACK_IMPORTED_MODULE_17__["AnimationSystem"](this._cache));
     curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_rendering_PrePass__WEBPACK_IMPORTED_MODULE_12__["PrePass"](this._gl));
     curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_rendering__WEBPACK_IMPORTED_MODULE_21__["ForwardShadingSystem"]({
       gl: this._gl,
       cache: this._cache,
       shader: this._shader
+    }));
+    curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_rendering_DebugBVHThreePass__WEBPACK_IMPORTED_MODULE_22__["DebugBVHThreePass"]({
+      gl: this._gl,
+      cache: this._cache,
+      shader: this._bboxShader
     }));
     curbl_ecs__WEBPACK_IMPORTED_MODULE_8__["ECS"].addSystem(new _systems_rendering__WEBPACK_IMPORTED_MODULE_21__["SkyboxPass"]({
       gl: this._gl,
@@ -24855,10 +25408,6 @@ var sampleModels = {
   "MetalRoughSpheres": {
     gltfJson: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/MetalRoughSpheres/glTF/MetalRoughSpheres.gltf",
     gltfBin: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/MetalRoughSpheres/glTF/MetalRoughSpheres0.bin"
-  },
-  "Duck": {
-    gltfJson: "./assets/model/duck/Duck.gltf",
-    gltfBin: "./assets/model/duck/Duck0.bin"
   }
 };
 var Example =
@@ -24924,7 +25473,7 @@ function () {
       position: {
         x: 0,
         y: 0,
-        z: -4.00
+        z: 4.00
       },
       rotation: {
         x: 0,
@@ -25172,7 +25721,7 @@ function (_WorldScene) {
   };
 
   _proto.create = function create() {
-    var sceneObj = this.cache.get(_lib__WEBPACK_IMPORTED_MODULE_0__["CACHE_TYPE"].SCENE, "ExampleScene");
+    var sceneObj = this.cache.get(_lib__WEBPACK_IMPORTED_MODULE_0__["CACHE_TYPE"].MODEL, "ExampleScene");
     this.shader.unload();
     this.shader.initializeDefines(sceneObj.meshes[0]);
     this.shader.upload();

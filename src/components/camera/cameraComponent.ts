@@ -59,4 +59,8 @@ export class CameraComponent implements IComponent{
     public set projMatrix(value:mat4) {
         this._projMatrix = value;
     }
+
+    public get projViewMatrix(): mat4 {
+        return mat4.mul(mat4.create(), this._projMatrix, this._viewMatrix);
+    }
 }

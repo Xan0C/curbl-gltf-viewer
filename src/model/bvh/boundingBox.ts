@@ -1,19 +1,25 @@
 import {mat4, vec3} from "gl-matrix";
+import {BoundingVolume} from "./boundingVolume";
 
-export class BoundingBox {
+export class BoundingBox implements BoundingVolume<{ min: vec3, max: vec3 }> {
     private _min: vec3;
     private _max: vec3;
     private readonly _transform: mat4;
+    private readonly _center: vec3;
 
     constructor(min: vec3, max: vec3) {
         this._min = min;
         this._max = max;
         this._transform = mat4.create();
+        this._center = vec3.create();
+        this.update(this);
     }
 
     update(bbox: { min: vec3, max: vec3 }): void {
         vec3.min(this._min, this._min, bbox.min);
         vec3.min(this._max, this._max, bbox.max);
+        this.calculateTransform();
+        this.calculateCenter();
     }
 
     private calculateTransform(): mat4 {
@@ -27,6 +33,14 @@ export class BoundingBox {
         this._transform[14] = this._min[2];
 
         return this._transform;
+    }
+
+    private calculateCenter(): vec3 {
+        this._center[0] = (this._min[0] + this._max[0]) / 2.0;
+        this._center[1] = (this._min[1] + this._max[1]) / 2.0;
+        this._center[2] = (this._min[2] + this._max[2]) / 2.0;
+
+        return this._center;
     }
 
     get min(): vec3 {
@@ -47,6 +61,10 @@ export class BoundingBox {
 
     get transform(): mat4 {
         return this.calculateTransform();
+    }
+
+    get center(): vec3 {
+        return this.calculateCenter();
     }
 
     getAABB(matrix: mat4): BoundingBox {

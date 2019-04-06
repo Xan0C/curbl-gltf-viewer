@@ -89,7 +89,7 @@ export class Example {
             far: 100.0
         }));
         this.camera.add(new TransformComponent({
-            position: {x:0,y:0,z:-4.00},
+            position: {x:0,y:0,z:4.00},
             rotation: {x:0,y:0,z:0,w:1},
             scale: {x:1,y:1,z:1}
         }));

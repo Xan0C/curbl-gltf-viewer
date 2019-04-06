@@ -2,8 +2,7 @@ import {
     AnimationComponent,
     CACHE_TYPE,
     GLTFLoader,
-    KhronosPbrShader,
-    Scene,
+    KhronosPbrShader, Model,
     SceneComponent,
     SceneConfig,
     TransformComponent,
@@ -39,7 +38,7 @@ export class ModelScene extends WorldScene {
     }
 
     create(): void {
-        const sceneObj = this.cache.get<Scene>(CACHE_TYPE.SCENE, "ExampleScene");
+        const sceneObj = this.cache.get<Model>(CACHE_TYPE.MODEL, "ExampleScene");
 
         this.shader.unload();
         this.shader.initializeDefines(sceneObj.meshes[0]);

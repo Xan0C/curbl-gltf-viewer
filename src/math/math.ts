@@ -1,6 +1,32 @@
-import {vec3} from "gl-matrix";
+import {mat4, vec3, vec4} from "gl-matrix";
 
 export module Math3d {
+
+    export function getWorldCornersFromMatrix(mat: mat4): Array<vec3> {
+        const inverse = mat4.invert(mat4.create(), mat);
+        const corners = [];
+
+        for(let x=0; x < 2; x++) {
+            for(let y=0; y < 2; y++) {
+                for(let z=0; z < 2; z++) {
+                    const clipSpacePos = vec4.fromValues(
+                        x*2.0-1.0,
+                        y*2.0-1.0,
+                        z*2.0-1.0,
+                        1.0
+                    );
+                    vec4.transformMat4(clipSpacePos, clipSpacePos, inverse);
+                    corners.push(vec3.fromValues(
+                        clipSpacePos[0] / clipSpacePos[3],
+                        clipSpacePos[1] / clipSpacePos[3],
+                        clipSpacePos[2] / clipSpacePos[3]
+                    ));
+                }
+            }
+        }
+
+        return corners;
+    }
 
     /**
      * Return a vector point on a position of a sphere

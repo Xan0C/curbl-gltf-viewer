@@ -15,12 +15,14 @@ import {Model} from "../model/model";
 import {PrePass} from "../systems/rendering/PrePass";
 import {GUISystem} from "../systems/gui/GUISystem";
 import {LookAtCameraControlSystem} from "../systems/camera/LookAtCameraControlSystem";
-import {CameraSystem} from "../systems/camera/CameraSystem";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {vec4} from "gl-matrix";
 import {AnimationSystem} from "../systems/animation/AnimationSystem";
 import {WorldSystem} from "../systems/world/worldSystem";
+import {BBoxShader} from "../shader/BBoxShader";
+import {CameraSystem} from "../systems/camera";
 import {ForwardShadingSystem, SkyboxPass} from "../systems/rendering";
+import {DebugBVHThreePass} from "../systems/rendering/DebugBVHThreePass";
 
 export class Viewer {
     private _cache:Cache;
@@ -29,6 +31,7 @@ export class Viewer {
     private _gl: WebGL2RenderingContext;
     private _shader: KhronosPbrShader;
     private _skyboxShader: SkyboxShader;
+    private _bboxShader: BBoxShader;
     private _world: WorldSystem;
 
     constructor(config:{width: number, height:number}={width:1280, height: 720}) {
@@ -65,6 +68,7 @@ export class Viewer {
         //Create shader
         this._shader = new KhronosPbrShader(this._gl, this._cache);
         this._skyboxShader = new SkyboxShader(this._gl, this._cache);
+        this._bboxShader = new BBoxShader(this._gl);
         //Load shader
         this._loader.get(GLSLLoader).add(
             "shader",
@@ -77,6 +81,12 @@ export class Viewer {
             "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-vert.glsl",
             "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-frag.glsl",
             this._skyboxShader
+        );
+        this._loader.get(GLSLLoader).add(
+            "bboxShader",
+            "/assets/shader/bbox-vert.glsl",
+            "/assets/shader/bbox-frag.glsl",
+            this._bboxShader
         );
 
         this.load(onLoaded);
@@ -108,6 +118,7 @@ export class Viewer {
         ECS.addSystem(new AnimationSystem(this._cache));
         ECS.addSystem(new PrePass(this._gl));
         ECS.addSystem(new ForwardShadingSystem({gl: this._gl, cache: this._cache, shader: this._shader}));
+        ECS.addSystem(new DebugBVHThreePass({gl: this._gl, cache: this._cache, shader: this._bboxShader}));
         ECS.addSystem(new SkyboxPass({gl: this._gl, cache: this._cache, shader: this._skyboxShader}));
     }
 
@@ -115,6 +126,7 @@ export class Viewer {
         this._loader.load(()=>{
             this._shader.upload();
             this._skyboxShader.upload();
+            this._bboxShader.upload();
             this.createSystems();
             onLoaded();
             this.update(0);

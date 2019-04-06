@@ -1,6 +1,6 @@
 import {Attributes, GL_PRIMITIVES, GLVertexArrayObject} from "../../gl";
 import {Accessor, ACCESSOR_TYPE} from "../data/accessor";
-import {BoundingBox} from "./boundingBox";
+import {BoundingBox} from "../bvh/boundingBox";
 import {vec3} from "gl-matrix";
 import GLAttribute = Attributes.GLAttribute;
 
@@ -17,6 +17,7 @@ export class Primitive {
     private _material:string;
     private _vertexArrayObject:GLVertexArrayObject;
     private _boundingBox: BoundingBox;
+    public drawing: boolean = true;
 
     constructor(){
         this._attributes = Object.create(null);
@@ -29,7 +30,7 @@ export class Primitive {
         this.initVertexArrayObject(gl);
     }
 
-    initBoundingBox(): BoundingBox {
+    private initBoundingBox(): BoundingBox {
         const position = this._attributes[GL_PRIMITIVES.POSITION];
         if(position && position.type === ACCESSOR_TYPE.VEC3) {
             if(position.max && position.min) {
@@ -89,7 +90,7 @@ export class Primitive {
      * @param {number} offset
      */
     draw(mode:number=this._draw_mode, size:number=this._indices.count, type:number=this._indices.componentType, offset:number=this._indices.byteOffset+this._indices.bufferView.bufferOffset):void{
-        if(this._vertexArrayObject) {
+        if(this._vertexArrayObject && this.drawing) {
             this._vertexArrayObject.bind();
             this._vertexArrayObject.draw(mode, size, type, offset);
             this._vertexArrayObject.unbind();
@@ -137,11 +138,7 @@ export class Primitive {
     }
 
     get boundingBox(): BoundingBox {
-        return this._boundingBox;
-    }
-
-    set boundingBox(value: BoundingBox) {
-        this._boundingBox = value;
+        return this._boundingBox || this.initBoundingBox();
     }
 
     get vertexArrayObject(): GLVertexArrayObject {

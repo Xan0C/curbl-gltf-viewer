@@ -16,6 +16,7 @@ export class LookAtCameraComponent implements IComponent{
     protected _panning:vec3;
     protected _zooming:vec3;
     protected _zoomPos:number;
+    private _position:vec3;
 
     constructor(config?:LookAtCameraConfig){
         this.init(config);
@@ -76,5 +77,13 @@ export class LookAtCameraComponent implements IComponent{
 
     public set zoomPos(value:number) {
         this._zoomPos = value;
+    }
+
+    get position(): vec3 {
+        return this._position;
+    }
+
+    set position(value: vec3) {
+        this._position = value;
     }
 }

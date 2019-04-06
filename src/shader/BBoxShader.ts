@@ -1,7 +1,6 @@
-import {Mesh, Shader} from "../model";
+import {Shader} from "../model";
 import {UBO_BINDINGS} from "../viewer";
-import {BoundingBox} from "../model/mesh/boundingBox";
-import {mat4} from "gl-matrix";
+import {mat4, vec3} from "gl-matrix";
 
 export class BBoxShader extends Shader {
 
@@ -9,10 +8,9 @@ export class BBoxShader extends Shader {
         super(gl);
     }
 
-    apply(mesh:Mesh, bbox:BoundingBox):void {
-        const model = mat4.create();
-        mat4.multiply(model, mesh.transform.modelMatrix, bbox.transform);
-        this.uniforms.u_ModelMatrix = model;
+    apply(modelMatrix: mat4,  color?: vec3):void {
+        this.uniforms.u_ModelMatrix = modelMatrix;
+        this.uniforms.u_Color = color || vec3.fromValues(0,0,1);
         this.applyCamera();
     }
 
