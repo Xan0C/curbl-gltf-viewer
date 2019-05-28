@@ -12,10 +12,6 @@ export abstract class WorldScene {
      * Each Scene needs a unique name
      */
     private readonly _name:string;
-    /**
-     * destroy all entities on tearDown {default: false}
-     */
-    private _destroyOnTearDown:boolean;
 
     /**
      * if systems is active and should be updated
@@ -29,7 +25,6 @@ export abstract class WorldScene {
 
     constructor(config:SceneConfig){
         this.entities = {};
-        this._destroyOnTearDown = config.destroyOnTearDown||false;
         this._name = config.name;
     }
 
@@ -55,16 +50,9 @@ export abstract class WorldScene {
     tearDown():void {
         this.shutdown();
         this._active = false;
-        if(this._destroyOnTearDown) {
-            const keys = Object.keys(this.entities);
-            for(let i=0, entity:IEntity; entity = this.entities[keys[i]]; i++){
-                ECS.destroyEntity(entity);
-            }
-        }else{
-            const keys = Object.keys(this.entities);
-            for(let i=0, entity:IEntity; entity = this.entities[keys[i]]; i++){
-                ECS.removeEntity(entity);
-            }
+        const keys = Object.keys(this.entities);
+        for(let i=0, entity:IEntity; entity = this.entities[keys[i]]; i++){
+            ECS.removeEntity(entity);
         }
     }
 
@@ -96,14 +84,6 @@ export abstract class WorldScene {
     }
 
     /**
-     * Destroy entity, removes it from the scene and ecs and removes all components
-     */
-    destroy(entity:IEntity):boolean {
-        delete this.entities[entity.id];
-        return ECS.destroyEntity(entity);
-    }
-
-    /**
      * called once the scene starts
      */
     abstract preload():void;
@@ -128,14 +108,6 @@ export abstract class WorldScene {
 
     get name(): string {
         return this._name;
-    }
-
-    get destroyOnTearDown(): boolean {
-        return this._destroyOnTearDown;
-    }
-
-    set destroyOnTearDown(value: boolean) {
-        this._destroyOnTearDown = value;
     }
 
     get active(): boolean {
