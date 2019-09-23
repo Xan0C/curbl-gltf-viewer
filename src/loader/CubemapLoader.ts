@@ -1,7 +1,7 @@
 import {LOAD_TYPE, Middleware, Resource} from "curbl-loader";
-import {GLCubemap} from "../gl/GLCubemap";
-import {MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "../gl/constants";
-import {GLTexture} from "../gl";
+import {GLCubemap} from "curbl-gl-util";
+import {MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "curbl-gl-util";
+import {GLTexture} from "curbl-gl-util";
 import {TextureLoaderConfig} from "./TextureLoader";
 import {CACHE_TYPE} from "../cache";
 

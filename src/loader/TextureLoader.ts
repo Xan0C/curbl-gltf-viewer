@@ -1,5 +1,5 @@
 import {LOAD_TYPE, Middleware, Resource} from "curbl-loader";
-import {GLTexture, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "../gl";
+import {GLTexture, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "curbl-gl-util";
 import {CACHE_TYPE} from "../cache";
 
 export type TextureLoaderConfig = {

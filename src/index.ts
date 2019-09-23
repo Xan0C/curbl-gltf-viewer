@@ -6,7 +6,6 @@ export * from "./cache/index";
 export * from "./canvas/index";
 export * from "./components/index";
 export * from "./events/index";
-export * from "./gl/index";
 export * from "./gltf/index";
 export * from "./loader/index";
 export * from "./material/index";

@@ -1,5 +1,5 @@
 import {Shader} from "../scene/shader";
-import {GLTexture} from "../gl";
+import {GLTexture} from "curbl-gl-util";
 import {Cache, CACHE_TYPE} from "../cache";
 import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 

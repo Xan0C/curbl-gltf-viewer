@@ -1,5 +1,4 @@
-import {GL_BUFFERS} from "../../gl/constants";
-import {GLBuffer} from "../../gl";
+import {GL_BUFFERS, GLBuffer} from "curbl-gl-util";
 
 /**
  * Describes which buffer to create for the GPU

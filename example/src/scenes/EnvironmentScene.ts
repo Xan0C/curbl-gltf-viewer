@@ -2,16 +2,12 @@ import {
     WorldScene,
     CubemapLoader,
     GLOBAL_TEXTURES,
-    GL_INTERNALFORMAT,
-    GL_TYPES,
-    MAG_FILTER,
-    MIN_FILTER,
-    TEXTURE_WRAP,
     LightComponent,
     GUIComponent,
     TextureLoader
 } from "../../../lib";
 import {ECS} from "curbl-ecs";
+import {GL_INTERNALFORMAT, GL_TYPES, MAG_FILTER, MIN_FILTER, TEXTURE_WRAP} from "curbl-gl-util";
 
 export class EnvironmentScene extends WorldScene {
     preload(): void {

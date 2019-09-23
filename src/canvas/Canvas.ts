@@ -1,4 +1,5 @@
-import {WebGLUtils} from "../gl/gl_util";
+import { WebGLUtil } from "curbl-gl-util";
+
 
 export class Canvas {
     private readonly _defaultWidth:number;
@@ -29,7 +30,7 @@ export class Canvas {
 
     public get context():WebGL2RenderingContext{
         if(!this._context) {
-            this._context = WebGLUtils.setupWebGL(this._element,{ antialias: true, stencil: true, alpha: false} ) as WebGL2RenderingContext;
+            this._context = WebGLUtil.setupWebGL(this._element,{ antialias: true, stencil: true, alpha: false} ) as WebGL2RenderingContext;
         }
         return this._context;
     }

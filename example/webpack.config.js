@@ -27,6 +27,11 @@ module.exports = {
     module: {
         rules: [
             {
+                test:  /\.worker\.(ts|js)x?$/,
+                loader: 'worker-loader',
+                options: { publicPath: '/dist/' }
+            },
+            {
                 test: /\.(ts|js)x?$/,
                 loader: 'babel-loader'
             },

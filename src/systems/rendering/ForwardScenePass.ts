@@ -2,7 +2,7 @@ import {ECS, IEntity, System} from "curbl-ecs";
 import {SceneComponent} from "../../components";
 import {Cache, CACHE_TYPE} from "../../cache";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
-import {GL_PRIMITIVES} from "../../gl/constants";
+import {GL_PRIMITIVES} from "curbl-gl-util";
 import {Scene, Shader} from "../../scene";
 
 

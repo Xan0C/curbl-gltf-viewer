@@ -4,7 +4,7 @@ import {CubemapLoader} from "../loader/CubemapLoader";
 import {TextureLoader} from "../loader/TextureLoader";
 import {GLTFLoader} from "../loader/GLTFLoader";
 import {BaseCache, Cache, CACHE_TYPE} from "../cache";
-import {GLTexture} from "../gl";
+import {GLTexture} from "curbl-gl-util";
 import {Animation, Mesh} from "../scene";
 import {Material, MATERIAL_MAPS, Materialmap} from "../material";
 import {ECS} from "curbl-ecs";

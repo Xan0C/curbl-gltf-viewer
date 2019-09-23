@@ -1,4 +1,4 @@
-import {GL_TYPES} from "../../gl/constants";
+import {GL_TYPES} from "curbl-gl-util";
 import {ACCESSOR_TYPE} from "../../scene/data";
 
 export interface IGLTF_Accessor {

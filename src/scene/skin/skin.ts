@@ -1,6 +1,6 @@
 import {SceneNode} from "../sceneNode";
 import {mat4} from "gl-matrix";
-import {GLUniformBufferObject} from "../../gl/GLUniformBufferObject";
+import {GLUniformBufferObject} from "curbl-gl-util";
 import {UBO_BINDINGS} from "../../viewer/constants";
 
 const NUM_MAX_JOINTS = 65;

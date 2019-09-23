@@ -1,11 +1,10 @@
 import {BufferView} from "./data";
 import {Primitive} from "./primitive";
-import {Attributes, GL_BUFFERS, GL_PRIMITIVES, GLBuffer} from "../gl";
+import {GL_BUFFERS, GL_PRIMITIVES, GLAttribute, GLBuffer} from "curbl-gl-util";
 import {Material, MATERIAL_MAPS} from "../material";
 import {Cache, CACHE_TYPE} from "../cache";
 import {Shader} from "./shader";
 import {Accessor} from "./data/accessor";
-import GLAttribute = Attributes.GLAttribute;
 
 export class Mesh {
     //TODO still not sure if keeping bufferViews on mesh level or on primitive level
@@ -99,7 +98,7 @@ export class Mesh {
      * @param {Shader} shader
      * @param {Attributes.GLAttribute} glAttribute
      */
-    addAttribute(key:GL_PRIMITIVES, glAttribute:GLAttribute):void{
+    addAttribute(key:GL_PRIMITIVES, glAttribute: GLAttribute):void{
         for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
             const attribute:Accessor = primitive.attributes[key];
             if(attribute !== null && attribute !== undefined) {
