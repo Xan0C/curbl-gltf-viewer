@@ -1,7 +1,7 @@
-import {Materialmap} from "./materialmap";
+import { Materialmap } from './materialmap';
 
 export enum MATERIAL_TYPES {
-    PBR
+    PBR,
 }
 
 export enum MATERIAL_MAPS {
@@ -9,13 +9,13 @@ export enum MATERIAL_MAPS {
     NORMAL,
     OCCLUSION,
     EMISSIVE,
-    METAL_ROUGHNESS
+    METAL_ROUGHNESS,
 }
 
 export enum ALPHA_MODE {
-    OPAQUE = "OPAQUE",
-    MASK = "MASK",
-    BLEND = "BLEND"
+    OPAQUE = 'OPAQUE',
+    MASK = 'MASK',
+    BLEND = 'BLEND',
 }
 
 export class Material<T = any> {
@@ -24,28 +24,28 @@ export class Material<T = any> {
      * default PBR
      * @property
      */
-    private _type:MATERIAL_TYPES;
+    private _type: MATERIAL_TYPES;
     /**
      * name of the material
      * @property
      */
-    protected _name:string;
+    protected _name: string;
     /**
      * List of maps for this material
      * @property
      */
-    protected _maps:Array<Materialmap>;
+    protected _maps: Array<Materialmap>;
     /**
      * Modeldata for the type of this Material e.g. MetallicRoughness,SpecularGlossiness data
      * @property
      */
-    protected _model:T;
+    protected _model: T;
 
-    private _alphaMode:ALPHA_MODE;
-    private _alphaCutoff:number;
-    private _doubleSided:boolean;
+    private _alphaMode: ALPHA_MODE;
+    private _alphaCutoff: number;
+    private _doubleSided: boolean;
 
-    constructor(name:string,model?:T){
+    constructor(name: string, model?: T) {
         this._type = MATERIAL_TYPES.PBR;
         this.name = name;
         this._maps = [];
@@ -55,7 +55,7 @@ export class Material<T = any> {
         this._doubleSided = false;
     }
 
-    hasMap(key:MATERIAL_MAPS):boolean {
+    hasMap(key: MATERIAL_MAPS): boolean {
         return !!this._maps[key];
     }
 
@@ -67,19 +67,19 @@ export class Material<T = any> {
         this._name = value;
     }
 
-    public get maps():Array<Materialmap> {
+    public get maps(): Array<Materialmap> {
         return this._maps;
     }
 
-    public set maps(value:Array<Materialmap>) {
+    public set maps(value: Array<Materialmap>) {
         this._maps = value;
     }
 
-    public get model():T {
+    public get model(): T {
         return this._model;
     }
 
-    public set model(value:T) {
+    public set model(value: T) {
         this._model = value;
     }
 

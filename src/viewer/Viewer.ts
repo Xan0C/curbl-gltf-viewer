@@ -1,45 +1,45 @@
-import {Canvas} from "../canvas/Canvas";
-import {MiddlewareData, ResourceLoader} from "@curbl/loader";
-import {CubemapLoader} from "../loader/CubemapLoader";
-import {TextureLoader} from "../loader/TextureLoader";
-import {GLTFLoader} from "../loader/GLTFLoader";
-import {BaseCache, Cache, CACHE_TYPE} from "../cache";
-import {GLTexture} from "@curbl/gl-util";
-import {Animation, Mesh} from "../scene";
-import {Material, MATERIAL_MAPS, Materialmap} from "../material";
-import {ECS} from "@curbl/ecs";
-import {GLSLLoader} from "../loader/GLSLLoader";
-import {KhronosPbrShader} from "../shader/khronosPbrShader";
-import {SkyboxShader} from "../shader/SkyboxShader";
-import {Scene} from "../scene/scene";
-import {SkyboxPass} from "../systems/rendering/SkyboxPass";
-import {ForwardShadingSystem} from "../systems/rendering/ForwardShadingSystem";
-import {PrePass} from "../systems/rendering/PrePass";
-import {GUISystem} from "../systems/gui/GUISystem";
-import {LookAtCameraControlSystem} from "../systems/camera/LookAtCameraControlSystem";
-import {CameraSystem} from "../systems/camera/CameraSystem";
-import {MetallicRoughness} from "../material/metallicRoughness";
-import {vec4} from "gl-matrix";
-import {AnimationSystem} from "../systems/animation/AnimationSystem";
-import {WorldSystem} from "../systems/world/worldSystem";
+import { Canvas } from '../canvas/Canvas';
+import { MiddlewareData, ResourceLoader } from '@curbl/loader';
+import { CubemapLoader } from '../loader/CubemapLoader';
+import { TextureLoader } from '../loader/TextureLoader';
+import { GLTFLoader } from '../loader/GLTFLoader';
+import { BaseCache, Cache, CACHE_TYPE } from '../cache';
+import { GLTexture } from '@curbl/gl-util';
+import { Animation, Mesh } from '../scene';
+import { Material, MATERIAL_MAPS, Materialmap } from '../material';
+import { ECS } from '@curbl/ecs';
+import { GLSLLoader } from '../loader/GLSLLoader';
+import { KhronosPbrShader } from '../shader/khronosPbrShader';
+import { SkyboxShader } from '../shader/SkyboxShader';
+import { Scene } from '../scene/scene';
+import { SkyboxPass } from '../systems/rendering/SkyboxPass';
+import { ForwardShadingSystem } from '../systems/rendering/ForwardShadingSystem';
+import { PrePass } from '../systems/rendering/PrePass';
+import { GUISystem } from '../systems/gui/GUISystem';
+import { LookAtCameraControlSystem } from '../systems/camera/LookAtCameraControlSystem';
+import { CameraSystem } from '../systems/camera/CameraSystem';
+import { MetallicRoughness } from '../material/metallicRoughness';
+import { vec4 } from 'gl-matrix';
+import { AnimationSystem } from '../systems/animation/AnimationSystem';
+import { WorldSystem } from '../systems/world/worldSystem';
 
 export class Viewer {
-    private _cache:Cache;
-    private _canvas:Canvas;
+    private _cache: Cache;
+    private _canvas: Canvas;
     private _loader: ResourceLoader;
     private _gl: WebGL2RenderingContext;
     private _shader: KhronosPbrShader;
     private _skyboxShader: SkyboxShader;
     private _world: WorldSystem;
 
-    constructor(config:{width: number, height:number}={width:1280, height: 720}) {
-        this._canvas = new Canvas({width:config.width, height: config.height});
+    constructor(config: { width: number; height: number } = { width: 1280, height: 720 }) {
+        this._canvas = new Canvas({ width: config.width, height: config.height });
         this._loader = new ResourceLoader();
         this._cache = new Cache();
     }
 
-    init(onLoaded:()=>void) {
-        this._canvas.appendCanvas("root");
+    init(onLoaded: () => void) {
+        this._canvas.appendCanvas('root');
         const gl = this._canvas.context;
         this._gl = gl;
 
@@ -57,8 +57,8 @@ export class Viewer {
         this._loader.addMiddleware(new GLSLLoader(gl), GLSLLoader);
 
         //Cache them all
-        this._loader.onLoadComplete.on((data:MiddlewareData<any>) => {
-            this._cache.add(data.type as number,data.key,data.data);
+        this._loader.onLoadComplete.on((data: MiddlewareData<any>) => {
+            this._cache.add(data.type as number, data.key, data.data);
         });
 
         this.defaultMaterial();
@@ -66,25 +66,29 @@ export class Viewer {
         this._shader = new KhronosPbrShader(this._gl, this._cache);
         this._skyboxShader = new SkyboxShader(this._gl, this._cache);
         //Load shader
-        this._loader.get(GLSLLoader).add(
-            "shader",
-            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-vert.glsl",
-            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-frag.glsl",
-            this._shader
-        );
-        this._loader.get(GLSLLoader).add(
-            "skyboxShader",
-            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-vert.glsl",
-            "https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-frag.glsl",
-            this._skyboxShader
-        );
+        this._loader
+            .get(GLSLLoader)
+            .add(
+                'shader',
+                'https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-vert.glsl',
+                'https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/pbr-frag.glsl',
+                this._shader
+            );
+        this._loader
+            .get(GLSLLoader)
+            .add(
+                'skyboxShader',
+                'https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-vert.glsl',
+                'https://raw.githubusercontent.com/Xan0C/curbl-gltf-viewer/master/assets/shader/skybox-frag.glsl',
+                this._skyboxShader
+            );
 
         this.load(onLoaded);
     }
 
     private defaultMaterial() {
         const gl = this._gl;
-        const texture = GLTexture.fromData(gl,new Uint8Array([128, 128, 128, 255]) as any,1,1,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE);
+        const texture = GLTexture.fromData(gl, new Uint8Array([128, 128, 128, 255]) as any, 1, 1, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE);
         texture.enableNearestScaling();
         texture.enableWrapClamp();
 
@@ -101,18 +105,18 @@ export class Viewer {
     private createSystems() {
         //Create Systems
         ECS.systemUpdateMethods = ['update', 'render'];
-        this._world = ECS.addSystem(new WorldSystem({loader: this._loader, cache: this._cache}));
-        ECS.addSystem(new CameraSystem({gl: this._gl}));
+        this._world = ECS.addSystem(new WorldSystem({ loader: this._loader, cache: this._cache }));
+        ECS.addSystem(new CameraSystem({ gl: this._gl }));
         ECS.addSystem(new LookAtCameraControlSystem(this._canvas));
         ECS.addSystem(new GUISystem());
         ECS.addSystem(new AnimationSystem(this._cache));
         ECS.addSystem(new PrePass(this._gl));
-        ECS.addSystem(new ForwardShadingSystem({gl: this._gl, cache: this._cache, shader: this._shader}));
-        ECS.addSystem(new SkyboxPass({gl: this._gl, cache: this._cache, shader: this._skyboxShader}));
+        ECS.addSystem(new ForwardShadingSystem({ gl: this._gl, cache: this._cache, shader: this._shader }));
+        ECS.addSystem(new SkyboxPass({ gl: this._gl, cache: this._cache, shader: this._skyboxShader }));
     }
 
-    private load(onLoaded:()=>void) {
-        this._loader.load(()=>{
+    private load(onLoaded: () => void) {
+        this._loader.load(() => {
             this._shader.upload();
             this._skyboxShader.upload();
             this.createSystems();
@@ -121,9 +125,11 @@ export class Viewer {
         });
     }
 
-    private update(t:number){
+    private update(t: number) {
         ECS.update(t);
-        requestAnimationFrame((t)=>{this.update(t)});
+        requestAnimationFrame(t => {
+            this.update(t);
+        });
     }
 
     get cache(): Cache {

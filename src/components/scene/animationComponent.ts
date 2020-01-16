@@ -1,24 +1,23 @@
-import {ECS, Component} from "@curbl/ecs";
-import {SceneComponentConfig} from "./sceneComponent";
+import { ECS, Component } from '@curbl/ecs';
+import { SceneComponentConfig } from './sceneComponent';
 
 @ECS.Component()
 export class AnimationComponent implements Component {
+    private _key: string;
 
-    private _key:string;
-
-    private _startTime:number;
+    private _startTime: number;
     private _pauseStart: number;
-    private _pauseEnd:number;
-    private _running:boolean;
-    private _paused:boolean;
-    private _loop:boolean;
-    private _autoStart:boolean;
+    private _pauseEnd: number;
+    private _running: boolean;
+    private _paused: boolean;
+    private _loop: boolean;
+    private _autoStart: boolean;
 
-    constructor(config:{key:string}){
+    constructor(config: { key: string }) {
         this.init(config);
     }
 
-    init(config:SceneComponentConfig){
+    init(config: SceneComponentConfig) {
         this._key = config.key;
         this._running = false;
         this._paused = false;
@@ -29,8 +28,7 @@ export class AnimationComponent implements Component {
         this._loop = true;
     }
 
-    remove():void {
-    }
+    remove(): void {}
 
     start() {
         this._running = true;
@@ -66,12 +64,12 @@ export class AnimationComponent implements Component {
     }
 
     set paused(value: boolean) {
-        if(this._paused === value){
+        if (this._paused === value) {
             return;
         }
-        if(value === true) {
+        if (value === true) {
             this._pauseStart = performance.now();
-        }else{
+        } else {
             this._pauseEnd = performance.now();
         }
         this._paused = value;

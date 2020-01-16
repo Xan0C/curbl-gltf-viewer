@@ -1,15 +1,13 @@
-import {Mesh, Primitive} from "../scene";
-import {IGLTF_Accessor, IGLTF_Primitive} from "./model";
-import {GLTFModel} from "./GLTFModel";
-import {IBaseCache} from "../cache/caches";
-import {CACHE_TYPE} from "../cache";
-
+import { Mesh, Primitive } from '../scene';
+import { IGLTF_Accessor, IGLTF_Primitive } from './model';
+import { GLTFModel } from './GLTFModel';
+import { IBaseCache } from '../cache/caches';
+import { CACHE_TYPE } from '../cache';
 
 export class GLTFMeshProcessor {
-
     private model: GLTFModel;
-    private _meshes:Array<Mesh>;
-    private cache:IBaseCache<Mesh>;
+    private _meshes: Array<Mesh>;
+    private cache: IBaseCache<Mesh>;
 
     constructor(model: GLTFModel) {
         this.model = model;
@@ -17,16 +15,16 @@ export class GLTFMeshProcessor {
         this.cache = this.model.cache.getCache(CACHE_TYPE.MESH);
     }
 
-    processMesh(idx:number): Mesh {
-        if(this._meshes[idx]) {
+    processMesh(idx: number): Mesh {
+        if (this._meshes[idx]) {
             return this._meshes[idx];
         }
 
         const sceneMesh = new Mesh();
         const mesh = this.model.gltf.meshes[idx];
-        sceneMesh.name = mesh.name||"mesh"+idx;
+        sceneMesh.name = mesh.name || 'mesh' + idx;
 
-        for(let i=0, primitive:IGLTF_Primitive; primitive = mesh.primitives[i]; i++){
+        for (let i = 0, primitive: IGLTF_Primitive; (primitive = mesh.primitives[i]); i++) {
             sceneMesh.addPrimitive(this.parsePrimitives(sceneMesh, primitive));
         }
 
@@ -39,26 +37,26 @@ export class GLTFMeshProcessor {
      * creates a new mesh/GLTF_Primitive for the gltf
      * @param {IGLTF_Primitive} gltfPrimitive
      */
-    private parsePrimitives(mesh: Mesh, gltfPrimitive:IGLTF_Primitive):Primitive{
+    private parsePrimitives(mesh: Mesh, gltfPrimitive: IGLTF_Primitive): Primitive {
         const gltf = this.model.gltf;
         const primitive = new Primitive();
         //Add attributes to mesh
-        for(let id in gltfPrimitive.attributes){
+        for (const id in gltfPrimitive.attributes) {
             //Create BufferView for each Accessor/GLBuffer for Position,Normal,tex,tangent etc. and map the accessor bufferViewIdx new
             const accessor = gltf.accessors[gltfPrimitive.attributes[id]];
             this.addAttribute(primitive, id, accessor);
             mesh.addBufferView(accessor.bufferView, this.model.getBufferView(accessor.bufferView));
         }
         //Set indices for indexBuffer
-        if(gltfPrimitive.indices !== undefined && gltfPrimitive.indices !== null) {
+        if (gltfPrimitive.indices !== undefined && gltfPrimitive.indices !== null) {
             //Create BufferView for each IndexBuffer and map the accessor bufferViewIdx new
             const accessor = gltf.accessors[gltfPrimitive.indices];
             this.setIndices(primitive, accessor);
             mesh.addBufferView(accessor.bufferView, this.model.getBufferView(accessor.bufferView, true));
         }
-        primitive.draw_mode = gltfPrimitive.mode||4; //Default GL_TRIANGLE
+        primitive.draw_mode = gltfPrimitive.mode || 4; //Default GL_TRIANGLE
         //Set the Material name for the mesh
-        this.setMeshMaterial(primitive,gltfPrimitive.material);
+        this.setMeshMaterial(primitive, gltfPrimitive.material);
 
         //TODO: morph targets primitive.targets
         return primitive;
@@ -71,7 +69,7 @@ export class GLTFMeshProcessor {
      * @param {string} id
      * @param {IGLTF_Accessor} accessor
      */
-    private addAttribute(primitive:Primitive, id:string, accessor:IGLTF_Accessor):void {
+    private addAttribute(primitive: Primitive, id: string, accessor: IGLTF_Accessor): void {
         const gltf = this.model.gltf;
         const view = gltf.bufferViews[accessor.bufferView];
 
@@ -80,7 +78,7 @@ export class GLTFMeshProcessor {
             accessor.type,
             accessor.componentType,
             accessor.normalized,
-            view.byteStride||0,
+            view.byteStride || 0,
             accessor.byteOffset,
             accessor.bufferView,
             accessor.min,
@@ -94,8 +92,8 @@ export class GLTFMeshProcessor {
      * @param {Primitive} mesh
      * @param {number} materialIdx
      */
-    private setMeshMaterial(mesh:Primitive,materialIdx?:number):void {
-        if(materialIdx === undefined || materialIdx === null){
+    private setMeshMaterial(mesh: Primitive, materialIdx?: number): void {
+        if (materialIdx === undefined || materialIdx === null) {
             mesh.material = '__default__';
             return;
         }
@@ -107,8 +105,8 @@ export class GLTFMeshProcessor {
      * @param {Primitive} primitive
      * @param {IGLTF_Accessor} indices
      */
-    private setIndices(primitive:Primitive, indices:IGLTF_Accessor):void{
-        primitive.setIndices(indices.count, indices.componentType, indices.byteOffset||0, indices.bufferView);
+    private setIndices(primitive: Primitive, indices: IGLTF_Accessor): void {
+        primitive.setIndices(indices.count, indices.componentType, indices.byteOffset || 0, indices.bufferView);
     }
 
     get meshes(): Array<Mesh> {

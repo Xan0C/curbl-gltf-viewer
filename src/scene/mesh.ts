@@ -1,18 +1,18 @@
-import {BufferView} from "./data";
-import {Primitive} from "./primitive";
-import {GL_BUFFERS, GL_PRIMITIVES, GLAttribute, GLBuffer} from "@curbl/gl-util";
-import {Material, MATERIAL_MAPS} from "../material";
-import {Cache, CACHE_TYPE} from "../cache";
-import {Shader} from "./shader";
-import {Accessor} from "./data/accessor";
+import { BufferView } from './data';
+import { Primitive } from './primitive';
+import { GL_BUFFERS, GL_PRIMITIVES, GLAttribute, GLBuffer } from '@curbl/gl-util';
+import { Material, MATERIAL_MAPS } from '../material';
+import { Cache, CACHE_TYPE } from '../cache';
+import { Shader } from './shader';
+import { Accessor } from './data/accessor';
 
 export class Mesh {
     //TODO still not sure if keeping bufferViews on mesh level or on primitive level
-    private _bufferViews:{[idx:number]:BufferView};
-    private _primitives:Array<Primitive>;
-    private _name:string;
+    private _bufferViews: { [idx: number]: BufferView };
+    private _primitives: Array<Primitive>;
+    private _name: string;
 
-    constructor(){
+    constructor() {
         this._primitives = [];
         this._bufferViews = Object.create(null);
     }
@@ -25,21 +25,21 @@ export class Mesh {
      * @param {GLBuffer} indexBuffer - use existing IndexBuffer and add the gltf indices into it
      * @returns {Mesh}
      */
-    public init(gl:WebGL2RenderingContext,vertexBuffer?:GLBuffer,indexBuffer?:GLBuffer):Mesh {
-        this.initBuffers(gl,vertexBuffer,indexBuffer);
+    public init(gl: WebGL2RenderingContext, vertexBuffer?: GLBuffer, indexBuffer?: GLBuffer): Mesh {
+        this.initBuffers(gl, vertexBuffer, indexBuffer);
         this.setIndexBuffers(gl);
         return this;
     }
 
-    private initBuffers(gl: WebGL2RenderingContext, vertexBuffer?:GLBuffer, indexBuffer?:GLBuffer) {
+    private initBuffers(gl: WebGL2RenderingContext, vertexBuffer?: GLBuffer, indexBuffer?: GLBuffer) {
         const keys = Object.keys(this._bufferViews);
-        for(let i=0, view:BufferView; view = this._bufferViews[keys[i]]; i++) {
-            if(view.buffer === null || view.buffer === undefined){
-                let buffer:GLBuffer;
-                if(view.target === GL_BUFFERS.ARRAY_BUFFER){
-                    buffer = vertexBuffer||GLBuffer.create(gl,view.target,null,view.drawType);
-                }else{
-                    buffer = indexBuffer||GLBuffer.create(gl,view.target,null,view.drawType);
+        for (let i = 0, view: BufferView; (view = this._bufferViews[keys[i]]); i++) {
+            if (view.buffer === null || view.buffer === undefined) {
+                let buffer: GLBuffer;
+                if (view.target === GL_BUFFERS.ARRAY_BUFFER) {
+                    buffer = vertexBuffer || GLBuffer.create(gl, view.target, null, view.drawType);
+                } else {
+                    buffer = indexBuffer || GLBuffer.create(gl, view.target, null, view.drawType);
                 }
                 view.bufferOffset = buffer.byteLength;
                 buffer.addData(view.data);
@@ -52,9 +52,9 @@ export class Mesh {
      * Create all the VAO for the IndexBuffers
      * @param {WebGL2RenderingContext} gl
      */
-    private setIndexBuffers(gl:WebGL2RenderingContext):void{
-        for(let i=0,primitive:Primitive; primitive = this._primitives[i]; i++){
-            if(primitive.indices && primitive.indices.bufferView !== undefined && primitive.indices.bufferView !== null) {
+    private setIndexBuffers(gl: WebGL2RenderingContext): void {
+        for (let i = 0, primitive: Primitive; (primitive = this._primitives[i]); i++) {
+            if (primitive.indices && primitive.indices.bufferView !== undefined && primitive.indices.bufferView !== null) {
                 const view = this._bufferViews[primitive.indices.bufferView];
                 primitive.initVertexArrayObject(gl, view.buffer);
             }
@@ -66,11 +66,11 @@ export class Mesh {
      * Create the GPU_Buffers and upload this Mesh to the GPU
      * @returns {Mesh}
      */
-    public upload():Mesh {
+    public upload(): Mesh {
         const keys = Object.keys(this._bufferViews);
-        for(let i=0, view:BufferView; view = this._bufferViews[keys[i]]; i++){
-            if(!view.buffer) {
-                throw "Failed to upload buffer for bufferView, did you forget to initialize the buffer first?";
+        for (let i = 0, view: BufferView; (view = this._bufferViews[keys[i]]); i++) {
+            if (!view.buffer) {
+                throw 'Failed to upload buffer for bufferView, did you forget to initialize the buffer first?';
             }
             view.buffer.upload();
         }
@@ -82,9 +82,9 @@ export class Mesh {
      * @param {Shader} shader - Shader that should be used for all primitives/Materials
      * @param {Cache} cache - cache to get the materials
      */
-    public draw(shader: Shader, cache: Cache):void {
+    public draw(shader: Shader, cache: Cache): void {
         shader.applyMesh(this);
-        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
+        for (let i = 0, primitive: Primitive; (primitive = this._primitives[i]); i++) {
             const view = this._bufferViews[primitive.indices.bufferView];
             const offset = view.bufferOffset + primitive.indices.byteOffset;
             shader.applyMaterial(cache.get<Material>(CACHE_TYPE.MATERIAL, primitive.material));
@@ -98,14 +98,22 @@ export class Mesh {
      * @param {Shader} shader
      * @param {Attributes.GLAttribute} glAttribute
      */
-    addAttribute(key:GL_PRIMITIVES, glAttribute: GLAttribute):void{
-        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
-            const attribute:Accessor = primitive.attributes[key];
-            if(attribute !== null && attribute !== undefined) {
-                const view:BufferView = this._bufferViews[attribute.bufferView];
-                const buffer:GLBuffer = view.buffer;
+    addAttribute(key: GL_PRIMITIVES, glAttribute: GLAttribute): void {
+        for (let i = 0, primitive: Primitive; (primitive = this._primitives[i]); i++) {
+            const attribute: Accessor = primitive.attributes[key];
+            if (attribute !== null && attribute !== undefined) {
+                const view: BufferView = this._bufferViews[attribute.bufferView];
+                const buffer: GLBuffer = view.buffer;
                 const offset = view.bufferOffset + attribute.byteOffset;
-                primitive.vertexArrayObject.addAttribute(buffer, glAttribute, attribute.componentTypeCount, attribute.componentType, attribute.normalized, attribute.stride, offset);
+                primitive.vertexArrayObject.addAttribute(
+                    buffer,
+                    glAttribute,
+                    attribute.componentTypeCount,
+                    attribute.componentType,
+                    attribute.normalized,
+                    attribute.stride,
+                    offset
+                );
             }
         }
     }
@@ -114,11 +122,11 @@ export class Mesh {
      * check if any primitive in this mesh has the attribute
      * @param key - key of the attribute e.g. TANGENT,NORMAL, etc.
      */
-    hasAttribute(key:GL_PRIMITIVES|string):boolean {
-        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++){
-           if(primitive.hasAttribute(key)){
-               return true;
-           }
+    hasAttribute(key: GL_PRIMITIVES | string): boolean {
+        for (let i = 0, primitive: Primitive; (primitive = this._primitives[i]); i++) {
+            if (primitive.hasAttribute(key)) {
+                return true;
+            }
         }
         return false;
     }
@@ -128,29 +136,29 @@ export class Mesh {
      * @param cache - cache to get the material from
      * @param key - key of the map e.g ALBEDO, METALIC_ROUGHNESS etc.
      */
-    hasMap(cache:Cache,key:MATERIAL_MAPS): boolean {
-        for(let i=0, primitive:Primitive; primitive = this._primitives[i]; i++) {
+    hasMap(cache: Cache, key: MATERIAL_MAPS): boolean {
+        for (let i = 0, primitive: Primitive; (primitive = this._primitives[i]); i++) {
             const material = cache.get<Material>(CACHE_TYPE.MATERIAL, primitive.material);
-            if(material) {
+            if (material) {
                 return material.hasMap(key);
             }
         }
     }
 
-    public unload():void{
+    public unload(): void {
         //TODO: destroy data and each mesh vao
     }
 
-    public addPrimitive(mesh:Primitive):Primitive{
+    public addPrimitive(mesh: Primitive): Primitive {
         this._primitives.push(mesh);
         return mesh;
     }
 
-    public get primitives():Array<Primitive> {
+    public get primitives(): Array<Primitive> {
         return this._primitives;
     }
 
-    public set primitives(value:Array<Primitive>) {
+    public set primitives(value: Array<Primitive>) {
         this._primitives = value;
     }
 
@@ -162,7 +170,7 @@ export class Mesh {
         this._name = value;
     }
 
-    addBufferView(idx:number,bufferView:BufferView) {
+    addBufferView(idx: number, bufferView: BufferView) {
         this._bufferViews[idx] = bufferView;
     }
 }

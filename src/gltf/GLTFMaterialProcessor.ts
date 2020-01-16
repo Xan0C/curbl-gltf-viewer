@@ -1,23 +1,21 @@
-import {GLTFModel} from "./GLTFModel";
-import {ALPHA_MODE, Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap} from "../material";
-import {CACHE_TYPE, IBaseCache} from "../cache";
-import {MetallicRoughness} from "../material/metallicRoughness";
-import {IGLTF_Image, IGLTF_Material} from "./model";
-import {TextureLoader, TextureLoaderConfig} from "../loader/TextureLoader";
-import {TEXTURE_WRAP} from "@curbl/gl-util";
+import { GLTFModel } from './GLTFModel';
+import { ALPHA_MODE, Material, MATERIAL_MAPS, MATERIAL_TYPES, Materialmap } from '../material';
+import { CACHE_TYPE, IBaseCache } from '../cache';
+import { MetallicRoughness } from '../material/metallicRoughness';
+import { IGLTF_Image, IGLTF_Material } from './model';
+import { TextureLoader, TextureLoaderConfig } from '../loader/TextureLoader';
+import { TEXTURE_WRAP } from '@curbl/gl-util';
 
 export class GLTFMaterialProcessor {
-
     private model: GLTFModel;
     private materialCache: IBaseCache<Material>;
 
-    constructor(model:GLTFModel) {
+    constructor(model: GLTFModel) {
         this.model = model;
         this.materialCache = this.model.cache.getCache<Material>(CACHE_TYPE.MATERIAL);
     }
 
-
-    public processMaterial(materialIdx:number):Material {
+    public processMaterial(materialIdx: number): Material {
         const gltf = this.model.gltf;
         const gl = this.model.gl;
 
@@ -25,90 +23,86 @@ export class GLTFMaterialProcessor {
         const materialNode = gltf.materials[materialIdx];
 
         const cachedMat = this.materialCache.get(materialNode.name);
-        if(cachedMat) {
+        if (cachedMat) {
             return cachedMat;
         }
 
-        materialNode.name = materialNode.name||"material"+materialIdx;
+        materialNode.name = materialNode.name || 'material' + materialIdx;
 
-        let material:Material<MetallicRoughness>;
+        let material: Material<MetallicRoughness>;
 
-        if(materialNode.extensions && materialNode.extensions.KHR_materials_pbrSpecularGlossiness) {
-            throw "specular glossiness gltf is not supported";
+        if (materialNode.extensions && materialNode.extensions.KHR_materials_pbrSpecularGlossiness) {
+            throw 'specular glossiness gltf is not supported';
         } else {
             material = new Material<MetallicRoughness>(materialNode.name);
-            this.parsePBRMaterial(materialNode,material as Material<MetallicRoughness>);
+            this.parsePBRMaterial(materialNode, material as Material<MetallicRoughness>);
         }
 
-        if(materialNode.emissiveFactor){
+        if (materialNode.emissiveFactor) {
             material.model.emissiveFactor.set(materialNode.emissiveFactor);
         }
 
-        material.alphaMode = materialNode.alphaMode as ALPHA_MODE || ALPHA_MODE.OPAQUE;
+        material.alphaMode = (materialNode.alphaMode as ALPHA_MODE) || ALPHA_MODE.OPAQUE;
         material.alphaCutoff = materialNode.alphaCutoff || 0.5;
         material.doubleSided = !!materialNode.doubleSided;
 
-        if(materialNode.emissiveTexture){
-            this.parseTexture(material,materialNode.emissiveTexture.index,MATERIAL_MAPS.EMISSIVE,{
+        if (materialNode.emissiveTexture) {
+            this.parseTexture(material, materialNode.emissiveTexture.index, MATERIAL_MAPS.EMISSIVE, {
                 premultiplyAlpha: false,
                 internalFormat: gl.SRGB8_ALPHA8,
-                format:gl.RGBA,
-                type:gl.UNSIGNED_BYTE,
+                format: gl.RGBA,
+                type: gl.UNSIGNED_BYTE,
             });
         }
 
-        if(materialNode.normalTexture){
-            material.model.normalScale = materialNode.normalTexture.scale||1;
-            this.parseTexture(material,materialNode.normalTexture.index,MATERIAL_MAPS.NORMAL,{
+        if (materialNode.normalTexture) {
+            material.model.normalScale = materialNode.normalTexture.scale || 1;
+            this.parseTexture(material, materialNode.normalTexture.index, MATERIAL_MAPS.NORMAL, {
                 premultiplyAlpha: false,
                 internalFormat: gl.RGBA,
-                format:gl.RGBA,
-                type:gl.UNSIGNED_BYTE,
+                format: gl.RGBA,
+                type: gl.UNSIGNED_BYTE,
             });
         }
 
-        if(materialNode.occlusionTexture){
-            material.model.occlusionStrength = materialNode.occlusionTexture.strength||1;
-            this.parseTexture(material,materialNode.occlusionTexture.index,MATERIAL_MAPS.OCCLUSION,{
+        if (materialNode.occlusionTexture) {
+            material.model.occlusionStrength = materialNode.occlusionTexture.strength || 1;
+            this.parseTexture(material, materialNode.occlusionTexture.index, MATERIAL_MAPS.OCCLUSION, {
                 premultiplyAlpha: false,
                 internalFormat: gl.RGBA,
-                format:gl.RGBA,
-                type:gl.UNSIGNED_BYTE,
+                format: gl.RGBA,
+                type: gl.UNSIGNED_BYTE,
             });
         }
 
-        this.materialCache.add(material.name,material);
+        this.materialCache.add(material.name, material);
         return material;
     }
 
-    private parsePBRMaterial(materialNode:IGLTF_Material,material:Material<MetallicRoughness>):void{
+    private parsePBRMaterial(materialNode: IGLTF_Material, material: Material<MetallicRoughness>): void {
         const pbr = materialNode.pbrMetallicRoughness;
         material.type = MATERIAL_TYPES.PBR;
         const gl = this.model.gl;
 
-        if(!material.model){
+        if (!material.model) {
             material.model = new MetallicRoughness();
         }
 
-        if(pbr.baseColorFactor){
+        if (pbr.baseColorFactor) {
             material.model.baseColorFactor.set(pbr.baseColorFactor);
         }
 
-        if(pbr.metallicFactor !== null
-            && pbr.metallicFactor !== undefined)
-        {
+        if (pbr.metallicFactor !== null && pbr.metallicFactor !== undefined) {
             material.model.metallicFactor = pbr.metallicFactor;
         }
 
-        if(pbr.roughnessFactor !== null
-            && pbr.roughnessFactor !== undefined)
-        {
+        if (pbr.roughnessFactor !== null && pbr.roughnessFactor !== undefined) {
             material.model.roughnessFactor = pbr.roughnessFactor;
         }
 
         //AlbedoTexture
-        if(pbr.baseColorTexture !== undefined && pbr.baseColorTexture !== null) {
-            this.parseTexture(material,pbr.baseColorTexture.index,MATERIAL_MAPS.ALBEDO,{
+        if (pbr.baseColorTexture !== undefined && pbr.baseColorTexture !== null) {
+            this.parseTexture(material, pbr.baseColorTexture.index, MATERIAL_MAPS.ALBEDO, {
                 premultiplyAlpha: false,
                 internalFormat: gl.SRGB8_ALPHA8,
                 format: gl.RGBA,
@@ -117,8 +111,8 @@ export class GLTFMaterialProcessor {
         }
 
         //Metallic Roughness Texture
-        if(pbr.metallicRoughnessTexture !== undefined && pbr.metallicRoughnessTexture !== null) {
-            this.parseTexture(material,pbr.metallicRoughnessTexture.index,MATERIAL_MAPS.METAL_ROUGHNESS,{
+        if (pbr.metallicRoughnessTexture !== undefined && pbr.metallicRoughnessTexture !== null) {
+            this.parseTexture(material, pbr.metallicRoughnessTexture.index, MATERIAL_MAPS.METAL_ROUGHNESS, {
                 premultiplyAlpha: false,
                 internalFormat: gl.RGBA,
                 format: gl.RGBA,
@@ -134,29 +128,29 @@ export class GLTFMaterialProcessor {
      * @param {number} map
      * @param {TextureLoaderConfig} config
      */
-    private parseTexture(material:Material,index:number,map:number,config:TextureLoaderConfig):void{
-        if(index === null || index === undefined) {
+    private parseTexture(material: Material, index: number, map: number, config: TextureLoaderConfig): void {
+        if (index === null || index === undefined) {
             return;
         }
         const gltf = this.model.gltf;
         const loader = this.model.loader;
         const path = this.model.path;
 
-        let img:IGLTF_Image;
-        if(gltf.textures[index].source !== undefined && gltf.textures[index].source !== null) {
+        let img: IGLTF_Image;
+        if (gltf.textures[index].source !== undefined && gltf.textures[index].source !== null) {
             img = gltf.images[gltf.textures[index].source];
         }
-        if(gltf.textures[index].sampler !== undefined && gltf.textures[index].sampler !== null) {
+        if (gltf.textures[index].sampler !== undefined && gltf.textures[index].sampler !== null) {
             config.sampler = gltf.samplers[gltf.textures[index].sampler];
-        }else{
+        } else {
             config.sampler = {
                 wrapS: TEXTURE_WRAP.REPEAT,
-                wrapT: TEXTURE_WRAP.REPEAT
-            }
+                wrapT: TEXTURE_WRAP.REPEAT,
+            };
         }
         //TODO: Parse img from data
-        loader.get(TextureLoader).add(img.name||img.uri,path+img.uri,config);
-        material.maps[map] = new Materialmap(img.name||img.uri);
+        loader.get(TextureLoader).add(img.name || img.uri, path + img.uri, config);
+        material.maps[map] = new Materialmap(img.name || img.uri);
         material.maps[map].sampler = config.sampler;
     }
 }

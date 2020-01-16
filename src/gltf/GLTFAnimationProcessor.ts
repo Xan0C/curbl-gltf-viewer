@@ -1,48 +1,47 @@
-import {IGLTF_AnimationSampler, IGLTF_Channel} from "./model/GLTF_Animation";
-import {IGLTF_Accessor} from "./model";
-import {AnimationSampler, Interpolation} from "../scene/animation/animationSampler";
-import {Accessor} from "../scene/data/accessor";
-import {AnimationChannel} from "../scene/animation/animationChannel";
-import {Animation} from "../scene/animation";
-import {GLTFModel} from "./GLTFModel";
-import {IBaseCache} from "../cache/caches";
-import {CACHE_TYPE} from "../cache";
+import { IGLTF_AnimationSampler, IGLTF_Channel } from './model/GLTF_Animation';
+import { IGLTF_Accessor } from './model';
+import { AnimationSampler, Interpolation } from '../scene/animation/animationSampler';
+import { Accessor } from '../scene/data/accessor';
+import { AnimationChannel } from '../scene/animation/animationChannel';
+import { Animation } from '../scene/animation';
+import { GLTFModel } from './GLTFModel';
+import { IBaseCache } from '../cache/caches';
+import { CACHE_TYPE } from '../cache';
 
 export class GLTFAnimationProcessor {
+    private model: GLTFModel;
+    private cache: IBaseCache<Animation>;
+    private _animations: Array<Animation>;
 
-    private model:GLTFModel;
-    private cache:IBaseCache<Animation>;
-    private _animations:Array<Animation>;
-
-    constructor(model:GLTFModel) {
+    constructor(model: GLTFModel) {
         this.model = model;
         this.cache = this.model.cache.getCache(CACHE_TYPE.ANIMATION);
     }
 
-    processAnimations():Array<Animation> {
+    processAnimations(): Array<Animation> {
         this._animations = [];
         const gltf = this.model.gltf;
 
-        gltf.animations = gltf.animations||[];
-        for(let i=0; i < gltf.animations.length; i++) {
+        gltf.animations = gltf.animations || [];
+        for (let i = 0; i < gltf.animations.length; i++) {
             this._animations.push(this.processAnimation(i));
         }
 
         return this._animations;
     }
 
-    private processAnimation(idx:number): Animation {
+    private processAnimation(idx: number): Animation {
         const animation = new Animation();
         const gltfAnimation = this.model.gltf.animations[idx];
-        animation.name = gltfAnimation.name||"animation"+idx;
+        animation.name = gltfAnimation.name || 'animation' + idx;
 
-        for(let i=0, sampler:IGLTF_AnimationSampler; sampler = gltfAnimation.samplers[i]; i++) {
+        for (let i = 0, sampler: IGLTF_AnimationSampler; (sampler = gltfAnimation.samplers[i]); i++) {
             const animationSampler = this.processSampler(sampler);
             animation.addSampler(animationSampler);
             animation.duration = animation.duration < animationSampler.duration ? animationSampler.duration : animation.duration;
         }
 
-        for(let i=0, channel:IGLTF_Channel; channel = gltfAnimation.channels[i]; i++) {
+        for (let i = 0, channel: IGLTF_Channel; (channel = gltfAnimation.channels[i]); i++) {
             animation.addChannel(this.processChannel(channel));
         }
 
@@ -54,7 +53,7 @@ export class GLTFAnimationProcessor {
         const gltf = this.model.gltf;
 
         const animationSampler = new AnimationSampler();
-        animationSampler.interpolation = sampler.interpolation||Interpolation.LINEAR;
+        animationSampler.interpolation = sampler.interpolation || Interpolation.LINEAR;
 
         const inputAccessor = this.createAccessor(gltf.accessors[sampler.input]);
         const outputAccessor = this.createAccessor(gltf.accessors[sampler.output]);
@@ -63,7 +62,7 @@ export class GLTFAnimationProcessor {
         animationSampler.outputData = this.model.getAccessorData(outputAccessor);
 
         animationSampler.componentTypeCount = outputAccessor.componentTypeCount;
-        animationSampler.duration = animationSampler.inputData[animationSampler.inputData.length-1];
+        animationSampler.duration = animationSampler.inputData[animationSampler.inputData.length - 1];
 
         return animationSampler;
     }
@@ -83,14 +82,14 @@ export class GLTFAnimationProcessor {
 
         const accessor = new Accessor();
         accessor.bufferView = gltfAccessor.bufferView;
-        accessor.byteOffset = gltfAccessor.byteOffset||0;
+        accessor.byteOffset = gltfAccessor.byteOffset || 0;
         accessor.normalized = gltfAccessor.normalized;
         accessor.type = gltfAccessor.type;
         accessor.componentType = gltfAccessor.componentType;
         accessor.count = gltfAccessor.count;
-        accessor.min = gltfAccessor.min||[];
-        accessor.max = gltfAccessor.max||[];
-        accessor.stride = gltf.bufferViews[gltfAccessor.bufferView].byteStride||0;
+        accessor.min = gltfAccessor.min || [];
+        accessor.max = gltfAccessor.max || [];
+        accessor.stride = gltf.bufferViews[gltfAccessor.bufferView].byteStride || 0;
 
         return accessor;
     }

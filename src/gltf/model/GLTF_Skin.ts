@@ -3,6 +3,6 @@ export interface IGLTF_Skin {
     skeleton?: number;
     joints: Array<number>;
     name?: string;
-    extensions: {[id:string]:any};
+    extensions: { [id: string]: any };
     extras?: any;
 }

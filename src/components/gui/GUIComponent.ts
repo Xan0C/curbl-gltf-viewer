@@ -1,4 +1,4 @@
-import {ECS, Component} from "@curbl/ecs";
+import { ECS, Component } from '@curbl/ecs';
 
 export type GUIComponentConfig = {
     folder?: string;
@@ -8,15 +8,14 @@ export type GUIComponentConfig = {
         propName: string;
         min?: number;
         max?: number;
-        items?: Array<string>|{[x:string]:any};
+        items?: Array<string> | { [x: string]: any };
         onChange?: (value) => void;
         onFinishChange?: (value) => void;
-    }>
+    }>;
 };
 
 @ECS.Component()
 export class GUIComponent implements Component {
-
     public config: GUIComponentConfig;
 
     constructor(config: GUIComponentConfig) {
@@ -27,6 +26,5 @@ export class GUIComponent implements Component {
         this.config = config;
     }
 
-    remove(): void {
-    }
+    remove(): void {}
 }

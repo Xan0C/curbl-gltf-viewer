@@ -1,15 +1,15 @@
-import {SceneNode} from "./sceneNode";
-import {GLAttribute, GL_PRIMITIVES, GLBuffer} from "@curbl/gl-util";
-import {Shader} from "./shader";
-import {Cache} from "../cache";
-import {Mesh} from "./mesh";
-import {Animation} from "./animation";
+import { SceneNode } from './sceneNode';
+import { GLAttribute, GL_PRIMITIVES, GLBuffer } from '@curbl/gl-util';
+import { Shader } from './shader';
+import { Cache } from '../cache';
+import { Mesh } from './mesh';
+import { Animation } from './animation';
 
 export class Scene {
-    private _name:string;
-    private _meshes:Array<Mesh>;
-    private _animations:Array<Animation>;
-    private _nodes:Array<SceneNode>;
+    private _name: string;
+    private _meshes: Array<Mesh>;
+    private _animations: Array<Animation>;
+    private _nodes: Array<SceneNode>;
 
     constructor() {
         this._nodes = [];
@@ -25,9 +25,9 @@ export class Scene {
      * @param {GLBuffer} indexBuffer - use existing IndexBuffer and add the gltf indices into it
      * @returns {Mesh}
      */
-    init(gl:WebGL2RenderingContext,vertexBuffer?:GLBuffer,indexBuffer?:GLBuffer):Scene {
-        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
-                node.init(gl, vertexBuffer, indexBuffer);
+    init(gl: WebGL2RenderingContext, vertexBuffer?: GLBuffer, indexBuffer?: GLBuffer): Scene {
+        for (let i = 0, node: SceneNode; (node = this._nodes[i]); i++) {
+            node.init(gl, vertexBuffer, indexBuffer);
         }
         return this;
     }
@@ -37,8 +37,8 @@ export class Scene {
      * Create the GPU_Buffers and upload this Mesh to the GPU
      * @returns {Mesh}
      */
-    upload():Scene {
-        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
+    upload(): Scene {
+        for (let i = 0, node: SceneNode; (node = this._nodes[i]); i++) {
             node.upload();
         }
         return this;
@@ -49,8 +49,8 @@ export class Scene {
      * @param {Shader} shader - Shader that should be used for all primitives/Materials
      * @param {Cache} cache - cache to get the materials
      */
-    draw(shader: Shader, cache: Cache):void {
-        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
+    draw(shader: Shader, cache: Cache): void {
+        for (let i = 0, node: SceneNode; (node = this._nodes[i]); i++) {
             shader.applyScene(this);
             node.draw(shader, cache);
         }
@@ -62,14 +62,14 @@ export class Scene {
      * @param {Shader} shader
      * @param {Attributes.GLAttribute} glAttribute
      */
-    addAttribute(key:GL_PRIMITIVES,glAttribute:GLAttribute):void{
-        for(let i=0, node: SceneNode; node = this._nodes[i]; i++) {
+    addAttribute(key: GL_PRIMITIVES, glAttribute: GLAttribute): void {
+        for (let i = 0, node: SceneNode; (node = this._nodes[i]); i++) {
             node.addAttribute(key, glAttribute);
         }
     }
 
-    addNode(...nodes:SceneNode[]) {
-        for(let i=0, node:SceneNode; node = nodes[i]; i++) {
+    addNode(...nodes: SceneNode[]) {
+        for (let i = 0, node: SceneNode; (node = nodes[i]); i++) {
             this._nodes.push(node);
         }
     }
@@ -81,7 +81,6 @@ export class Scene {
     set name(value: string) {
         this._name = value;
     }
-
 
     get meshes(): Array<Mesh> {
         return this._meshes;
@@ -99,7 +98,7 @@ export class Scene {
         this._animations = value;
     }
 
-    get root():SceneNode {
+    get root(): SceneNode {
         return this._nodes[0];
     }
 }

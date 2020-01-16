@@ -1,4 +1,4 @@
-import {ECS, Component} from "@curbl/ecs";
+import { ECS, Component } from '@curbl/ecs';
 
 export type SkyboxComponentConfig = {
     texture?: string;
@@ -6,14 +6,13 @@ export type SkyboxComponentConfig = {
 
 @ECS.Component()
 export class SkyboxComponent implements Component {
-
     private _texture: string;
 
-    constructor(config:SkyboxComponentConfig={}){
+    constructor(config: SkyboxComponentConfig = {}) {
         this.init(config);
     }
 
-    init(config: SkyboxComponentConfig={}): void {
+    init(config: SkyboxComponentConfig = {}): void {
         this._texture = config.texture;
     }
 

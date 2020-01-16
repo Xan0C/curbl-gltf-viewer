@@ -1,15 +1,15 @@
-import {vec3, vec4} from "gl-matrix";
+import { vec3, vec4 } from 'gl-matrix';
 
 export class MetallicRoughness {
-    private _emissiveFactor:vec3;
-    private _baseColorFactor:vec4;
-    private _metallicFactor:number;
-    private _roughnessFactor:number;
-    private _normalScale:number;
-    private _occlusionStrength:number;
+    private _emissiveFactor: vec3;
+    private _baseColorFactor: vec4;
+    private _metallicFactor: number;
+    private _roughnessFactor: number;
+    private _normalScale: number;
+    private _occlusionStrength: number;
 
-    constructor(){
-        this._baseColorFactor = vec4.fromValues(1,1,1,1);
+    constructor() {
+        this._baseColorFactor = vec4.fromValues(1, 1, 1, 1);
         this._metallicFactor = 1;
         this._roughnessFactor = 1;
         this._normalScale = 1;

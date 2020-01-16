@@ -1,3 +1,5 @@
-import {Example} from "./example";
+import { Example } from './example';
 
-window.onload = () => {new Example();};
+window.onload = () => {
+    new Example();
+};

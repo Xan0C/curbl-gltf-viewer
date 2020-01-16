@@ -1,5 +1,5 @@
-import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "@curbl/gl-util";
-import {Accessor, ACCESSOR_TYPE} from "../data/accessor";
+import { GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject } from '@curbl/gl-util';
+import { Accessor, ACCESSOR_TYPE } from '../data/accessor';
 
 /**
  * GLTF Primitive wrapper
@@ -7,24 +7,24 @@ import {Accessor, ACCESSOR_TYPE} from "../data/accessor";
  * or. a stream of vertices that can be rendered together
  */
 export class Primitive {
-    private _name:string;
-    private _draw_mode:number;
-    private _attributes:{[id:string]:Accessor};
-    private _indices:Accessor;
-    private _material:string;
-    private _vertexArrayObject:GLVertexArrayObject;
+    private _name: string;
+    private _draw_mode: number;
+    private _attributes: { [id: string]: Accessor };
+    private _indices: Accessor;
+    private _material: string;
+    private _vertexArrayObject: GLVertexArrayObject;
 
-    constructor(){
+    constructor() {
         this._attributes = Object.create(null);
         this._draw_mode = 4; //GL_TRIANGLE
-        this._material = "__default__";
+        this._material = '__default__';
     }
 
     /**
      * Check if this mesh has the attribute
      * @param key - name/key of the attribute e.g. TANGENT,NORMAL,POSITION etc.
      */
-    hasAttribute(key:GL_PRIMITIVES|string):boolean {
+    hasAttribute(key: GL_PRIMITIVES | string): boolean {
         return !!this._attributes[key];
     }
 
@@ -44,16 +44,16 @@ export class Primitive {
      * @returns {Accessor}
      */
     public addAttribute(
-        key:GL_PRIMITIVES|string,
-        accessorType:ACCESSOR_TYPE,
-        glType:GL_TYPES,
-        normalized:boolean=false,
-        stride:number=0,
-        byteOffset:number=0,
-        bufferView:number,
-        min:Array<number>=[],
-        max:Array<number>=[]
-    ):Accessor{
+        key: GL_PRIMITIVES | string,
+        accessorType: ACCESSOR_TYPE,
+        glType: GL_TYPES,
+        normalized = false,
+        stride = 0,
+        byteOffset = 0,
+        bufferView: number,
+        min: Array<number> = [],
+        max: Array<number> = []
+    ): Accessor {
         const accessor = new Accessor();
         accessor.bufferView = bufferView;
         accessor.type = accessorType;
@@ -75,7 +75,7 @@ export class Primitive {
      * @param {number} bufferView
      * @returns {IndexAccessor}
      */
-    public setIndices(count:number, type:GL_TYPES, byteOffset:number=0, bufferView:number):Accessor{
+    public setIndices(count: number, type: GL_TYPES, byteOffset = 0, bufferView: number): Accessor {
         this._indices = new Accessor();
         this._indices.bufferView = bufferView;
         this._indices.count = count;
@@ -84,8 +84,8 @@ export class Primitive {
         return this._indices;
     }
 
-    initVertexArrayObject(gl:WebGL2RenderingContext,indexBuffer:GLBuffer,vao?:GLVertexArrayObject):void{
-        this._vertexArrayObject = vao||new GLVertexArrayObject(gl);
+    initVertexArrayObject(gl: WebGL2RenderingContext, indexBuffer: GLBuffer, vao?: GLVertexArrayObject): void {
+        this._vertexArrayObject = vao || new GLVertexArrayObject(gl);
         this._vertexArrayObject.setIndexBuffer(indexBuffer);
     }
 
@@ -97,59 +97,64 @@ export class Primitive {
      * @param {number} type
      * @param {number} offset
      */
-    draw(mode:number=this._draw_mode, size:number=this._indices.count, type:number=this._indices.componentType, offset:number=this._indices.byteOffset):void{
-        if(this._vertexArrayObject) {
+    draw(
+        mode: number = this._draw_mode,
+        size: number = this._indices.count,
+        type: number = this._indices.componentType,
+        offset: number = this._indices.byteOffset
+    ): void {
+        if (this._vertexArrayObject) {
             this._vertexArrayObject.bind();
             this._vertexArrayObject.draw(mode, size, type, offset);
             this._vertexArrayObject.unbind();
         }
     }
 
-    public get name():string {
+    public get name(): string {
         return this._name;
     }
 
-    public set name(value:string) {
+    public set name(value: string) {
         this._name = value;
     }
 
-    public get draw_mode():number {
+    public get draw_mode(): number {
         return this._draw_mode;
     }
 
-    public set draw_mode(value:number) {
+    public set draw_mode(value: number) {
         this._draw_mode = value;
     }
 
-    public get attributes():{ [p:string]:Accessor } {
+    public get attributes(): { [p: string]: Accessor } {
         return this._attributes;
     }
 
-    public set attributes(value:{ [p:string]:Accessor }) {
+    public set attributes(value: { [p: string]: Accessor }) {
         this._attributes = value;
     }
 
-    public get indices():Accessor {
+    public get indices(): Accessor {
         return this._indices;
     }
 
-    public set indices(value:Accessor) {
+    public set indices(value: Accessor) {
         this._indices = value;
     }
 
-    public get material():string {
+    public get material(): string {
         return this._material;
     }
 
-    public set material(value:string) {
+    public set material(value: string) {
         this._material = value;
     }
 
-    public get vertexArrayObject():GLVertexArrayObject {
+    public get vertexArrayObject(): GLVertexArrayObject {
         return this._vertexArrayObject;
     }
 
-    public set vertexArrayObject(value:GLVertexArrayObject) {
+    public set vertexArrayObject(value: GLVertexArrayObject) {
         this._vertexArrayObject = value;
     }
 }

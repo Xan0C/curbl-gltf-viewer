@@ -1,4 +1,4 @@
-import {IBaseCache} from "./caches";
+import { IBaseCache } from './caches';
 
 /**
  * With Scene, Node and Mesh cache we can access the Model in different stages
@@ -6,23 +6,23 @@ import {IBaseCache} from "./caches";
  * e.g. Node has Animation, Transform etc. for one Mesh
  * e.g. Scene has all Nodes with all Animations and Transforms
  */
-export enum CACHE_TYPE  {
+export enum CACHE_TYPE {
     TEXTURE,
     MESH,
     SCENE,
     ANIMATION,
     MATERIAL,
     SHADER,
-    NOOP
+    NOOP,
 }
 
 /**
  * Global Cache
  */
 export class Cache {
-    private caches:Array<IBaseCache<any>>;
+    private caches: Array<IBaseCache<any>>;
 
-    constructor(){
+    constructor() {
         this.caches = [];
     }
 
@@ -31,7 +31,7 @@ export class Cache {
      * @param {CACHE_TYPE} type
      * @param {IBaseCache<T>} cache
      */
-    addCache<T>(type:number, cache:IBaseCache<T>):void{
+    addCache<T>(type: number, cache: IBaseCache<T>): void {
         this.caches[type] = cache;
     }
 
@@ -39,8 +39,8 @@ export class Cache {
      * Remove a sub cache
      * @param {string|number} type
      */
-    removeCache(type:number):void{
-        this.caches.splice(type,1);
+    removeCache(type: number): void {
+        this.caches.splice(type, 1);
     }
 
     /**
@@ -48,7 +48,7 @@ export class Cache {
      * @param {string|number} type
      * @returns {IBaseCache<T>}
      */
-    getCache<T>(type:number):IBaseCache<T>{
+    getCache<T>(type: number): IBaseCache<T> {
         return this.caches[type] as IBaseCache<T>;
     }
 
@@ -58,8 +58,8 @@ export class Cache {
      * @param {string} key
      * @param data
      */
-    public add(type:number, key:string, data:any){
-        if(this.caches[type]) {
+    public add(type: number, key: string, data: any) {
+        if (this.caches[type]) {
             this.caches[type].add(key, data);
         }
     }
@@ -70,14 +70,14 @@ export class Cache {
      * @param {string} key
      * @returns {T}
      */
-    public get<T>(type:number, key:string):T{
-        if(this.caches[type]){
+    public get<T>(type: number, key: string): T {
+        if (this.caches[type]) {
             return this.caches[type].get(key);
         }
     }
 
-    public has(type:number, key:string):boolean{
-        if(this.caches[type]){
+    public has(type: number, key: string): boolean {
+        if (this.caches[type]) {
             return !!this.caches[type].get(key);
         }
         return false;

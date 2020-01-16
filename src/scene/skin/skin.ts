@@ -1,18 +1,18 @@
-import {SceneNode} from "../sceneNode";
-import {mat4} from "gl-matrix";
-import {GLUniformBufferObject} from "@curbl/gl-util";
-import {UBO_BINDINGS} from "../../viewer/constants";
+import { SceneNode } from '../sceneNode';
+import { mat4 } from 'gl-matrix';
+import { GLUniformBufferObject } from '@curbl/gl-util';
+import { UBO_BINDINGS } from '../../viewer/constants';
 
 const NUM_MAX_JOINTS = 65;
 
 export class Skin {
-    private _data:Float32Array;
-    private _joints:Array<SceneNode>;
-    private _skeleton:SceneNode;
-    private _inverseBindMatrices:Array<mat4>;
-    private _jointMatrices:Array<mat4>;
-    private _ubo:GLUniformBufferObject;
-    private _dirty:boolean;
+    private _data: Float32Array;
+    private _joints: Array<SceneNode>;
+    private _skeleton: SceneNode;
+    private _inverseBindMatrices: Array<mat4>;
+    private _jointMatrices: Array<mat4>;
+    private _ubo: GLUniformBufferObject;
+    private _dirty: boolean;
 
     constructor() {
         this._joints = [];
@@ -23,7 +23,7 @@ export class Skin {
     }
 
     init(gl: WebGL2RenderingContext) {
-        for(let i=0; i < this._joints.length; i++) {
+        for (let i = 0; i < this._joints.length; i++) {
             this._jointMatrices.push(mat4.create());
         }
         this._ubo = new GLUniformBufferObject(gl, UBO_BINDINGS.SKIN);
@@ -34,16 +34,16 @@ export class Skin {
         //this.update();
     }
 
-    update():void {
-        if(!this._dirty) {
+    update(): void {
+        if (!this._dirty) {
             return;
         }
 
-        for(let i=0, jointMatrix:mat4; jointMatrix = this._jointMatrices[i]; i++) {
-            this._data.set(jointMatrix, i*16);
+        for (let i = 0, jointMatrix: mat4; (jointMatrix = this._jointMatrices[i]); i++) {
+            this._data.set(jointMatrix, i * 16);
         }
 
-        this._ubo.updateItem("matrix", this._data, true);
+        this._ubo.updateItem('matrix', this._data, true);
         this._dirty = false;
     }
 

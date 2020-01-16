@@ -1,26 +1,26 @@
-import * as EventEmitter from "eventemitter3";
+import * as EventEmitter from 'eventemitter3';
 
 /**
  * EmitSignal wrapper for a single event of an EventEmitter
  */
-export class EmitSignal<EventFunction extends EventEmitter.ListenerFn = (...args:Array<any>) => void> {
-    private _type:string | symbol;
+export class EmitSignal<EventFunction extends EventEmitter.ListenerFn = (...args: Array<any>) => void> {
+    private _type: string | symbol;
     private _emitter: EventEmitter;
 
-    constructor(emitter:EventEmitter,type:string|symbol){
+    constructor(emitter: EventEmitter, type: string | symbol) {
         this._type = type;
         this._emitter = emitter;
     }
 
     emit(...args: any[]): boolean {
-        return this._emitter.emit(this._type,...args);
+        return this._emitter.emit(this._type, ...args);
     }
 
     /**
      * function alias for emit
      * @param args
      */
-    dispatch(...args:any[]): boolean {
+    dispatch(...args: any[]): boolean {
         return this.emit(...args);
     }
 
@@ -35,7 +35,7 @@ export class EmitSignal<EventFunction extends EventEmitter.ListenerFn = (...args
      * @param context - context to call the function with
      */
     add(fn: EventFunction, context?: any): this {
-        return this.on(fn,context);
+        return this.on(fn, context);
     }
 
     once(fn: EventFunction, context?: any): this {
@@ -49,7 +49,7 @@ export class EmitSignal<EventFunction extends EventEmitter.ListenerFn = (...args
      * @param context
      */
     addOnce(fn: EventFunction, context?: any): this {
-        return this.once(fn,context);
+        return this.once(fn, context);
     }
 
     removeAllListeners(): this {
