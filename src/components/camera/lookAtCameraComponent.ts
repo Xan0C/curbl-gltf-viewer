@@ -1,4 +1,4 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "curbl-ecs";
 import {vec3} from "gl-matrix";
 
 export type LookAtCameraConfig = {
@@ -9,7 +9,7 @@ export type LookAtCameraConfig = {
 };
 
 @ECS.Component()
-export class LookAtCameraComponent implements IComponent{
+export class LookAtCameraComponent implements Component {
 
     protected _target:vec3;
     protected _up:vec3;

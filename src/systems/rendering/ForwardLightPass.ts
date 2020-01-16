@@ -1,4 +1,4 @@
-import {ECS, IEntity, System} from "curbl-ecs";
+import {ECS, Entity, System} from "curbl-ecs";
 import {LightComponent} from "../../components";
 import {Cache} from "../../cache";
 import {ForwardScenePass} from "./ForwardScenePass";
@@ -35,7 +35,7 @@ export class ForwardLightPass extends System {
         //this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
 
         this.shader.bind();
-        for(let i=0, light:IEntity; light = this.entities[i]; i++) {
+        for(let i=0, light:Entity; light = this.entities[i]; i++) {
             this.shader.uniforms.u_LightColor = light.get(LightComponent).color.elements;
             this.shader.uniforms.u_LightDirection = light.get(LightComponent).direction;
             this.scenePass.draw();

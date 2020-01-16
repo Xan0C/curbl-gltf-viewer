@@ -1,4 +1,4 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "curbl-ecs";
 
 export type GUIComponentConfig = {
     folder?: string;
@@ -15,7 +15,7 @@ export type GUIComponentConfig = {
 };
 
 @ECS.Component()
-export class GUIComponent implements IComponent {
+export class GUIComponent implements Component {
 
     public config: GUIComponentConfig;
 

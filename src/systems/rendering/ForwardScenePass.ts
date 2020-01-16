@@ -1,4 +1,4 @@
-import {ECS, IEntity, System} from "curbl-ecs";
+import {ECS, Entity, System} from "curbl-ecs";
 import {SceneComponent} from "../../components";
 import {Cache, CACHE_TYPE} from "../../cache";
 import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
@@ -33,7 +33,7 @@ export class ForwardScenePass extends System {
      * Init Shader for the Meshes
      * @param entity
      */
-    private initEntity(entity:IEntity):void{
+    private initEntity(entity:Entity):void{
         const sceneComponent = entity.get(SceneComponent);
         const scene = this.cache.get<Scene>(CACHE_TYPE.SCENE,sceneComponent.key);
         if(scene){
@@ -55,12 +55,12 @@ export class ForwardScenePass extends System {
     }
 
     draw():void{
-        for(let i=0, entity:IEntity; entity = this.entities[i]; i++) {
+        for(let i=0, entity:Entity; entity = this.entities[i]; i++) {
             this.drawScene(entity);
         }
     }
 
-    private drawScene(entity:IEntity):void {
+    private drawScene(entity:Entity):void {
         const key = entity.get(SceneComponent).key;
         const scene = this.cache.get<Scene>(CACHE_TYPE.SCENE,key);
         this.shader.apply();

@@ -1,4 +1,4 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "curbl-ecs";
 import {mat4, quat, vec3} from "gl-matrix";
 
 export type TransformComponentConfig = {
@@ -8,7 +8,7 @@ export type TransformComponentConfig = {
 };
 
 @ECS.Component()
-export class TransformComponent implements IComponent {
+export class TransformComponent implements Component {
     private _level:number;
     private _parent:TransformComponent;
     private _children:TransformComponent[];

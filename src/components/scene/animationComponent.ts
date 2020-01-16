@@ -1,8 +1,8 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "curbl-ecs";
 import {SceneComponentConfig} from "./sceneComponent";
 
 @ECS.Component()
-export class AnimationComponent implements IComponent {
+export class AnimationComponent implements Component {
 
     private _key:string;
 

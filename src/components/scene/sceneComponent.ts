@@ -1,9 +1,9 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "curbl-ecs";
 
 export type SceneComponentConfig = {key:string};
 
 @ECS.Component()
-export class SceneComponent implements IComponent {
+export class SceneComponent implements Component {
     private _key:string;
 
     constructor(config:SceneComponentConfig){
