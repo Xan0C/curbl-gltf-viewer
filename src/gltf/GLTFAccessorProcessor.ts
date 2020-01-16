@@ -1,6 +1,6 @@
 import {IGLTF_Accessor, IGLTF_BufferView} from "./model";
 import {BufferView, GLTF_ACCESORTYPE_SIZE} from "../scene/data";
-import {GL_BUFFERS, GL_TYPES} from "curbl-gl-util";
+import {GL_BUFFERS, GL_TYPES} from "@curbl/gl-util";
 import {GLTFModel, TypedArray} from "./GLTFModel";
 
 export class GLTFAccessorProcessor {

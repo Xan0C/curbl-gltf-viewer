@@ -1,4 +1,4 @@
-import {ECS, IEntity, System} from "curbl-ecs";
+import {ECS, Entity, System} from "@curbl/ecs";
 import {AnimationComponent} from "../../components/scene/animationComponent";
 import {Animation} from "../../scene/animation";
 import {Cache,CACHE_TYPE} from "../../cache";
@@ -21,7 +21,7 @@ export class AnimationSystem extends System {
     }
 
     update(t:number) {
-        for(let i=0, entity:IEntity; entity = this.entities[i]; i++) {
+        for(let i=0, entity: Entity; entity = this.entities[i]; i++) {
             const animationComponent = entity.get(AnimationComponent);
 
             if(animationComponent.autoStart && animationComponent.loop && !animationComponent.running) {

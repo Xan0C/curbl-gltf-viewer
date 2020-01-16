@@ -1,6 +1,6 @@
-import {ECS, System} from "curbl-ecs";
+import {ECS, System} from "@curbl/ecs";
 import {Shader} from "../../scene/shader";
-import {GLCube} from "curbl-gl-util";
+import {GLCube} from "@curbl/gl-util";
 import {Cache, CACHE_TYPE} from "../../cache";
 import {GLOBAL_TEXTURES} from "../../viewer/constants";
 

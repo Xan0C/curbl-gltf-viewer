@@ -1,7 +1,7 @@
-import {LOAD_TYPE, Middleware, Resource} from "curbl-loader";
+import {LOAD_TYPE, Middleware, Resource} from "@curbl/loader";
 import {CACHE_TYPE} from "../cache";
 import {Shader} from "../scene/shader";
-import {GLShader} from "curbl-gl-util";
+import {GLShader} from "@curbl/gl-util";
 
 export class GLSLLoader extends Middleware<GLShader> {
 

@@ -9,7 +9,7 @@ import {
     TransformComponent,
     WorldScene
 } from "../../../lib";
-import {ECS} from "curbl-ecs";
+import {ECS} from "@curbl/ecs";
 
 export interface ModelSceneConfig extends SceneConfig {
     gltfJson: string;

@@ -1,4 +1,4 @@
-import {GL_BUFFERS, GLBuffer} from "curbl-gl-util";
+import {GL_BUFFERS, GLBuffer} from "@curbl/gl-util";
 
 /**
  * Describes which buffer to create for the GPU

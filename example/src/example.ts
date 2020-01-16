@@ -2,7 +2,7 @@ import {Viewer} from "../../lib/viewer";
 import {EnvironmentScene} from "./scenes/EnvironmentScene";
 import {ModelScene} from "./scenes/ModelScene";
 import {GUIComponent} from "../../lib/components/gui";
-import {ECS, IEntity} from "curbl-ecs";
+import {ECS, Entity} from "@curbl/ecs";
 import {CameraComponent, LookAtCameraComponent} from "../../lib/components/camera";
 import {TransformComponent} from "../../lib/components/transform";
 import {mat4} from "gl-matrix";
@@ -39,7 +39,7 @@ const sampleModels = {
 };
 
 export class Example {
-    private camera:IEntity;
+    private camera:Entity;
     private viewer: Viewer;
     private scene: string;
 

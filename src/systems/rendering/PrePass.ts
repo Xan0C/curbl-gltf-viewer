@@ -1,4 +1,4 @@
-import {ECS, System} from "curbl-ecs";
+import {ECS, System} from "@curbl/ecs";
 
 @ECS.System()
 export class PrePass extends System {

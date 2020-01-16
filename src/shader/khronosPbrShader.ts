@@ -2,7 +2,7 @@ import {Shader} from "../scene/shader";
 import {Mesh} from "../scene";
 import {ALPHA_MODE, Material, MATERIAL_MAPS} from "../material";
 import {MetallicRoughness} from "../material/metallicRoughness";
-import {GL_PRIMITIVES, GLTexture, GLCubemap} from "curbl-gl-util";
+import {GL_PRIMITIVES, GLTexture, GLCubemap} from "@curbl/gl-util";
 import {Cache, CACHE_TYPE} from "../cache";
 import {GLOBAL_TEXTURES, UBO_BINDINGS} from "../viewer/constants";
 import {SceneNode} from "../scene/sceneNode";

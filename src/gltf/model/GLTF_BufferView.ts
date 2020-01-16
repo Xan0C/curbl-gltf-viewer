@@ -1,4 +1,4 @@
-import {GL_BUFFERS} from "curbl-gl-util";
+import {GL_BUFFERS} from "@curbl/gl-util";
 
 export interface IGLTF_BufferView {
     name?:string;

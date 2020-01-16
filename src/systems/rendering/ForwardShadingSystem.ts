@@ -1,4 +1,4 @@
-import {ECS, System} from "curbl-ecs";
+import {ECS, System} from "@curbl/ecs";
 import {Cache} from "../../cache";
 import {ForwardLightPass} from "./ForwardLightPass";
 import {Shader} from "../../scene/shader";

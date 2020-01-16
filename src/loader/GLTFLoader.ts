@@ -1,4 +1,4 @@
-import {LOAD_TYPE, Middleware, Resource} from "curbl-loader";
+import {LOAD_TYPE, Middleware, Resource} from "@curbl/loader";
 import {GLTF_Parser} from "../gltf/GLTFParser";
 import {Cache, CACHE_TYPE} from "../cache";
 import {Scene} from "../scene/scene";

@@ -4,7 +4,7 @@ import {CACHE_TYPE, IBaseCache} from "../cache";
 import {MetallicRoughness} from "../material/metallicRoughness";
 import {IGLTF_Image, IGLTF_Material} from "./model";
 import {TextureLoader, TextureLoaderConfig} from "../loader/TextureLoader";
-import {TEXTURE_WRAP} from "curbl-gl-util";
+import {TEXTURE_WRAP} from "@curbl/gl-util";
 
 export class GLTFMaterialProcessor {
 

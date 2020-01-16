@@ -1,4 +1,4 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "@curbl/ecs";
 import {Color} from "../../math";
 import {vec3} from "gl-matrix";
 
@@ -10,7 +10,7 @@ export interface BaseLightConfig  {
 }
 
 @ECS.Component()
-export class LightComponent implements IComponent{
+export class LightComponent implements Component {
 
     private _color:Color;
     private _direction: vec3;

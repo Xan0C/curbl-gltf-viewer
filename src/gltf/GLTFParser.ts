@@ -1,4 +1,4 @@
-import {ResourceLoader} from "curbl-loader";
+import {ResourceLoader} from "@curbl/loader";
 import {IGLTF_Model} from "./model";
 import {Cache} from "../cache";
 import {Scene} from "../scene/scene";

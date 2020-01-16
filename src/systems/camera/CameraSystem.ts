@@ -1,8 +1,8 @@
-import {ECS, IEntity, System} from "curbl-ecs";
+import {ECS, Entity, System} from "@curbl/ecs";
 import {CameraComponent, TransformComponent} from "../../components";
-import {GLUniformBufferObject} from "curbl-gl-util";
+import {GLUniformBufferObject} from "@curbl/gl-util";
 import {UBO_BINDINGS} from "../../viewer/constants";
-import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
+import {SYSTEM_EVENTS} from "@curbl/ecs/lib/Events";
 import {mat4, vec3} from "gl-matrix";
 
 /**
@@ -14,7 +14,7 @@ export class CameraSystem extends System {
     /**
      * Active Camera Entity
      */
-    private _camera:IEntity;
+    private _camera: Entity;
     private cameraUBO: GLUniformBufferObject;
     private gl:WebGL2RenderingContext;
 
@@ -41,7 +41,7 @@ export class CameraSystem extends System {
         this.events.on(SYSTEM_EVENTS.ENTITY_REMOVED,this.removeEntity,this);
     }
 
-    initEntity(entity:IEntity):void {
+    initEntity(entity:Entity):void {
         if(!this._camera){
             this._camera = entity;
             const camera = this._camera.get(CameraComponent);
@@ -54,7 +54,7 @@ export class CameraSystem extends System {
         }
     }
 
-    removeEntity(entity:IEntity):void{
+    removeEntity(entity:Entity):void{
         if(entity === this._camera){
             this._camera = undefined;
         }
@@ -70,11 +70,11 @@ export class CameraSystem extends System {
         }
     }
 
-    public get camera():IEntity {
+    public get camera():Entity {
         return this._camera;
     }
 
-    public set camera(value:IEntity) {
+    public set camera(value:Entity) {
         this._camera = value;
     }
 }

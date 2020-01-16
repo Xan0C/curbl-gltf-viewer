@@ -1,7 +1,7 @@
 import {IGLTF_Accessor, IGLTF_Model} from "./model";
 import {BufferView, Mesh, Scene, SceneNode} from "../scene";
 import {Cache} from "../cache";
-import {ResourceLoader} from "curbl-loader";
+import {ResourceLoader} from "@curbl/loader";
 import {GLTFMaterialProcessor} from "./GLTFMaterialProcessor";
 import {GLTFMeshProcessor} from "./GLTFMeshProcessor";
 import {GLTFNodeProcessor} from "./GLTFNodeProcessor";

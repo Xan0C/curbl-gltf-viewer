@@ -1,5 +1,5 @@
 import {SceneNode} from "./sceneNode";
-import {GLAttribute, GL_PRIMITIVES, GLBuffer} from "curbl-gl-util";
+import {GLAttribute, GL_PRIMITIVES, GLBuffer} from "@curbl/gl-util";
 import {Shader} from "./shader";
 import {Cache} from "../cache";
 import {Mesh} from "./mesh";

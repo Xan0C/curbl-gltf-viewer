@@ -1,6 +1,6 @@
-import {ECS, IEntity, System} from "curbl-ecs";
+import {ECS, Entity, System} from "@curbl/ecs";
 import * as dat from "dat.gui";
-import {SYSTEM_EVENTS} from "curbl-ecs/lib/Events";
+import {SYSTEM_EVENTS} from "@curbl/ecs/lib/Events";
 import {GUIComponent} from "../../components/gui/GUIComponent";
 import {GUIController} from "dat.gui";
 
@@ -18,7 +18,7 @@ export class GUISystem extends System {
         this.events.on(SYSTEM_EVENTS.ENTITY_ADDED, this.onEntityAdded, this);
     }
 
-    onEntityAdded(entity:IEntity) {
+    onEntityAdded(entity:Entity) {
         const config = entity.get(GUIComponent).config;
         let folder = this.gui;
         let controller: GUIController;

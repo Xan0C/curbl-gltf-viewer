@@ -1,4 +1,4 @@
-import { WebGLUtil } from "curbl-gl-util";
+import { WebGLUtil } from "@curbl/gl-util";
 
 
 export class Canvas {

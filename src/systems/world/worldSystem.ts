@@ -1,7 +1,7 @@
-import {ECS, System} from "curbl-ecs";
+import {ECS, System} from "@curbl/ecs";
 import {WorldScene} from "./worldScene";
 import {Cache} from "../../cache";
-import {ResourceLoader} from "curbl-loader";
+import {ResourceLoader} from "@curbl/loader";
 
 @ECS.System()
 export class WorldSystem extends System {

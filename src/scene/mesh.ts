@@ -1,6 +1,6 @@
 import {BufferView} from "./data";
 import {Primitive} from "./primitive";
-import {GL_BUFFERS, GL_PRIMITIVES, GLAttribute, GLBuffer} from "curbl-gl-util";
+import {GL_BUFFERS, GL_PRIMITIVES, GLAttribute, GLBuffer} from "@curbl/gl-util";
 import {Material, MATERIAL_MAPS} from "../material";
 import {Cache, CACHE_TYPE} from "../cache";
 import {Shader} from "./shader";

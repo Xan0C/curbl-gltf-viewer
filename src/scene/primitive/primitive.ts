@@ -1,4 +1,4 @@
-import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "curbl-gl-util";
+import {GL_PRIMITIVES, GL_TYPES, GLBuffer, GLVertexArrayObject} from "@curbl/gl-util";
 import {Accessor, ACCESSOR_TYPE} from "../data/accessor";
 
 /**

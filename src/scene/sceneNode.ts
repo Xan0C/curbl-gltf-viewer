@@ -1,6 +1,6 @@
 import {Transform} from "./transform";
 import {Mesh} from "./mesh";
-import {GLAttribute, GL_PRIMITIVES, GLBuffer} from "curbl-gl-util";
+import {GLAttribute, GL_PRIMITIVES, GLBuffer} from "@curbl/gl-util";
 import {Shader} from "./shader";
 import {Cache} from "../cache";
 import {Skin} from "./skin/skin";

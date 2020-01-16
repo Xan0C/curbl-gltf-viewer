@@ -1,5 +1,5 @@
-import {ECS, IEntity} from "curbl-ecs";
-import {ResourceLoader} from "curbl-loader";
+import {ECS, Entity} from "@curbl/ecs";
+import {ResourceLoader} from "@curbl/loader";
 import {Cache} from "../../cache";
 
 export interface SceneConfig {
@@ -13,14 +13,14 @@ export abstract class WorldScene {
     private readonly _name:string;
 
     /**
-     * if systems is active and should be updated
+     * if scene is active and should be updated
      */
     private _active:boolean;
 
     private _loader:ResourceLoader;
     private _cache:Cache;
 
-    private entities:{[id:string]:IEntity};
+    private entities:{[id:string]:Entity};
 
     constructor(config: SceneConfig){
         this.entities = {};
@@ -50,7 +50,7 @@ export abstract class WorldScene {
         this.shutdown();
         this._active = false;
         const keys = Object.keys(this.entities);
-        for (let i = 0, entity: IEntity; entity = this.entities[keys[i]]; i++) {
+        for (let i = 0, entity: Entity; entity = this.entities[keys[i]]; i++) {
             ECS.removeEntity(entity);
         }
     }
@@ -59,7 +59,7 @@ export abstract class WorldScene {
      * Restore the Scene, adding all Entities previously removed, with their latest values
      */
     restore():void{
-        for(let i=0, entity:IEntity; entity = this.entities[i]; i++){
+        for(let i=0, entity:Entity; entity = this.entities[i]; i++){
             ECS.addEntity(entity);
         }
     }
@@ -68,7 +68,7 @@ export abstract class WorldScene {
      * add Entity to the Scene
      * @param entity
      */
-    add<T extends IEntity = IEntity>(entity:T):T {
+    add<T extends Entity = Entity>(entity:T):T {
         this.entities[entity.id] = ECS.addEntity(entity);
         return entity;
     }
@@ -77,7 +77,7 @@ export abstract class WorldScene {
      * Remove entity from the scene and ecs
      * @param entity
      */
-    remove<T extends IEntity = IEntity>(entity:T):T {
+    remove<T extends Entity = Entity>(entity:T):T {
         delete this.entities[entity.id];
         return ECS.removeEntity(entity) as T;
     }

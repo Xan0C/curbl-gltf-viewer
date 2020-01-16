@@ -1,4 +1,4 @@
-import {GLShader} from "curbl-gl-util";
+import {GLShader} from "@curbl/gl-util";
 import {Material} from "../material";
 import {Mesh} from "./mesh";
 import {SceneNode} from "./sceneNode";

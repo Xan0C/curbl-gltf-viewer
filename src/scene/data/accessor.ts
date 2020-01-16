@@ -1,4 +1,4 @@
-import {GL_TYPES} from "curbl-gl-util";
+import {GL_TYPES} from "@curbl/gl-util";
 
 export enum ACCESSOR_TYPE  {
     SCALAR = "SCALAR",

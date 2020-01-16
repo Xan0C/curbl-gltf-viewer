@@ -1,12 +1,12 @@
 import {CameraComponent, LookAtCameraComponent, TransformComponent} from "../../components";
-import {ECS, IEntity, ISystem, System} from "curbl-ecs";
+import {ECS, Entity, System} from "@curbl/ecs";
 import {Math3d} from "../../math";
 import {DomEvents} from "../../events/DomEvents";
 import {mat4, quat, vec3} from "gl-matrix";
 import {Canvas} from "../../canvas";
 
 @ECS.System(TransformComponent,CameraComponent,LookAtCameraComponent)
-export class LookAtCameraControlSystem extends System implements ISystem {
+export class LookAtCameraControlSystem extends System {
     private lastMouseX:number;
     private lastMouseY:number;
     private drag:boolean;
@@ -52,7 +52,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     }
 
     public onMouseUp(ev:MouseEvent){
-        for(let i=0,entity:IEntity; entity = this.entities[i]; i++){
+        for(let i=0,entity:Entity; entity = this.entities[i]; i++){
             let transform = entity.get(TransformComponent);
             let perspective = entity.get(LookAtCameraComponent);
 
@@ -74,7 +74,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     }
 
     public onMouseWheel(ev:WheelEvent){
-        for(let i=0,entity:IEntity; entity = this.entities[i]; i++) {
+        for(let i=0,entity:Entity; entity = this.entities[i]; i++) {
             let transform = entity.get(TransformComponent);
             let perspective = entity.get(LookAtCameraComponent);
 
@@ -91,7 +91,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
 
     public onMouseMove(ev:MouseEvent){
         if(this.drag){
-            for(let i=0,entity:IEntity; entity = this.entities[i]; i++) {
+            for(let i=0,entity:Entity; entity = this.entities[i]; i++) {
                 this.rotate(entity,ev.x, ev.y);
                 this.lastMouseX = ev.x;
                 this.lastMouseY = ev.y;
@@ -119,7 +119,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
             x -= 0.1;
         }
 
-        for(let i=0,entity:IEntity; entity = this.entities[i]; i++) {
+        for(let i=0,entity:Entity; entity = this.entities[i]; i++) {
             const perspective = entity.get(LookAtCameraComponent);
             const transform = entity.get(TransformComponent);
             this.pan(entity,x, y);
@@ -137,7 +137,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     /**
      * Calculate the panning-plane
      */
-    protected pan(entity:IEntity,dx:number,dy:number){
+    protected pan(entity:Entity,dx:number,dy:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
 
@@ -158,7 +158,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     /**
      * Calculate camera zoom
      */
-    protected zoom(entity:IEntity,wheelDelta:number,delta:number){
+    protected zoom(entity:Entity,wheelDelta:number,delta:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
         const dz = (perspective.zoomPos - wheelDelta) * delta;
@@ -173,7 +173,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
         }
     }
 
-    protected rotate(entity:IEntity,x:number,y:number){
+    protected rotate(entity:Entity,x:number,y:number){
         const perspective = entity.get(LookAtCameraComponent);
         const transform = entity.get(TransformComponent);
         const po = Math3d.getVSpherePos(this.lastMouseX,this.lastMouseY,this.canvas.width,this.canvas.height);
@@ -224,7 +224,7 @@ export class LookAtCameraControlSystem extends System implements ISystem {
     }
 
     update():void{
-        for(let i=0, entity:IEntity; entity = this.entities[i]; i++){
+        for(let i=0, entity:Entity; entity = this.entities[i]; i++){
             const camera = entity.get(CameraComponent);
             const transform = entity.get(TransformComponent);
             const perspective = entity.get(LookAtCameraComponent);

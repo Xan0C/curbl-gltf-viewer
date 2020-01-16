@@ -1,4 +1,4 @@
-import {ECS, IComponent} from "curbl-ecs";
+import {ECS, Component} from "@curbl/ecs";
 import {mat4} from "gl-matrix";
 
 export type CameraConfig = {
@@ -11,7 +11,7 @@ export type CameraConfig = {
 };
 
 @ECS.Component('CameraComponent')
-export class CameraComponent implements IComponent{
+export class CameraComponent implements Component {
 
     private _viewMatrix:mat4;
     private _projMatrix:mat4;
