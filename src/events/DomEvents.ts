@@ -33,7 +33,7 @@ export const DomEvents = {
     onWheel: new EmitSignal(emitter, DOM_EVENTS.WHEEL),
 };
 
-(function() {
+(function () {
     document.onkeydown = (ev: KeyboardEvent) => {
         DomEvents.onKeyDown.dispatch(ev);
     };

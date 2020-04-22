@@ -46,7 +46,7 @@ export class CubemapLoader extends Middleware<GLCubemap> {
     transform(...resources: Resource<HTMLImageElement>[]): GLCubemap {
         const images = resources
             .sort((a, b) => a.config.face - b.config.face + (a.config.level - b.config.level) * 6)
-            .map(resource => resource.request);
+            .map((resource) => resource.request);
 
         const textureConfig = resources[0].config;
 

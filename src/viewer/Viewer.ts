@@ -127,7 +127,7 @@ export class Viewer {
 
     private update(t: number) {
         ECS.update(t);
-        requestAnimationFrame(t => {
+        requestAnimationFrame((t) => {
             this.update(t);
         });
     }

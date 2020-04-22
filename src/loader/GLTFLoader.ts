@@ -51,8 +51,8 @@ export class GLTFLoader extends Middleware<Scene> {
     }
 
     transform(...resources: Resource<XMLHttpRequest>[]): Scene {
-        const jsonResource = resources.find(resource => resource.config.type === 'json');
-        const bufferResource = resources.find(resource => resource.config.type === 'buffer');
+        const jsonResource = resources.find((resource) => resource.config.type === 'json');
+        const bufferResource = resources.find((resource) => resource.config.type === 'buffer');
 
         const url = jsonResource.options.url;
         const match = url.match(/[\w\.]+/g);

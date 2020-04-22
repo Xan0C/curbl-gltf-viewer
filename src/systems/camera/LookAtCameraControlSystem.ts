@@ -21,9 +21,9 @@ export class LookAtCameraControlSystem extends System {
     }
 
     setUp(): void {
-        this.canvas.element.addEventListener('mousedown', ev => this.onMouseDown(ev));
+        this.canvas.element.addEventListener('mousedown', (ev) => this.onMouseDown(ev));
         this.canvas.element.addEventListener('mouseup', () => this.onMouseUp());
-        this.canvas.element.addEventListener('mousemove', ev => this.onMouseMove(ev));
+        this.canvas.element.addEventListener('mousemove', (ev) => this.onMouseMove(ev));
 
         DomEvents.onWheel.add(this.onMouseWheel, this);
         DomEvents.onKeyDown.add(this.onKeyDown, this);

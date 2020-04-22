@@ -40,8 +40,8 @@ export class GLSLLoader extends Middleware<GLShader> {
     }
 
     transform(...resources: Resource<XMLHttpRequest>[]): Shader {
-        const vertex = resources.find(r => r.config.type === 'vertex');
-        const fragment = resources.find(r => r.config.type === 'fragment');
+        const vertex = resources.find((r) => r.config.type === 'vertex');
+        const fragment = resources.find((r) => r.config.type === 'fragment');
 
         if (vertex.config.shader) {
             const shader: Shader = vertex.config.shader;

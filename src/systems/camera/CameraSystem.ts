@@ -1,8 +1,7 @@
-import { ECS, Entity, System } from '@curbl/ecs';
+import { ECS, Entity, System, SYSTEM_EVENTS } from '@curbl/ecs';
 import { CameraComponent, TransformComponent } from '../../components';
 import { GLUniformBufferObject } from '@curbl/gl-util';
 import { UBO_BINDINGS } from '../../viewer/constants';
-import { SYSTEM_EVENTS } from '@curbl/ecs/lib/Events';
 import { mat4, vec3 } from 'gl-matrix';
 
 /**

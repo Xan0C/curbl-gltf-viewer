@@ -1,6 +1,5 @@
-import { ECS, Entity, System } from '@curbl/ecs';
+import { ECS, Entity, System, SYSTEM_EVENTS } from '@curbl/ecs';
 import * as dat from 'dat.gui';
-import { SYSTEM_EVENTS } from '@curbl/ecs/lib/Events';
 import { GUIComponent } from '../../components/gui/GUIComponent';
 import { GUIController } from 'dat.gui';
 
